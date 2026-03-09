@@ -7,7 +7,7 @@ export const API = {
         SEND_OTP: '/send-verification-otp',
         VERIFY_OTP: '/verify-otp',
         PATIENT_SIGNUP: '/auth/patient-signup',
-        DOCTOR_SIGNUP: '/auth/signup-doctor',
-        DOCTOR_VERIFY_SESSION: '/auth/signup-doctor/verify-session',
+        DOCTOR_SIGNUP: '/auth/doctor-signup',
+        DOCTOR_VERIFY_SESSION: '/auth/doctor-signup/verify-session',
     },
 };

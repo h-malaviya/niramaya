@@ -7,7 +7,7 @@ export const APP_ROUTES = {
         RESET_PASSWORD: '/reset-password',
     },
     DOCTOR: {
-        SIGNUP_SUCCESS: '/signup-doctor/success',
-        SIGNUP_FAILURE: '/signup-doctor/payment-failed',
+        SIGNUP_SUCCESS: '/auth/doctor-signup/success',
+        SIGNUP_FAILURE: '/auth/doctor-signup/payment-failed',
     }
 };

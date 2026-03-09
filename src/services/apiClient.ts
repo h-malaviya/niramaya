@@ -3,7 +3,7 @@ import { STORAGE_KEYS } from '../constants/storage-keys';
 import { API } from '../constants/api-routes';
 import { APP_ROUTES } from '../constants/app-routes';
 
-const BACKEND_BASE_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000/api';
+const BACKEND_BASE_URL = import.meta.env.VITE_BACKEND_URL;
 
 export const apiClient = axios.create({
     baseURL: BACKEND_BASE_URL,
