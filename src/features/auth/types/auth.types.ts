@@ -187,9 +187,22 @@ export interface IPatientSignupRequest {
     gender: Gender;
     city: IndianCity;
     dob: string;
+    verification_token: string;
 }
 
-export interface IPatientSignupResponse extends IApiResponse<null> { }
+export interface IAuthResponseData {
+    user: {
+        id: string;
+        email: string;
+        role: string;
+        first_name: string;
+        last_name: string;
+    };
+    accessToken: string;
+    refreshToken: string;
+}
+
+export interface IPatientSignupResponse extends IApiResponse<IAuthResponseData> { }
 
 // Doctor signup request
 export interface IDoctorSignupRequest {
@@ -206,9 +219,20 @@ export interface IDoctorSignupRequest {
     specialties: Specialty[];
     consultation_fee: number;
     plan_name: DoctorPlan;
+    verification_token: string;
 }
 
-export interface IDoctorSignupResponse extends IApiResponse<null> { }
+export interface IDoctorSignupResponse extends IApiResponse<{
+    sessionId: string | null;
+    sessionUrl: string | null;
+}> { }
+
+// Verify Doctor Session (After Stripe Success)
+export interface IVerifyDoctorSessionRequest {
+    session_id: string;
+}
+
+export interface IVerifyDoctorSessionResponse extends IApiResponse<IAuthResponseData> { }
 
 // send verification otp request and response
 export interface ISendVerificationOtpRequest {
@@ -227,4 +251,30 @@ export interface IVerifyOtpRequest {
     otp: string;
 }
 
-export interface IVerifyOtpResponse extends IApiResponse<null> { }
+export interface IVerifyOtpResponse extends IApiResponse<{
+    verification_token: string;
+}> { }
+
+// Login request and response
+export interface ILoginRequest {
+    email: string;
+    password: string;
+    forceLogout?: boolean;
+}
+
+export interface ILoginResponse extends IApiResponse<IAuthResponseData> { }
+
+// Forgot password request and response
+export interface IForgotPasswordRequest {
+    email: string;
+}
+
+export interface IForgotPasswordResponse extends IApiResponse<null> { }
+
+// Reset password request and response
+export interface IResetPasswordRequest {
+    token: string;
+    password: string;
+}
+
+export interface IResetPasswordResponse extends IApiResponse<null> { }

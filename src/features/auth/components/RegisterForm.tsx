@@ -68,6 +68,8 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ role, plan }) => {
     const [otpSent, setOtpSent] = useState(false);
     const [enteredOtp, setEnteredOtp] = useState("");
 
+    const [verificationToken, setVerificationToken] = useState("");
+
     // Options for dropdowns
     const genderOptions = Object.values(Gender).map((v) => ({ label: v, value: v }));
     const cityOptions = Object.values(IndianCity).map((v) => ({ label: v.replace(/_/g, " "), value: v }));
@@ -234,7 +236,8 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ role, plan }) => {
         if (enteredOtp.length !== 6) return;
         try {
             const res = (await verifyOtp({ token: otpToken, otp: enteredOtp })) as IVerifyOtpResponse;
-            if (res.success) {
+            if (res.success && res.data?.verification_token) {
+                setVerificationToken(res.data.verification_token);
                 setIsEmailVerified(true);
                 setOtpSent(false);
             }
@@ -255,11 +258,12 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ role, plan }) => {
             email: formData.email,
             first_name: formData.first_name,
             last_name: formData.last_name,
-            phone_number: `+91${formData.phone_number}`,
+            phone_number: formData.phone_number,
             password: formData.password,
             gender: formData.gender,
             city: formData.city,
             dob: formData.dob,
+            verification_token: verificationToken,
         };
 
         if (role === "patient") {

@@ -131,10 +131,19 @@ const Header = () => {
                     </nav>
 
                     {/* CTA Button */}
-                    <div className="hidden md:flex items-center gap-3">
+                    <div className="hidden md:flex items-center gap-4">
+                        <Link
+                            to={APP_ROUTES.AUTH.LOGIN}
+                            className={`px-5 py-2.5 rounded-xl text-sm font-bold transition-all border ${isScrolled
+                                ? 'border-primary-600 text-primary-600 bg-primary-50/50 hover:bg-primary-50'
+                                : 'border-white/30 text-white hover:bg-white/10 backdrop-blur-sm'
+                                }`}
+                        >
+                            Sign In
+                        </Link>
                         <Link
                             to={APP_ROUTES.AUTH.REGISTER}
-                            className="btn-gradient px-6 py-2.5 rounded-xl text-white text-sm font-semibold cursor-pointer"
+                            className="btn-gradient px-6 py-2.5 rounded-xl text-white text-sm font-bold cursor-pointer shadow-lg shadow-primary-600/10 hover:scale-105 transition-transform"
                         >
                             Get Started
                         </Link>
@@ -174,7 +183,7 @@ const Header = () => {
                         transition={{ duration: 0.3 }}
                         className="md:hidden absolute top-full inset-x-0 overflow-hidden bg-white/95 backdrop-blur-xl border-t border-primary-100 shadow-2xl"
                     >
-                        <div className="px-4 py-6 space-y-2">
+                        <div className="px-4 py-8 space-y-2">
                             {navLinks.map((link) => {
                                 const sectionId = link.href.substring(1);
                                 const isActive = isHomePage && activeSection === sectionId;
@@ -196,11 +205,18 @@ const Header = () => {
                                     </Link>
                                 );
                             })}
-                            <div className="pt-4 border-t border-dark-100 mt-4">
+                            <div className="pt-6 border-t border-dark-100 mt-6 grid grid-cols-2 gap-4">
+                                <Link
+                                    to={APP_ROUTES.AUTH.LOGIN}
+                                    onClick={() => setIsMobileMenuOpen(false)}
+                                    className="flex items-center justify-center px-6 py-4 rounded-2xl text-primary-600 font-bold bg-primary-50 border border-primary-100 active:scale-95 transition-transform"
+                                >
+                                    Sign In
+                                </Link>
                                 <Link
                                     to={APP_ROUTES.AUTH.REGISTER}
                                     onClick={() => setIsMobileMenuOpen(false)}
-                                    className="block btn-gradient text-center px-6 py-4 rounded-2xl text-white font-bold text-lg shadow-lg"
+                                    className="btn-gradient text-center px-6 py-4 rounded-2xl text-white font-bold shadow-lg"
                                 >
                                     Get Started
                                 </Link>
