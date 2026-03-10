@@ -370,3 +370,9 @@ export interface IQRCodeResponseData {
 
 export interface IGetQRCodeResponse extends IApiResponse<IQRCodeResponseData> { }
 export interface IRegenerateQRCodeResponse extends IApiResponse<IQRCodeResponseData> { }
+
+// Session Validation
+export interface IValidateSessionRequest {
+}
+
+export interface IValidateSessionResponse extends IApiResponse<null> { }

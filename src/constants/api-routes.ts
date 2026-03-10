@@ -9,6 +9,7 @@ export const API = {
         PATIENT_SIGNUP: '/auth/patient-signup',
         DOCTOR_SIGNUP: '/auth/doctor-signup',
         DOCTOR_VERIFY_SESSION: '/auth/doctor-signup/verify-session',
+        VALIDATE_SESSION: '/auth/validate',
     },
     PROFILE: {
         UPDATE_PATIENT: "/patients/update-profile",
