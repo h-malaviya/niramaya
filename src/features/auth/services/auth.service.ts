@@ -17,6 +17,8 @@ import {
     IResetPasswordResponse,
     IVerifyDoctorSessionRequest,
     IVerifyDoctorSessionResponse,
+    IValidateSessionRequest,
+    IValidateSessionResponse,
 } from "../types/auth.types";
 
 export const authService = {
@@ -55,6 +57,13 @@ export const authService = {
     verifyDoctorSession: async (data: IVerifyDoctorSessionRequest) => {
         const response = await apiClient.post<IVerifyDoctorSessionResponse>(
             API.AUTH.DOCTOR_VERIFY_SESSION,
+            data
+        );
+        return response.data;
+    },
+    validateSession: async (data: IValidateSessionRequest) => {
+        const response = await apiClient.post<IValidateSessionResponse>(
+            API.AUTH.VALIDATE_SESSION,
             data
         );
         return response.data;

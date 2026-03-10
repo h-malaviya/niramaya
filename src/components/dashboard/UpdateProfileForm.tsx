@@ -75,10 +75,16 @@ export const UpdateProfileForm: React.FC<UpdateProfileFormProps> = ({
     onSubmit,
     isLoading
 }) => {
+    // Helper to strip +91
+    const stripPrefix = (phone: string | null | undefined) => {
+        if (!phone) return "";
+        return phone.startsWith("+91") ? phone.slice(3) : phone;
+    };
+
     const [formData, setFormData] = useState<IProfileFormData>({
         first_name: initialData.first_name || "",
         last_name: initialData.last_name || "",
-        phone_number: initialData.phone_number || "",
+        phone_number: stripPrefix(initialData.phone_number),
         city: initialData.city || "" as IndianCity,
         // Doctor specific
         bio: initialData.doctor_profile?.bio || "",
@@ -92,7 +98,7 @@ export const UpdateProfileForm: React.FC<UpdateProfileFormProps> = ({
         blood_group: initialData.patient_profile?.blood_group || "" as BloodType,
         allergies: initialData.patient_profile?.allergies || "",
         emergency_contact_name: initialData.patient_profile?.emergency_contact_name || "",
-        emergency_contact_phone: initialData.patient_profile?.emergency_contact_phone || "",
+        emergency_contact_phone: stripPrefix(initialData.patient_profile?.emergency_contact_phone),
         // Passwords
         old_password: "",
         new_password: "",

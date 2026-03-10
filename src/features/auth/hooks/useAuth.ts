@@ -37,7 +37,6 @@ export const useAuth = () => {
         onSuccess: (data) => {
             if (data.success && data.data) {
                 localStorage.setItem(STORAGE_KEYS.ACCESS_TOKEN, data.data.accessToken);
-                localStorage.setItem(STORAGE_KEYS.REFRESH_TOKEN, data.data.refreshToken);
                 toast.success("Account created successfully!");
                 navigate(APP_ROUTES.PATIENT.DASHBOARD);
             } else {
@@ -71,7 +70,6 @@ export const useAuth = () => {
         onSuccess: (data) => {
             if (data.success && data.data) {
                 localStorage.setItem(STORAGE_KEYS.ACCESS_TOKEN, data.data.accessToken);
-                localStorage.setItem(STORAGE_KEYS.REFRESH_TOKEN, data.data.refreshToken);
                 toast.success("Payment verified! Welcome to Niramaya.");
                 navigate(APP_ROUTES.DOCTOR.DASHBOARD);
             } else {
@@ -88,7 +86,6 @@ export const useAuth = () => {
         onSuccess: (data) => {
             if (data.success && data.data) {
                 localStorage.setItem(STORAGE_KEYS.ACCESS_TOKEN, data.data.accessToken);
-                localStorage.setItem(STORAGE_KEYS.REFRESH_TOKEN, data.data.refreshToken);
                 toast.success("Logged in successfully!");
 
                 // Redirect based on role

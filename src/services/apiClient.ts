@@ -11,6 +11,7 @@ export const apiClient = axios.create({
     headers: {
         'Content-Type': 'application/json',
     },
+    withCredentials: true,
 });
 
 // Request interceptor for token injection
@@ -46,7 +47,12 @@ apiClient.interceptors.response.use(
 
         // If error is 401 and we haven't retried yet
         const isAuthEndpoint =
-            originalRequest.url?.includes(API.AUTH.REFRESH);
+            originalRequest.url?.includes(API.AUTH.REFRESH) ||
+            originalRequest.url?.includes(API.AUTH.LOGIN) ||
+            originalRequest.url?.includes(API.AUTH.PATIENT_SIGNUP) ||
+            originalRequest.url?.includes(API.AUTH.DOCTOR_SIGNUP) ||
+            originalRequest.url?.includes(API.AUTH.SEND_OTP) ||
+            originalRequest.url?.includes(API.AUTH.VERIFY_OTP);
 
         if (error.response?.status === 401 && !originalRequest._retry && !isAuthEndpoint) {
 
@@ -70,14 +76,11 @@ apiClient.interceptors.response.use(
             console.warn('Access token expired. Attempting refresh...');
 
             try {
-                const refreshToken = localStorage.getItem(STORAGE_KEYS.REFRESH_TOKEN);
-                if (!refreshToken) {
-                    throw new Error('No refresh token available');
-                }
+                // Note: Refresh token is handled by the browser via HTTP-only cookies
 
                 // Attempt to refresh token using a fresh axios call (to avoid interceptors)
-                const response = await axios.post(`${BACKEND_BASE_URL}${API.AUTH.REFRESH}`, {
-                    refreshToken
+                const response = await axios.post(`${BACKEND_BASE_URL}${API.AUTH.REFRESH}`, {}, {
+                    withCredentials: true
                 });
 
                 const { accessToken, refreshToken: newRefreshToken } = response.data.data;
