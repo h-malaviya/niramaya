@@ -17,9 +17,9 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, allowedRoles 
 
     useEffect(() => {
         if (!authenticated) {
-            toast.error("Please login to access this page");
+            toast.error("Please login to access this page", { id: "login-required" });
         } else if (allowedRoles && userRole && !allowedRoles.includes(userRole)) {
-            toast.error("You are not authorized to access this page");
+            toast.error("You are not authorized to access this page", { id: "not-authorized" });
         }
     }, [authenticated, userRole, allowedRoles]);
 
