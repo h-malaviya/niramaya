@@ -9,7 +9,8 @@ import {
     Qualification,
     BloodType,
     IUpdateDoctorProfileRequest,
-    IUpdatePatientProfileRequest
+    IUpdatePatientProfileRequest,
+    IUserData
 } from "../../features/auth/types/auth.types";
 import { Role } from "../../types/role.enum";
 import {
@@ -27,21 +28,43 @@ import {
     User,
     Phone,
     Lock,
-    MapPin,
     Briefcase,
     IndianRupee,
     FileText,
     Activity,
     Ruler,
     Weight,
-    Droplet,
     AlertCircle,
     Shield
 } from "lucide-react";
 
+interface IProfileFormData {
+    first_name: string;
+    last_name: string;
+    phone_number: string;
+    city: IndianCity;
+    // Doctor specific
+    bio: string;
+    specialties: Specialty[];
+    experience: number;
+    qualifications: Qualification[];
+    consultation_fee: number;
+    // Patient specific
+    height: number;
+    weight: number;
+    blood_group: BloodType;
+    allergies: string;
+    emergency_contact_name: string;
+    emergency_contact_phone: string;
+    // Passwords
+    old_password?: string;
+    new_password?: string;
+    confirm_new_password?: string;
+}
+
 interface UpdateProfileFormProps {
     role: Role;
-    initialData: any; // User's current data
+    initialData: IUserData;
     onSubmit: (data: IUpdateDoctorProfileRequest | IUpdatePatientProfileRequest) => Promise<void>;
     isLoading?: boolean;
 }
@@ -52,24 +75,24 @@ export const UpdateProfileForm: React.FC<UpdateProfileFormProps> = ({
     onSubmit,
     isLoading
 }) => {
-    const [formData, setFormData] = useState<any>({
+    const [formData, setFormData] = useState<IProfileFormData>({
         first_name: initialData.first_name || "",
         last_name: initialData.last_name || "",
         phone_number: initialData.phone_number || "",
         city: initialData.city || "" as IndianCity,
         // Doctor specific
-        bio: initialData.bio || "",
-        specialties: initialData.specialties || [] as Specialty[],
-        experience: initialData.experience || 0,
-        qualifications: initialData.qualifications || [] as Qualification[],
-        consultation_fee: initialData.consultation_fee || 0,
+        bio: initialData.doctor_profile?.bio || "",
+        specialties: initialData.doctor_profile?.specialties || [],
+        experience: initialData.doctor_profile?.experience || 0,
+        qualifications: initialData.doctor_profile?.qualifications || [],
+        consultation_fee: initialData.doctor_profile?.consultation_fee || 0,
         // Patient specific
-        height: initialData.height || 0,
-        weight: initialData.weight || 0,
-        blood_group: initialData.blood_group || "" as BloodType,
-        allergies: initialData.allergies || "",
-        emergency_contact_name: initialData.emergency_contact_name || "",
-        emergency_contact_phone: initialData.emergency_contact_phone || "",
+        height: initialData.patient_profile?.height || 0,
+        weight: initialData.patient_profile?.weight || 0,
+        blood_group: initialData.patient_profile?.blood_group || "" as BloodType,
+        allergies: initialData.patient_profile?.allergies || "",
+        emergency_contact_name: initialData.patient_profile?.emergency_contact_name || "",
+        emergency_contact_phone: initialData.patient_profile?.emergency_contact_phone || "",
         // Passwords
         old_password: "",
         new_password: "",
@@ -82,13 +105,25 @@ export const UpdateProfileForm: React.FC<UpdateProfileFormProps> = ({
     // Track changes
     useEffect(() => {
         const hasChanges = Object.keys(formData).some((key) => {
-            if (["old_password", "new_password", "confirm_new_password"].includes(key)) {
-                return formData[key] !== "";
+            const field = key as keyof IProfileFormData;
+            if (["old_password", "new_password", "confirm_new_password"].includes(field)) {
+                return formData[field] !== "";
             }
-            if (Array.isArray(formData[key])) {
-                return JSON.stringify(formData[key]) !== JSON.stringify(initialData[key] || []);
+
+            // Get initial value from correct place
+            let initialVal: string | number | string[] | undefined | null;
+            if (["bio", "specialties", "experience", "qualifications", "consultation_fee"].includes(field)) {
+                initialVal = initialData.doctor_profile?.[field as keyof typeof initialData.doctor_profile] as string | number | string[];
+            } else if (["height", "weight", "blood_group", "allergies", "emergency_contact_name", "emergency_contact_phone"].includes(field)) {
+                initialVal = initialData.patient_profile?.[field as keyof typeof initialData.patient_profile] as string | number | string[];
+            } else {
+                initialVal = initialData[field as keyof typeof initialData] as string | number | string[];
             }
-            return formData[key] !== (initialData[key] || (typeof formData[key] === "number" ? 0 : ""));
+
+            if (Array.isArray(formData[field])) {
+                return JSON.stringify(formData[field]) !== JSON.stringify(initialVal || []);
+            }
+            return formData[field] !== (initialVal || (typeof formData[field] === "number" ? 0 : ""));
         });
         setIsChanged(hasChanges);
     }, [formData, initialData]);
@@ -104,7 +139,7 @@ export const UpdateProfileForm: React.FC<UpdateProfileFormProps> = ({
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
-        setFormData((prev: any) => ({ ...prev, [name]: value }));
+        setFormData((prev) => ({ ...prev, [name]: value }));
 
         if (errors[name]) {
             setErrors((prev) => {
@@ -164,14 +199,17 @@ export const UpdateProfileForm: React.FC<UpdateProfileFormProps> = ({
         if (!value) return;
         const current = formData[name] as string[];
         if (!current.includes(value)) {
-            setFormData((prev: any) => ({ ...prev, [name]: [...current, value] }));
+            setFormData((prev) => ({
+                ...prev,
+                [name]: [...current, value] as Specialty[] | Qualification[]
+            }));
         }
     };
 
     const handleRemoveItem = (name: "specialties" | "qualifications", value: string) => {
-        setFormData((prev: any) => ({
+        setFormData((prev) => ({
             ...prev,
-            [name]: (formData[name] as string[]).filter((item) => item !== value),
+            [name]: (formData[name] as string[]).filter((item) => item !== value) as Specialty[] | Qualification[],
         }));
     };
 
@@ -262,7 +300,7 @@ export const UpdateProfileForm: React.FC<UpdateProfileFormProps> = ({
                     label="Phone Number"
                     name="phone_number"
                     value={formData.phone_number}
-                    onChange={(e) => setFormData((p: any) => ({ ...p, phone_number: e.target.value.replace(/\D/g, "").slice(0, 10) }))}
+                    onChange={(e) => setFormData((p) => ({ ...p, phone_number: e.target.value.replace(/\D/g, "").slice(0, 10) }))}
                     onBlur={handleBlur}
                     error={errors.phone_number}
                     icon={<Phone className="w-4 h-4 text-gray-400" />}
@@ -320,7 +358,7 @@ export const UpdateProfileForm: React.FC<UpdateProfileFormProps> = ({
                                 error={errors.specialties}
                             />
                             <div className="flex flex-wrap gap-2">
-                                {formData.specialties.map((s: any) => (
+                                {formData.specialties.map((s) => (
                                     <Badge key={s} onRemove={() => handleRemoveItem("specialties", s)} className="bg-primary-50 text-primary-700 hover:bg-primary-100 border-primary-200">
                                         {s.replace(/_/g, " ")}
                                     </Badge>
@@ -337,7 +375,7 @@ export const UpdateProfileForm: React.FC<UpdateProfileFormProps> = ({
                                 error={errors.qualifications}
                             />
                             <div className="flex flex-wrap gap-2">
-                                {formData.qualifications.map((q: any) => (
+                                {formData.qualifications.map((q) => (
                                     <Badge key={q} onRemove={() => handleRemoveItem("qualifications", q)} className="bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border-emerald-200">
                                         {q.replace(/_/g, " ")}
                                     </Badge>
@@ -444,7 +482,7 @@ export const UpdateProfileForm: React.FC<UpdateProfileFormProps> = ({
                             label="Emergency Contact Phone"
                             name="emergency_contact_phone"
                             value={formData.emergency_contact_phone}
-                            onChange={(e) => setFormData((p: any) => ({ ...p, emergency_contact_phone: e.target.value.replace(/\D/g, "").slice(0, 10) }))}
+                            onChange={(e) => setFormData((p) => ({ ...p, emergency_contact_phone: e.target.value.replace(/\D/g, "").slice(0, 10) }))}
                             error={errors.emergency_contact_phone}
                             icon={<Phone className="w-4 h-4 text-gray-400" />}
                             iconPosition="left"

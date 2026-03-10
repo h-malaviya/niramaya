@@ -8,6 +8,7 @@ import { ProfileInfoCard } from '../../../components/dashboard/ProfileInfoCard';
 import { UpdateProfileForm } from '../../../components/dashboard/UpdateProfileForm';
 import { useProfile } from '../../auth/hooks/useProfile';
 import { Role } from '../../../types/role.enum';
+import { IUpdateDoctorProfileRequest, IUpdatePatientProfileRequest } from '../../auth/types/auth.types';
 
 const DoctorProfile: React.FC = () => {
     const [isEditing, setIsEditing] = useState(false);
@@ -36,7 +37,7 @@ const DoctorProfile: React.FC = () => {
 
     const doctorDetails = profile.doctor_profile;
 
-    const handleUpdate = async (data: any) => {
+    const handleUpdate = async (data: IUpdateDoctorProfileRequest | IUpdatePatientProfileRequest) => {
         try {
             await updateProfile({ data });
             setIsEditing(false);
@@ -67,18 +68,6 @@ const DoctorProfile: React.FC = () => {
         }
     };
 
-    // Prepare initial data for the form
-    const initialFormData = {
-        first_name: profile.first_name,
-        last_name: profile.last_name,
-        phone_number: profile.phone_number?.replace(/^\+91/, '') || '',
-        city: profile.city,
-        bio: doctorDetails?.bio || '',
-        specialties: doctorDetails?.specialties || [],
-        experience: doctorDetails?.experience || 0,
-        qualifications: doctorDetails?.qualifications || [],
-        consultation_fee: doctorDetails?.consultation_fee || 0
-    };
 
     return (
         <DoctorLayout>
@@ -119,7 +108,7 @@ const DoctorProfile: React.FC = () => {
                 {isEditing ? (
                     <UpdateProfileForm
                         role={Role.DOCTOR}
-                        initialData={initialFormData}
+                        initialData={profile}
                         onSubmit={handleUpdate}
                     />
                 ) : (

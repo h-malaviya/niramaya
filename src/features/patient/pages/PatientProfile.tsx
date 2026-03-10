@@ -8,6 +8,7 @@ import { ProfileInfoCard } from '../../../components/dashboard/ProfileInfoCard';
 import { UpdateProfileForm } from '../../../components/dashboard/UpdateProfileForm';
 import { useProfile } from '../../auth/hooks/useProfile';
 import { Role } from '../../../types/role.enum';
+import { IUpdateDoctorProfileRequest, IUpdatePatientProfileRequest } from '../../auth/types/auth.types';
 
 const PatientProfile: React.FC = () => {
     const [isEditing, setIsEditing] = useState(false);
@@ -36,7 +37,7 @@ const PatientProfile: React.FC = () => {
 
     const patientDetails = profile.patient_profile;
 
-    const handleUpdate = async (data: any) => {
+    const handleUpdate = async (data: IUpdateDoctorProfileRequest | IUpdatePatientProfileRequest) => {
         try {
             await updateProfile({ data });
             setIsEditing(false);
@@ -67,19 +68,6 @@ const PatientProfile: React.FC = () => {
         }
     };
 
-    // Prepare initial data for the form
-    const initialFormData = {
-        first_name: profile.first_name,
-        last_name: profile.last_name,
-        phone_number: profile.phone_number?.replace(/^\+91/, '') || '',
-        city: profile.city,
-        height: patientDetails?.height || 0,
-        weight: patientDetails?.weight || 0,
-        blood_group: patientDetails?.blood_group || null,
-        allergies: patientDetails?.allergies || '',
-        emergency_contact_name: patientDetails?.emergency_contact_name || '',
-        emergency_contact_phone: patientDetails?.emergency_contact_phone?.replace(/^\+91/, '') || ''
-    };
 
     return (
         <PatientLayout>
@@ -122,7 +110,7 @@ const PatientProfile: React.FC = () => {
                     <div className="max-w-4xl mx-auto">
                         <UpdateProfileForm
                             role={Role.PATIENT}
-                            initialData={initialFormData}
+                            initialData={profile}
                             onSubmit={handleUpdate}
                         />
                     </div>
