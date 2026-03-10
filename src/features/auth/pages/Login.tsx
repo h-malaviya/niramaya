@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { LogIn, Mail, Lock, Loader2, UserCircle2 } from "lucide-react";
 import { useAuth } from "../hooks/useAuth";
@@ -15,7 +15,6 @@ const Login: React.FC = () => {
         password: "",
     });
     const [errors, setErrors] = useState<Record<string, string>>({});
-    const navigate = useNavigate();
     const { login, isLoggingIn } = useAuth();
 
     const validateField = (name: string, value: string) => {
@@ -51,10 +50,7 @@ const Login: React.FC = () => {
         }
 
         try {
-            const response = await login({ ...formData, forceLogout });
-            if (response.success && response.data) {
-                navigate(APP_ROUTES.HOME);
-            }
+            await login({ ...formData, forceLogout });
         } catch (err: any) {
             // Check for 409 Conflict (Single Device Login)
             if (err.response?.status === 409) {

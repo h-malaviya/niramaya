@@ -4,7 +4,8 @@ import { useSearchParams } from "react-router-dom";
 import { RegisterForm } from "../components/RegisterForm";
 import { Card } from "../../../components/ui/Card";
 import PricingPlans from "../../../components/PricingPlans";
-import { Role, DoctorPlan } from "../types/auth.types";
+import { Role } from "../../../types/role.enum";
+import { DoctorPlan } from "../types/auth.types";
 import { UserCircle2, Stethoscope, ArrowLeft } from "lucide-react";
 
 const Register: React.FC = () => {
@@ -14,14 +15,15 @@ const Register: React.FC = () => {
     const [selectedPlan, setSelectedPlan] = useState<DoctorPlan | undefined>();
 
     useEffect(() => {
-        const role = searchParams.get("role") as Role;
+        const roleParam = searchParams.get("role")?.toUpperCase();
+        const role = (roleParam === "DOCTOR" || roleParam === "PATIENT") ? roleParam as Role : null;
         const plan = searchParams.get("plan") as DoctorPlan;
 
         if (role) {
             setSelectedRole(role);
-            if (role === "patient") {
+            if (role === Role.PATIENT) {
                 setStep("details");
-            } else if (role === "doctor") {
+            } else if (role === Role.DOCTOR) {
                 if (plan) {
                     setSelectedPlan(plan);
                     setStep("details");
@@ -34,7 +36,7 @@ const Register: React.FC = () => {
 
     const handleRoleSelect = (role: Role) => {
         setSelectedRole(role);
-        if (role === "patient") {
+        if (role === Role.PATIENT) {
             setStep("details");
         } else {
             setStep("plan");
@@ -48,7 +50,7 @@ const Register: React.FC = () => {
 
     const handleBack = () => {
         if (step === "details") {
-            if (selectedRole === "doctor") {
+            if (selectedRole === Role.DOCTOR) {
                 setStep("plan");
             } else {
                 setStep("role");
@@ -85,7 +87,7 @@ const Register: React.FC = () => {
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto justify-items-center">
                                 <Card
-                                    onClick={() => handleRoleSelect("patient")}
+                                    onClick={() => handleRoleSelect(Role.PATIENT)}
                                     className="p-10 w-full max-w-sm"
                                 >
                                     <div className="flex flex-col items-center text-center">
@@ -98,7 +100,7 @@ const Register: React.FC = () => {
                                 </Card>
 
                                 <Card
-                                    onClick={() => handleRoleSelect("doctor")}
+                                    onClick={() => handleRoleSelect(Role.DOCTOR)}
                                     className="p-10 w-full max-w-sm"
                                 >
                                     <div className="flex flex-col items-center text-center">

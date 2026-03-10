@@ -9,5 +9,15 @@ export const APP_ROUTES = {
     DOCTOR: {
         SIGNUP_SUCCESS: '/auth/doctor-signup/success',
         SIGNUP_FAILURE: '/auth/doctor-signup/payment-failed',
+        DASHBOARD: '/doctor/dashboard',
+        APPOINTMENTS: '/doctor/appointments',
+        AVAILABILITY: '/doctor/availability',
+        PROFILE: '/doctor/profile',
+    },
+    PATIENT: {
+        DASHBOARD: '/patient/dashboard',
+        DOCTORS: '/patient/doctors',
+        APPOINTMENTS: '/patient/appointments',
+        PROFILE: '/patient/profile',
     }
 };

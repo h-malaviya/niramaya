@@ -20,7 +20,10 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
                 )}
                 <div className="relative flex items-center group">
                     {prefix && (
-                        <span className="absolute left-3 text-sm text-dark-500 border-r border-dark-200 pr-2 h-full flex items-center z-10">
+                        <span className={cn(
+                            "absolute text-sm text-dark-500 border-r border-dark-200 pr-2 h-full flex items-center z-10 transition-all",
+                            icon && iconPosition === "left" ? "left-10" : "left-3"
+                        )}>
                             {prefix}
                         </span>
                     )}
@@ -35,9 +38,9 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
                         className={cn(
                             "flex h-11 w-full rounded-xl border border-dark-200 bg-white px-4 py-2 text-sm ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-dark-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/20 focus-visible:border-primary-500 disabled:cursor-not-allowed disabled:opacity-50 transition-all",
                             error && "border-red-500 focus-visible:ring-red-500/20 focus-visible:border-red-500",
-                            prefix && "!pl-[4.5rem]",
+                            prefix && !icon && "!pl-[4.5rem]",
                             icon && iconPosition === "left" && !prefix && "!pl-[3rem]",
-                            icon && iconPosition === "left" && prefix && "!pl-[6rem]",
+                            icon && iconPosition === "left" && prefix && "!pl-[6.4rem]",
                             icon && iconPosition === "right" && "!pr-[3rem]",
                             className
                         )}
