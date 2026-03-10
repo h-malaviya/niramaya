@@ -8,12 +8,19 @@ import { ProfileInfoCard } from '../../../components/dashboard/ProfileInfoCard';
 import { UpdateProfileForm } from '../../../components/dashboard/UpdateProfileForm';
 import { useProfile } from '../../auth/hooks/useProfile';
 import { Role } from '../../../types/role.enum';
-import { IUpdateDoctorProfileRequest, IUpdatePatientProfileRequest } from '../../auth/types/auth.types';
+import { IUpdateDoctorProfileRequest, IUpdatePatientProfileRequest, DoctorPlan } from '../../auth/types/auth.types';
+import { getPlanFromToken } from '../../auth/utils/auth.utils';
+import { QRCodeModal } from '../../qrcode/components/QRCodeModal';
+import { QrCode } from 'lucide-react';
 
 const DoctorProfile: React.FC = () => {
     const [isEditing, setIsEditing] = useState(false);
+    const [isQRModalOpen, setIsQRModalOpen] = useState(false);
     const { profile, isFetchingProfile, updateProfile, isUpdating } = useProfile(Role.DOCTOR);
     const fileInputRef = React.useRef<HTMLInputElement>(null);
+
+    const plan = getPlanFromToken();
+    const isElite = plan === DoctorPlan.ELITE;
 
     if (isFetchingProfile) {
         return (
@@ -99,11 +106,28 @@ const DoctorProfile: React.FC = () => {
                         </div>
                     </div>
                     {!isEditing && (
-                        <Button className="px-8 rounded-2xl font-bold" onClick={() => setIsEditing(true)}>
-                            Edit Profile
-                        </Button>
+                        <div className="flex items-center gap-3">
+                            {isElite && (
+                                <Button
+                                    variant="outline"
+                                    className="px-6 rounded-2xl font-bold flex items-center gap-2 border-primary-100 text-primary-600 hover:bg-primary-50"
+                                    onClick={() => setIsQRModalOpen(true)}
+                                >
+                                    <QrCode className="w-5 h-5" />
+                                    My QR Code
+                                </Button>
+                            )}
+                            <Button className="px-8 rounded-2xl font-bold" onClick={() => setIsEditing(true)}>
+                                Edit Profile
+                            </Button>
+                        </div>
                     )}
                 </div>
+
+                <QRCodeModal
+                    isOpen={isQRModalOpen}
+                    onClose={() => setIsQRModalOpen(false)}
+                />
 
                 {isEditing ? (
                     <UpdateProfileForm

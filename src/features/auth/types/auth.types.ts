@@ -363,3 +363,10 @@ export interface IGetDoctorProfileResponse extends IApiResponse<IUserData> { }
 export interface IGetPatientProfileResponse extends IApiResponse<IUserData> { }
 export interface IUpdateDoctorProfileResponse extends IApiResponse<IUserData> { }
 export interface IUpdatePatientProfileResponse extends IApiResponse<IUserData> { }
+export interface IQRCodeResponseData {
+    qrcode_token: string;
+    qrcode_image_url: string;
+}
+
+export interface IGetQRCodeResponse extends IApiResponse<IQRCodeResponseData> { }
+export interface IRegenerateQRCodeResponse extends IApiResponse<IQRCodeResponseData> { }

@@ -16,4 +16,8 @@ export const API = {
         GET_DOCTOR_PROFILE: "/doctors/profile",
         GET_PATIENT_PROFILE: "/patients/profile",
     },
+    QRCODE: {
+        GET: "/doctors/qrcode",
+        REGENERATE: "/doctors/qrcode/regenerate",
+    },
 };
