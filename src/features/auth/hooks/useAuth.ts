@@ -1,11 +1,16 @@
 import { useMutation } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
 import { authService } from "../services/auth.service";
 import toast from "react-hot-toast";
 import { AxiosError } from "axios";
 import { IApiResponse } from "../../../types/global.types";
 import { STORAGE_KEYS } from "../../../constants/storage-keys";
+import { APP_ROUTES } from "../../../constants/app-routes";
+import { Role } from "../../../types/role.enum";
 
 export const useAuth = () => {
+    const navigate = useNavigate();
+
     const sendOtpMutation = useMutation({
         mutationFn: authService.sendVerificationOtp,
         onError: (error: AxiosError<IApiResponse>) => {
@@ -30,8 +35,11 @@ export const useAuth = () => {
     const patientSignupMutation = useMutation({
         mutationFn: authService.patientSignup,
         onSuccess: (data) => {
-            if (data.success) {
+            if (data.success && data.data) {
+                localStorage.setItem(STORAGE_KEYS.ACCESS_TOKEN, data.data.accessToken);
+                localStorage.setItem(STORAGE_KEYS.REFRESH_TOKEN, data.data.refreshToken);
                 toast.success("Account created successfully!");
+                navigate(APP_ROUTES.PATIENT.DASHBOARD);
             } else {
                 toast.error(data.message);
             }
@@ -65,6 +73,7 @@ export const useAuth = () => {
                 localStorage.setItem(STORAGE_KEYS.ACCESS_TOKEN, data.data.accessToken);
                 localStorage.setItem(STORAGE_KEYS.REFRESH_TOKEN, data.data.refreshToken);
                 toast.success("Payment verified! Welcome to Niramaya.");
+                navigate(APP_ROUTES.DOCTOR.DASHBOARD);
             } else {
                 toast.error(data.message || "Verification failed");
             }
@@ -81,6 +90,14 @@ export const useAuth = () => {
                 localStorage.setItem(STORAGE_KEYS.ACCESS_TOKEN, data.data.accessToken);
                 localStorage.setItem(STORAGE_KEYS.REFRESH_TOKEN, data.data.refreshToken);
                 toast.success("Logged in successfully!");
+
+                // Redirect based on role
+                const userRole = data.data.user.role.toUpperCase();
+                if (userRole === Role.DOCTOR) {
+                    navigate(APP_ROUTES.DOCTOR.DASHBOARD);
+                } else {
+                    navigate(APP_ROUTES.PATIENT.DASHBOARD);
+                }
             } else {
                 toast.error(data.message || "Login failed");
             }
@@ -112,6 +129,7 @@ export const useAuth = () => {
         onSuccess: (data) => {
             if (data.success) {
                 toast.success(data.message || "Password reset successfully!");
+                navigate(APP_ROUTES.AUTH.LOGIN);
             } else {
                 toast.error(data.message || "Failed to reset password");
             }

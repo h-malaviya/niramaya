@@ -10,4 +10,10 @@ export const API = {
         DOCTOR_SIGNUP: '/auth/doctor-signup',
         DOCTOR_VERIFY_SESSION: '/auth/doctor-signup/verify-session',
     },
+    PROFILE: {
+        UPDATE_PATIENT: "/patients/update-profile",
+        UPDATE_DOCTOR: "/doctors/update-profile",
+        GET_DOCTOR_PROFILE: "/doctors/profile",
+        GET_PATIENT_PROFILE: "/patients/profile",
+    },
 };

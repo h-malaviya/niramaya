@@ -170,12 +170,22 @@ export enum IndianCity {
     GANGTOK = "GANGTOK",
 }
 
+export enum BloodType {
+    A_POS = "A_POS",
+    A_NEG = "A_NEG",
+    B_POS = "B_POS",
+    B_NEG = "B_NEG",
+    AB_POS = "AB_POS",
+    AB_NEG = "AB_NEG",
+    O_POS = "O_POS",
+    O_NEG = "O_NEG",
+}
+
 export enum DoctorPlan {
     ELITE = "ELITE",
     PRO = "PRO",
 }
 
-export type Role = "patient" | "doctor";
 
 // Patient signup request body
 export interface IPatientSignupRequest {
@@ -278,3 +288,78 @@ export interface IResetPasswordRequest {
 }
 
 export interface IResetPasswordResponse extends IApiResponse<null> { }
+
+// Update Profile Requests
+export interface IUpdateDoctorProfileRequest {
+    first_name?: string;
+    last_name?: string;
+    phone_number?: string;
+    city?: IndianCity;
+    bio?: string;
+    specialties?: Specialty[];
+    experience?: number;
+    qualifications?: Qualification[];
+    consultation_fee?: number;
+    old_password?: string;
+    new_password?: string;
+    confirm_new_password?: string;
+}
+
+export interface IUpdatePatientProfileRequest {
+    first_name?: string;
+    last_name?: string;
+    phone_number?: string;
+    city?: IndianCity;
+    height?: number;
+    weight?: number;
+    blood_group?: BloodType;
+    allergies?: string;
+    emergency_contact_name?: string;
+    emergency_contact_phone?: string;
+    old_password?: string;
+    new_password?: string;
+    confirm_new_password?: string;
+}
+
+export interface IDoctorProfileData {
+    id: string;
+    user_id: string;
+    bio: string | null;
+    experience: number;
+    specialties: Specialty[];
+    qualifications: Qualification[];
+    consultation_fee: number;
+}
+
+export interface IPatientProfileData {
+    id: string;
+    user_id: string;
+    height: number | null;
+    weight: number | null;
+    blood_group: BloodType | null;
+    allergies: string | null;
+    emergency_contact_name: string | null;
+    emergency_contact_phone: string | null;
+}
+
+export interface IUserData {
+    id: string;
+    email: string;
+    first_name: string;
+    last_name: string;
+    dob: string;
+    gender: Gender;
+    city: IndianCity;
+    phone_number: string | null;
+    profile_image: string | null;
+    role_id: string;
+    created_at: string;
+    updated_at: string;
+    doctor_profile?: IDoctorProfileData;
+    patient_profile?: IPatientProfileData;
+}
+
+export interface IGetDoctorProfileResponse extends IApiResponse<IUserData> { }
+export interface IGetPatientProfileResponse extends IApiResponse<IUserData> { }
+export interface IUpdateDoctorProfileResponse extends IApiResponse<IUserData> { }
+export interface IUpdatePatientProfileResponse extends IApiResponse<IUserData> { }

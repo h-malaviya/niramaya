@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { DoctorPlan } from '../features/auth/types/auth.types';
+import { Role } from '../types/role.enum';
 
 const plans = [
     {
@@ -63,7 +64,7 @@ const PricingPlans = ({ onSelectPlan }: PricingPlansProps) => {
         if (onSelectPlan) {
             onSelectPlan(plan);
         } else {
-            navigate(`/register?role=doctor&plan=${plan}`);
+            navigate(`/register?role=${Role.DOCTOR.toLowerCase()}&plan=${plan}`);
         }
     };
 

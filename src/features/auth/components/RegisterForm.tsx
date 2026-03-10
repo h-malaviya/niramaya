@@ -11,10 +11,10 @@ import {
     Qualification,
     Specialty,
     DoctorPlan,
-    Role,
     ISendVerificationOtpResponse,
     IVerifyOtpResponse,
 } from "../types/auth.types";
+import { Role } from "../../../types/role.enum";
 import {
     validateName,
     validateEmail,
@@ -199,7 +199,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ role, plan }) => {
         if (!formData.gender) newErrors.gender = "Gender is required";
         if (!formData.city) newErrors.city = "City is required";
 
-        if (role === "doctor") {
+        if (role === Role.DOCTOR) {
             if (formData.qualifications.length === 0) newErrors.qualifications = "Select at least one qualification";
             if (formData.specialties.length === 0) newErrors.specialties = "Select at least one specialty";
 
@@ -266,7 +266,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ role, plan }) => {
             verification_token: verificationToken,
         };
 
-        if (role === "patient") {
+        if (role === Role.PATIENT) {
             await patientSignup(commonData);
         } else {
             await doctorSignup({
@@ -292,7 +292,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ role, plan }) => {
             formData.gender &&
             formData.city &&
             isEmailVerified &&
-            (role === "patient" || (formData.qualifications.length > 0 && formData.specialties.length > 0))
+            (role === Role.PATIENT || (formData.qualifications.length > 0 && formData.specialties.length > 0))
         );
     };
 
@@ -300,9 +300,9 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ role, plan }) => {
         <form onSubmit={handleSubmit} className="space-y-6 max-w-4xl mx-auto p-10 bg-white rounded-2xl shadow-xl border border-dark-100">
             <div className="text-center mb-10">
                 <h2 className="text-4xl font-extrabold text-dark-900 tracking-tight font-display">
-                    <span className="text-primary-600 capitalize">{role}</span> Registration
+                    <span className="text-primary-600 capitalize">{role.toLowerCase()}</span> Registration
                 </h2>
-                {role === "doctor" && plan && <p className="text-primary-600 font-semibold mt-2">Selected Plan: {plan}</p>}
+                {role === Role.DOCTOR && plan && <p className="text-primary-600 font-semibold mt-2">Selected Plan: {plan}</p>}
                 <p className="text-dark-500 mt-3 text-lg">Please fill in your details to create an account</p>
             </div>
 
@@ -476,7 +476,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ role, plan }) => {
                     required
                 />
 
-                {role === "doctor" && (
+                {role === Role.DOCTOR && (
                     <>
                         <div className="md:col-span-2 border-t pt-6 mt-2">
                             <h3 className="text-lg font-bold text-gray-800 mb-4">Professional Information</h3>
@@ -554,9 +554,9 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ role, plan }) => {
                     className="w-full py-4 text-lg"
                     disabled={!isFormValid()}
                     loading={isPatientSigningUp || isDoctorSigningUp}
-                    variant={role === "doctor" ? "secondary" : "primary"}
+                    variant={role === Role.DOCTOR ? "secondary" : "primary"}
                 >
-                    {role === "doctor" ? "Pay Now & Register" : "Register"}
+                    {role === Role.DOCTOR ? "Pay Now & Register" : "Register"}
                 </Button>
                 <p className="text-center text-sm text-gray-500 mt-4">
                     Already have an account? <a href={APP_ROUTES.AUTH.LOGIN} className="text-blue-600 font-semibold hover:underline">Log in</a>

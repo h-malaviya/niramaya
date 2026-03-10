@@ -5,6 +5,7 @@ import { XCircle, ArrowLeft, RefreshCw, AlertCircle } from "lucide-react";
 import { APP_ROUTES } from "../../../constants/app-routes";
 import { Card } from "../../../components/ui/Card";
 import { Button } from "../../../components/ui/Button";
+import { Role } from "../../../types/role.enum";
 
 const DoctorSignupCancel: React.FC = () => {
     const navigate = useNavigate();
@@ -45,7 +46,7 @@ const DoctorSignupCancel: React.FC = () => {
                                 Exit to Home
                             </Button>
                             <Button
-                                onClick={() => navigate(APP_ROUTES.AUTH.REGISTER + "?role=doctor")}
+                                onClick={() => navigate(APP_ROUTES.AUTH.REGISTER + `?role=${Role.DOCTOR.toLowerCase()}`)}
                                 className="flex-1 py-4 text-lg font-bold group"
                             >
                                 <RefreshCw className="mr-2 h-5 w-5 group-hover:rotate-180 transition-transform duration-500" />
