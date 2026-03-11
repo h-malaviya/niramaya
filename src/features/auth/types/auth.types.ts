@@ -1,4 +1,5 @@
 import { IApiResponse } from "../../../types/global.types";
+export type { IApiResponse };
 
 
 export enum Gender {

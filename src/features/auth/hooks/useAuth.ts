@@ -136,6 +136,25 @@ export const useAuth = () => {
         },
     });
 
+    const logoutMutation = useMutation({
+        mutationFn: authService.logout,
+        onSuccess: (data: IApiResponse<null>) => {
+            if (data.success) {
+                localStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN);
+                toast.success("Logged out successfully!");
+                navigate(APP_ROUTES.AUTH.LOGIN);
+            } else {
+                toast.error(data.message || "Logout failed");
+            }
+        },
+        onError: (_error: AxiosError<IApiResponse>) => {
+            // Even if server fails, we should clear local session
+            localStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN);
+            toast.success("Logged out successfully!");
+            navigate(APP_ROUTES.AUTH.LOGIN);
+        },
+    });
+
     return {
         sendOtp: sendOtpMutation.mutateAsync,
         isSendingOtp: sendOtpMutation.isPending,
@@ -153,5 +172,7 @@ export const useAuth = () => {
         isSendingResetLink: forgotPasswordMutation.isPending,
         resetPassword: resetPasswordMutation.mutateAsync,
         isResettingPassword: resetPasswordMutation.isPending,
+        logout: logoutMutation.mutateAsync,
+        isLoggingOut: logoutMutation.isPending,
     };
 };

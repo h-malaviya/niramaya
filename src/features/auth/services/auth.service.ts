@@ -19,6 +19,7 @@ import {
     IVerifyDoctorSessionResponse,
     IValidateSessionRequest,
     IValidateSessionResponse,
+    IApiResponse,
 } from "../types/auth.types";
 
 export const authService = {
@@ -86,6 +87,12 @@ export const authService = {
         const response = await apiClient.post<IResetPasswordResponse>(
             API.AUTH.RESET_PASSWORD,
             data
+        );
+        return response.data;
+    },
+    logout: async () => {
+        const response = await apiClient.post<IApiResponse<null>>(
+            API.AUTH.LOGOUT
         );
         return response.data;
     },
