@@ -147,11 +147,6 @@ export default function PatientDoctors() {
         fetchDoctors();
     }, [fetchDoctors]);
 
-    const handleFilterChange = (name: string, value: string | number) => {
-        setFilters(prev => ({ ...prev, [name]: value }));
-        setPagination(prev => ({ ...prev, page: 1 }));
-    };
-
     const handleClearFilters = () => {
         setFilters({
             specialty: '',

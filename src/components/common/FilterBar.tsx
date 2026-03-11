@@ -207,7 +207,7 @@ const FilterBar: React.FC<FilterBarProps> = ({
                                             checked={
                                                 group.type === 'radio'
                                                     ? localFilters[group.name] === opt.value
-                                                    : Array.isArray(localFilters[group.name]) && (localFilters[group.name] as any[]).includes(opt.value)
+                                                    : Array.isArray(localFilters[group.name]) && (localFilters[group.name] as any).includes(opt.value)
                                             }
                                             onChange={() => handleLocalChange(group.name, opt.value)}
                                             className={group.type === 'radio' ? "radio radio-primary radio-xs" : "checkbox checkbox-primary checkbox-xs"}
