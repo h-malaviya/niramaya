@@ -2,6 +2,7 @@ import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { APP_ROUTES } from '../../constants/app-routes';
+import { useAuth } from '../../features/auth/hooks/useAuth';
 import {
     LayoutDashboard,
     CalendarDays,
@@ -24,6 +25,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
         { name: 'Availability', path: APP_ROUTES.DOCTOR.AVAILABILITY, icon: Clock },
         { name: 'Profile', path: APP_ROUTES.DOCTOR.PROFILE, icon: User },
     ];
+    const { logout, isLoggingOut } = useAuth();
 
     return (
         <>
@@ -43,7 +45,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
             {/* Sidebar Drawer */}
             <aside className={`
                 fixed inset-y-0 left-0 z-50 w-72 bg-white border-r border-gray-100 flex flex-col transition-transform duration-300 ease-in-out
-                lg:translate-x-0 lg:static lg:w-64
+                lg:w-64 lg:translate-x-0
                 ${isOpen ? 'translate-x-0 shadow-2xl lg:shadow-none' : '-translate-x-full lg:translate-x-0'}
             `}>
                 <div className="p-6 border-b border-gray-50 flex items-center justify-between">
@@ -81,9 +83,13 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
                 </nav>
 
                 <div className="p-4 border-t border-gray-50">
-                    <button className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-red-500 hover:bg-red-50 transition-all duration-200">
+                    <button
+                        onClick={() => logout()}
+                        disabled={isLoggingOut}
+                        className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-red-500 hover:bg-red-50 transition-all duration-200 disabled:opacity-50"
+                    >
                         <LogOut className="w-5 h-5 flex-shrink-0" />
-                        <span className="font-medium">Logout</span>
+                        <span className="font-medium">{isLoggingOut ? 'Logging out...' : 'Logout'}</span>
                     </button>
                 </div>
             </aside>

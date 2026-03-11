@@ -10,6 +10,7 @@ export const API = {
         DOCTOR_SIGNUP: '/auth/doctor-signup',
         DOCTOR_VERIFY_SESSION: '/auth/doctor-signup/verify-session',
         VALIDATE_SESSION: '/auth/validate',
+        LOGOUT: '/auth/logout',
     },
     PROFILE: {
         UPDATE_PATIENT: "/patients/update-profile",
@@ -20,5 +21,9 @@ export const API = {
     QRCODE: {
         GET: "/doctors/qrcode",
         REGENERATE: "/doctors/qrcode/regenerate",
+    },
+    DOCTORS: {
+        BASE: "/doctors",
+        PATIENT_LIST: "/doctors/list",
     },
 };

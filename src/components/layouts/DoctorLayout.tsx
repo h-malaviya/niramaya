@@ -18,7 +18,7 @@ const DoctorLayout: React.FC<DoctorLayoutProps> = ({ children }) => {
     const specialty = profile?.doctor_profile?.specialties?.[0]?.replace(/_/g, " ") || 'Specialist';
 
     return (
-        <div className="flex min-h-screen bg-gray-50/50">
+        <div className="flex min-h-screen bg-gray-50/50 lg:pl-64">
             <Sidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
 
             <div className="flex-1 flex flex-col min-w-0 overflow-hidden">

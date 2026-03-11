@@ -19,5 +19,8 @@ export const APP_ROUTES = {
         DOCTORS: '/patient/doctors',
         APPOINTMENTS: '/patient/appointments',
         PROFILE: '/patient/profile',
+    },
+    APPOINTMENTS: {
+        BOOK: '/appointments/book',
     }
 };

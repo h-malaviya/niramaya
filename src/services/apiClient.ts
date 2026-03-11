@@ -12,6 +12,9 @@ export const apiClient = axios.create({
         'Content-Type': 'application/json',
     },
     withCredentials: true,
+    paramsSerializer: {
+        indexes: null, // results in 'specialties=a&specialties=b'
+    },
 });
 
 // Request interceptor for token injection

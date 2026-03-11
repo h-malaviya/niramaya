@@ -21,6 +21,8 @@ import GuestRoute from "../features/auth/components/GuestRoute";
 import { Role } from "../types/role.enum";
 import { APP_ROUTES } from "../constants/app-routes";
 
+import PatientLayout from "../components/layouts/PatientLayout";
+
 const router = createBrowserRouter([
     {
         path: APP_ROUTES.HOME,
@@ -105,7 +107,9 @@ const router = createBrowserRouter([
         path: APP_ROUTES.PATIENT.DASHBOARD,
         element: (
             <ProtectedRoute allowedRoles={[Role.PATIENT]}>
-                <PatientDoctors />
+                <PatientLayout>
+                    <PatientDoctors />
+                </PatientLayout>
             </ProtectedRoute>
         ),
     },
@@ -113,7 +117,9 @@ const router = createBrowserRouter([
         path: APP_ROUTES.PATIENT.DOCTORS,
         element: (
             <ProtectedRoute allowedRoles={[Role.PATIENT]}>
-                <PatientDoctors />
+                <PatientLayout>
+                    <PatientDoctors />
+                </PatientLayout>
             </ProtectedRoute>
         ),
     },
@@ -121,7 +127,9 @@ const router = createBrowserRouter([
         path: APP_ROUTES.PATIENT.APPOINTMENTS,
         element: (
             <ProtectedRoute allowedRoles={[Role.PATIENT]}>
-                <PatientAppointments />
+                <PatientLayout>
+                    <PatientAppointments />
+                </PatientLayout>
             </ProtectedRoute>
         ),
     },
@@ -129,7 +137,9 @@ const router = createBrowserRouter([
         path: APP_ROUTES.PATIENT.PROFILE,
         element: (
             <ProtectedRoute allowedRoles={[Role.PATIENT]}>
-                <PatientProfile />
+                <PatientLayout>
+                    <PatientProfile />
+                </PatientLayout>
             </ProtectedRoute>
         ),
     },
