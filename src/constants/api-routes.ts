@@ -26,4 +26,8 @@ export const API = {
         BASE: "/doctors",
         PATIENT_LIST: "/doctors/list",
     },
+    DOCTOR_EXTRA: {
+        GET_AVAILABILITY: '/doctors/availability',
+        EDIT_AVAILABILITY: '/doctors/availability/edit',
+    },
 };

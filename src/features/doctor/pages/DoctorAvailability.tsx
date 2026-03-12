@@ -1,35 +1,134 @@
-import React from 'react';
+import React, { useState } from 'react';
 import DoctorLayout from '../../../components/layouts/DoctorLayout';
-import { Save, CalendarDays } from 'lucide-react';
-import { Button } from '../../../components/ui/Button';
+import { CalendarDays, Loader2, Info, AlertCircle } from 'lucide-react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { availabilityService } from '../services/availability.service';
+import AvailabilityCalendar from '../components/AvailabilityCalendar';
+import AvailabilityForm from '../components/AvailabilityForm';
+import { toast } from 'react-hot-toast';
+import { getErrorMessage } from '../../../utils/api-error';
 
 const DoctorAvailability: React.FC = () => {
+    const queryClient = useQueryClient();
+    const [selectedDates, setSelectedDates] = useState<string[]>([]);
+
+    // Fetch availability
+    const { data, isLoading, error } = useQuery({
+        queryKey: ['doctor-availability'],
+        queryFn: availabilityService.getAvailability
+    });
+
+    const availabilities = data?.data?.availabilities || [];
+
+    // Update availability mutation
+    const updateMutation = useMutation({
+        mutationFn: availabilityService.updateAvailability,
+        onSuccess: (res) => {
+            if (res.success) {
+                toast.success('Availability updated successfully');
+                setSelectedDates([]);
+                queryClient.invalidateQueries({ queryKey: ['doctor-availability'] });
+            } else {
+                toast.error(res.message || 'Failed to update availability');
+            }
+        },
+        onError: (err) => {
+            toast.error(getErrorMessage(err));
+        }
+    });
+
+    const handleDateToggle = (date: string) => {
+        setSelectedDates(prev =>
+            prev.includes(date)
+                ? prev.filter(d => d !== date)
+                : [...prev, date]
+        );
+    };
 
     return (
         <DoctorLayout>
-            <div className="space-y-8">
-                <div className="flex items-center justify-between">
+            <div className="space-y-8 pb-20">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div>
-                        <h1 className="text-2xl font-bold text-gray-900">Availability</h1>
-                        <p className="text-gray-500 mt-1">Configure your working hours and booking slots</p>
+                        <h1 className="text-3xl font-black text-gray-900 tracking-tight">Schedule & Availability</h1>
+                        <p className="text-gray-500 font-medium mt-1">Configure your working hours and consultation slots for the next 30 days</p>
                     </div>
-                    <Button className="gap-2">
-                        <Save className="w-5 h-5" />
-                        Save Changes
-                    </Button>
                 </div>
 
-                {/* Coming Soon Message */}
-                <div className="bg-white rounded-3xl border border-dashed border-gray-200 p-32 text-center">
-                    <div className="w-24 h-24 bg-primary-50 rounded-full flex items-center justify-center mx-auto mb-8 shadow-inner">
-                        <CalendarDays className="w-12 h-12 text-primary-500" />
+                <div className="bg-primary-50 rounded-2xl p-6 border border-primary-100 flex items-start gap-4">
+                    <div className="p-2 bg-white rounded-xl shadow-sm">
+                        <Info className="w-5 h-5 text-primary-600" />
                     </div>
-                    <h2 className="text-3xl font-black text-gray-900 mb-3">Doctor Availability Coming Soon</h2>
-                    <p className="text-gray-500 text-lg font-medium max-w-xl mx-auto leading-relaxed">
-                        Setting your working days and consultation slots will be available soon. You'll be able to manage your schedule with precision.
-                    </p>
+                    <div className="space-y-1">
+                        <p className="text-sm font-bold text-primary-900">Configuring IST Timings</p>
+                        <p className="text-xs text-primary-700 leading-relaxed font-medium">
+                            All times below are in **Indian Standard Time (IST)**. 
+                        </p>
+                    </div>
                 </div>
+
+                {error ? (
+                    <div className="bg-red-50 border border-red-100 rounded-3xl p-10 text-center space-y-4">
+                        <div className="p-4 bg-white w-fit mx-auto rounded-2xl shadow-sm">
+                            <AlertCircle className="w-8 h-8 text-red-500" />
+                        </div>
+                        <h3 className="text-xl font-bold text-gray-900">Failed to load schedule</h3>
+                        <p className="text-red-600 text-sm max-w-md mx-auto">{getErrorMessage(error)}</p>
+                        <button
+                            onClick={() => queryClient.invalidateQueries({ queryKey: ['doctor-availability'] })}
+                            className="btn bg-red-600 hover:bg-red-700 text-white border-none rounded-xl px-8"
+                        >
+                            Try Again
+                        </button>
+                    </div>
+                ) : (
+                    <div className="flex flex-col xl:flex-row gap-8 items-start">
+                        {/* Calendar Section */}
+                        <div className="flex-1 w-full space-y-6">
+                            <AvailabilityCalendar
+                                availabilities={availabilities}
+                                selectedDates={selectedDates}
+                                onDateToggle={handleDateToggle}
+                                loading={isLoading}
+                            />
+
+                            {!selectedDates.length && (
+                                <div className="bg-white rounded-3xl border border-dashed border-gray-200 p-12 text-center space-y-4">
+                                    <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto text-gray-400">
+                                        <CalendarDays className="w-8 h-8" />
+                                    </div>
+                                    <p className="text-sm font-medium text-gray-500">
+                                        Select one or more dates from the calendar to modify your availability.
+                                    </p>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Form Section */}
+                        {selectedDates.length > 0 && (
+                            <div className="w-full xl:w-96 shrink-0 sticky top-28">
+                                <AvailabilityForm
+                                    selectedDates={selectedDates}
+                                    availabilities={availabilities}
+                                    onSave={(payload) => updateMutation.mutate(payload)}
+                                    onCancel={() => setSelectedDates([])}
+                                    isSaving={updateMutation.isPending}
+                                />
+                            </div>
+                        )}
+                    </div>
+                )}
             </div>
+
+            {/* Loading Overlay */}
+            {isLoading && !data && (
+                <div className="fixed inset-0 z-[100] bg-white/60 backdrop-blur-sm flex items-center justify-center">
+                    <div className="flex flex-col items-center gap-4">
+                        <Loader2 className="w-10 h-10 text-primary-600 animate-spin" />
+                        <p className="text-sm font-bold text-gray-600">Loading your schedule...</p>
+                    </div>
+                </div>
+            )}
         </DoctorLayout>
     );
 };
