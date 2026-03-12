@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { cn } from '../../../lib/utils';
 import { IDoctorAvailability } from '../types/availability.types';
-import { Calendar as CalendarIcon, CheckCircle2, XCircle, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Calendar as CalendarIcon, ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface AvailabilityCalendarProps {
     availabilities: IDoctorAvailability[];
