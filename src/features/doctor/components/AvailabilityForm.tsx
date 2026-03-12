@@ -17,15 +17,17 @@ const TimeSelect: React.FC<{
     label: string;
     error?: string;
 }> = ({ value, onChange, label, error }) => {
-    const [h, m] = (value || "00:00").split(':');
+    // Handle empty initial value (clash)
+    const [h, m] = value ? value.split(':') : ['', ''];
     const [localH, setLocalH] = useState(h);
     const [localM, setLocalM] = useState(m);
 
     // Sync with external value changes
     useEffect(() => {
-        setLocalH(h);
-        setLocalM(m);
-    }, [h, m]);
+        const [newH, newM] = value ? value.split(':') : ['', ''];
+        setLocalH(newH);
+        setLocalM(newM);
+    }, [value]);
 
     const handleHourChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const val = e.target.value.replace(/\D/g, '').slice(0, 2);
@@ -40,6 +42,9 @@ const TimeSelect: React.FC<{
     };
 
     const handleBlur = () => {
+        // Only pad if something was actually typed
+        if (!localH && !localM) return;
+
         let finalH = localH.padStart(2, '0');
         let finalM = localM.padStart(2, '0');
 
@@ -97,7 +102,14 @@ const AvailabilityForm: React.FC<AvailabilityFormProps> = ({
         availabilities.filter(a => selectedDates.includes(a.date)),
         [availabilities, selectedDates]);
 
-    const [form, setForm] = useState({
+    const [form, setForm] = useState<{
+        is_active: boolean;
+        start_at: string;
+        end_at: string;
+        break_start: string;
+        break_end: string;
+        slot_duration: number | string;
+    }>({
         is_active: true,
         start_at: '09:00',
         end_at: '17:00',
@@ -115,18 +127,17 @@ const AvailabilityForm: React.FC<AvailabilityFormProps> = ({
         const first = selectedAvails[0];
         const getTimeStr = (isoString: string | null) => {
             if (!isoString) return null;
-            // Raw extraction: "2026-03-12T09:00:00.000Z" -> "09:00"
             const timePart = isoString.split('T')[1];
             return timePart ? timePart.substring(0, 5) : null;
         };
 
         const initialState = {
             is_active: selectedAvails.every(a => a.is_active === first.is_active) ? first.is_active : true,
-            start_at: selectedAvails.every(a => getTimeStr(a.start_at) === getTimeStr(first.start_at)) ? getTimeStr(first.start_at)! : '09:00',
-            end_at: selectedAvails.every(a => getTimeStr(a.end_at) === getTimeStr(first.end_at)) ? getTimeStr(first.end_at)! : '17:00',
-            break_start: selectedAvails.every(a => getTimeStr(a.break_start) === getTimeStr(first.break_start)) ? getTimeStr(first.break_start) || '13:00' : '13:00',
-            break_end: selectedAvails.every(a => getTimeStr(a.break_end) === getTimeStr(first.break_end)) ? getTimeStr(first.break_end) || '14:00' : '14:00',
-            slot_duration: selectedAvails.every(a => a.slot_duration === first.slot_duration) ? first.slot_duration : 20
+            start_at: selectedAvails.every(a => getTimeStr(a.start_at) === getTimeStr(first.start_at)) ? (getTimeStr(first.start_at) || '') : '',
+            end_at: selectedAvails.every(a => getTimeStr(a.end_at) === getTimeStr(first.end_at)) ? (getTimeStr(first.end_at) || '') : '',
+            break_start: selectedAvails.every(a => getTimeStr(a.break_start) === getTimeStr(first.break_start)) ? (getTimeStr(first.break_start) || '') : '',
+            break_end: selectedAvails.every(a => getTimeStr(a.break_end) === getTimeStr(first.break_end)) ? (getTimeStr(first.break_end) || '') : '',
+            slot_duration: selectedAvails.every(a => a.slot_duration === first.slot_duration) ? first.slot_duration : ''
         };
 
         setForm(initialState);
@@ -143,7 +154,7 @@ const AvailabilityForm: React.FC<AvailabilityFormProps> = ({
 
             if (!form.start_at) newErrors.start_at = "Required";
             if (!form.end_at) newErrors.end_at = "Required";
-            if (!form.slot_duration || form.slot_duration <= 0) newErrors.slot_duration = "Invalid";
+            if (!form.slot_duration || Number(form.slot_duration) <= 0) newErrors.slot_duration = "Invalid";
 
             if (form.start_at && form.end_at && form.start_at >= form.end_at) {
                 newErrors.end_at = "Must be after start time";
@@ -161,19 +172,19 @@ const AvailabilityForm: React.FC<AvailabilityFormProps> = ({
                 const breakEndMins = toMin(form.break_end);
 
                 if (form.break_start >= form.break_end) {
-                    newErrors.break_end = "Break End must be after Break Start";
+                    newErrors.break_range = "Break End must be after Break Start";
                 }
                 if (breakStartMins <= startMins || breakEndMins >= endMins) {
                     newErrors.break_range = "Break must be strictly within working hours (cannot be at the start or end of shift)";
                 }
 
                 // Slot duration validation: cannot exceed shortest segment
-                if (!newErrors.break_range && !newErrors.break_end) {
+                if (!newErrors.break_range && !newErrors.break_end && form.slot_duration !== '') {
                     const durationBeforeBreak = breakStartMins - startMins;
                     const durationAfterBreak = endMins - breakEndMins;
                     const maxSlotDuration = Math.min(durationBeforeBreak, durationAfterBreak);
 
-                    if (form.slot_duration > maxSlotDuration) {
+                    if (Number(form.slot_duration) > maxSlotDuration) {
                         newErrors.slot_duration = `Cannot exceed ${maxSlotDuration} min (shortest segment)`;
                     }
                 }
@@ -187,7 +198,8 @@ const AvailabilityForm: React.FC<AvailabilityFormProps> = ({
 
     // Calculate end of day warning
     const shiftInfo = useMemo(() => {
-        if (!form.start_at || !form.end_at || !form.slot_duration) return null;
+        const durationNum = Number(form.slot_duration);
+        if (!form.start_at || !form.end_at || !durationNum || durationNum <= 0) return null;
 
         const toMin = (t: string) => {
             const [h, m] = t.split(':').map(Number);
@@ -209,26 +221,26 @@ const AvailabilityForm: React.FC<AvailabilityFormProps> = ({
             if (bStart > startMin && bEnd < endMin && bStart < bEnd) {
                 // Segment 1: Before Break
                 const seg1Mins = bStart - startMin;
-                const seg1Slots = Math.floor(seg1Mins / form.slot_duration);
+                const seg1Slots = Math.floor(seg1Mins / durationNum);
                 slots += seg1Slots;
 
                 // Segment 2: After Break
                 const seg2Mins = endMin - bEnd;
-                const seg2Slots = Math.floor(seg2Mins / form.slot_duration);
+                const seg2Slots = Math.floor(seg2Mins / durationNum);
                 slots += seg2Slots;
 
                 if (seg2Slots > 0) {
-                    const remainder = seg2Mins % form.slot_duration;
+                    const remainder = seg2Mins % durationNum;
                     lastEffectiveEnd = endMin - remainder;
                 } else if (seg1Slots > 0) {
-                    const remainder = seg1Mins % form.slot_duration;
+                    const remainder = seg1Mins % durationNum;
                     lastEffectiveEnd = bStart - remainder;
                 }
             }
         } else {
             const totalWorkMin = endMin - startMin;
-            slots = Math.floor(totalWorkMin / form.slot_duration);
-            const remainder = totalWorkMin % form.slot_duration;
+            slots = Math.floor(totalWorkMin / durationNum);
+            const remainder = totalWorkMin % durationNum;
             lastEffectiveEnd = endMin - remainder;
         }
 
@@ -246,8 +258,9 @@ const AvailabilityForm: React.FC<AvailabilityFormProps> = ({
         e.preventDefault();
         if (Object.keys(errors).length === 0) {
             onSave({
+                ...form,
                 dates: selectedDates,
-                ...form
+                slot_duration: Number(form.slot_duration)
             });
         }
     };
@@ -333,7 +346,7 @@ const AvailabilityForm: React.FC<AvailabilityFormProps> = ({
                                 <input
                                     type="number"
                                     value={form.slot_duration}
-                                    onChange={(e) => setForm(f => ({ ...f, slot_duration: parseInt(e.target.value) }))}
+                                    onChange={(e) => setForm(f => ({ ...f, slot_duration: e.target.value ? parseInt(e.target.value) : '' }))}
                                     className={cn(
                                         "w-full pr-12 pl-4 py-3 bg-gray-50 border rounded-xl text-sm font-bold focus:outline-none transition-all",
                                         errors.slot_duration ? "border-red-200 focus:border-red-500 bg-red-50/30" : "border-gray-100 focus:border-primary-500"
