@@ -1,19 +1,13 @@
 import React, { useState, useMemo } from 'react';
 import { cn } from '../../../lib/utils';
-import { IDoctorAvailability } from '../types/availability.types';
 import { Calendar as CalendarIcon, ChevronLeft, ChevronRight } from 'lucide-react';
-
-interface AvailabilityCalendarProps {
-    availabilities: IDoctorAvailability[];
-    selectedDates: string[]; // YYYY-MM-DD
-    onDateToggle: (date: string) => void;
-    loading?: boolean;
-}
+import { AvailabilityCalendarProps } from './types';
 
 const AvailabilityCalendar: React.FC<AvailabilityCalendarProps> = ({
     availabilities,
     selectedDates,
     onDateToggle,
+    mode,
     loading = false
 }) => {
     const [viewDate, setViewDate] = useState(new Date());
@@ -37,17 +31,16 @@ const AvailabilityCalendar: React.FC<AvailabilityCalendarProps> = ({
         todayUtc.setUTCHours(0, 0, 0, 0);
         const maxDateUtc = new Date(todayUtc.getTime() + 29 * 24 * 60 * 60 * 1000);
 
-        // Grid padding (Previous month's trailing days)
+        // Grid padding
         for (let i = 0; i < startPadding; i++) {
             days.push(null);
         }
 
-        // Actual days of the month
+        // Days of the month
         for (let d = 1; d <= totalDays; d++) {
             const dateObj = new Date(year, month, d);
             const dateStr = `${dateObj.getFullYear()}-${String(dateObj.getMonth() + 1).padStart(2, '0')}-${String(dateObj.getDate()).padStart(2, '0')}`;
 
-            // Interaction window check
             const currentDayUtc = new Date(Date.UTC(year, month, d, 0, 0, 0, 0));
             const isToday = currentDayUtc.getTime() === todayUtc.getTime();
             const isInRange = currentDayUtc >= todayUtc && currentDayUtc <= maxDateUtc;
@@ -89,7 +82,7 @@ const AvailabilityCalendar: React.FC<AvailabilityCalendarProps> = ({
     }
 
     return (
-        <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-6">
+        <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-6 overflow-hidden">
             <div className="flex items-center justify-between mb-8">
                 <div className="flex items-center gap-3">
                     <div className="p-2 bg-primary-50 rounded-xl">
@@ -97,7 +90,7 @@ const AvailabilityCalendar: React.FC<AvailabilityCalendarProps> = ({
                     </div>
                     <div>
                         <h3 className="font-bold text-gray-900">{monthLabel}</h3>
-                        <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest leading-none mt-0.5">30-Day Interaction Window</p>
+                        <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest leading-none mt-0.5">30-Day Window</p>
                     </div>
                 </div>
                 <div className="flex items-center gap-1">
@@ -131,7 +124,7 @@ const AvailabilityCalendar: React.FC<AvailabilityCalendarProps> = ({
                             disabled={!day.isInRange}
                             onClick={() => onDateToggle(day.dateStr)}
                             className={cn(
-                                "relative flex flex-col items-center justify-center h-20 rounded-2xl border-2 transition-all duration-200 group",
+                                "relative flex flex-col items-center justify-center h-16 sm:h-20 rounded-2xl border-2 transition-all duration-200 group",
                                 day.isSelected
                                     ? "bg-primary-600 border-primary-600 text-white shadow-lg shadow-primary-200 z-10 scale-105"
                                     : !day.isInRange
@@ -146,32 +139,30 @@ const AvailabilityCalendar: React.FC<AvailabilityCalendarProps> = ({
                                 {day.dayNum}
                             </span>
 
-                            {/* Status Dots */}
                             {day.isInRange && (
                                 <div className="flex gap-1">
                                     {hasData ? (
                                         isActive ? (
-                                            <div className={cn("w-1.5 h-1.5 rounded-full", day.isSelected ? "bg-primary-200" : "bg-green-500")} />
+                                            <div className={cn("w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full", day.isSelected ? "bg-primary-200" : "bg-green-500")} />
                                         ) : (
-                                            <div className={cn("w-1.5 h-1.5 rounded-full", day.isSelected ? "bg-white/40" : "bg-gray-300")} />
+                                            <div className={cn("w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full", day.isSelected ? "bg-white/40" : "bg-gray-300")} />
                                         )
                                     ) : (
-                                        <div className="w-1.5 h-1.5 rounded-full bg-orange-200 animate-pulse" />
+                                        <div className="w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full bg-orange-200 animate-pulse" />
                                     )}
                                 </div>
                             )}
 
-                            {/* Slot Count or Status Label */}
                             {day.isInRange && (
-                                <div className="mt-2 text-[8px] font-black uppercase tracking-tighter">
-                                    {isActive && day.availability?.total_slots !== undefined ? (
+                                <div className="mt-2 text-[7px] sm:text-[8px] font-black uppercase tracking-tighter">
+                                    {isActive ? (
                                         <span className={day.isSelected ? "text-primary-100" : "text-primary-600"}>
-                                            {day.availability.total_slots} Slots
+                                            {mode === 'doctor' ? (day.availability?.total_slots ?? 0) : (day.availability?.available_slots ?? 0)} Slots
                                         </span>
                                     ) : hasData && !isActive ? (
                                         <span className={day.isSelected ? "text-primary-200" : "text-gray-400"}>OFF</span>
                                     ) : !hasData ? (
-                                        <span className="text-orange-400">Pending</span>
+                                        <span className="text-orange-400">N/A</span>
                                     ) : null}
                                 </div>
                             )}
@@ -180,27 +171,25 @@ const AvailabilityCalendar: React.FC<AvailabilityCalendarProps> = ({
                 })}
             </div>
 
-            <div className="mt-8 flex flex-wrap gap-x-6 gap-y-3 pt-6 border-t border-gray-50">
+            <div className="mt-8 flex flex-wrap gap-x-4 gap-y-3 pt-6 border-t border-gray-50">
                 <div className="flex items-center gap-2">
-                    <div className="w-2.5 h-2.5 rounded-full bg-green-500" />
+                    <div className="w-2 h-2 rounded-full bg-green-500" />
                     <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Active</span>
                 </div>
                 <div className="flex items-center gap-2">
-                    <div className="w-2.5 h-2.5 rounded-full bg-gray-200" />
+                    <div className="w-2 h-2 rounded-full bg-gray-200" />
                     <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Inactive</span>
                 </div>
                 <div className="flex items-center gap-2">
-                    <div className="w-2.5 h-2.5 rounded-full bg-primary-600" />
+                    <div className="w-2 h-2 rounded-full bg-primary-600" />
                     <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Selected</span>
                 </div>
-                <div className="flex items-center gap-2">
-                    <div className="w-2.5 h-2.5 rounded-full bg-orange-200" />
-                    <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Pending</span>
-                </div>
-                <div className="ml-auto flex items-center gap-2">
-                    <div className="w-4 h-[2px] bg-primary-600" />
-                    <span className="text-[9px] font-bold text-primary-600 uppercase tracking-widest italic">Today</span>
-                </div>
+                {mode === 'doctor' && (
+                    <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 rounded-full bg-orange-200" />
+                        <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Pending</span>
+                    </div>
+                )}
             </div>
         </div>
     );

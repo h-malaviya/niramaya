@@ -3,7 +3,7 @@ import DoctorLayout from '../../../components/layouts/DoctorLayout';
 import { CalendarDays, Loader2, Info, AlertCircle } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { availabilityService } from '../services/availability.service';
-import AvailabilityCalendar from '../components/AvailabilityCalendar';
+import AvailabilityCalendar from '../../../components/common/AvailabilityCalendar/AvailabilityCalendar';
 import AvailabilityForm from '../components/AvailabilityForm';
 import { toast } from 'react-hot-toast';
 import { getErrorMessage } from '../../../utils/api-error';
@@ -62,7 +62,7 @@ const DoctorAvailability: React.FC = () => {
                     <div className="space-y-1">
                         <p className="text-sm font-bold text-primary-900">Configuring IST Timings</p>
                         <p className="text-xs text-primary-700 leading-relaxed font-medium">
-                            All times below are in **Indian Standard Time (IST)**. 
+                            All times below are in **Indian Standard Time (IST)**.
                         </p>
                     </div>
                 </div>
@@ -90,6 +90,7 @@ const DoctorAvailability: React.FC = () => {
                                 selectedDates={selectedDates}
                                 onDateToggle={handleDateToggle}
                                 loading={isLoading}
+                                mode="doctor"
                             />
 
                             {!selectedDates.length && (
