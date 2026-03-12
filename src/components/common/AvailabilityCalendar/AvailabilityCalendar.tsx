@@ -7,11 +7,24 @@ import { Role } from '../../../types/role.enum';
 const AvailabilityCalendar: React.FC<AvailabilityCalendarProps> = ({
     availabilities,
     selectedDates,
-    onDateToggle,
+    onDatesChange,
     mode,
     loading = false
 }) => {
     const [viewDate, setViewDate] = useState(new Date());
+
+    const handleDateClick = (date: string) => {
+        if (mode === Role.DOCTOR) {
+            // Toggling logic for doctors (Multiple Selection)
+            const newDates = selectedDates.includes(date)
+                ? selectedDates.filter(d => d !== date)
+                : [...selectedDates, date];
+            onDatesChange(newDates);
+        } else {
+            // Single selection for patients
+            onDatesChange([date]);
+        }
+    };
 
     const { calendarDays, monthLabel } = useMemo(() => {
         const year = viewDate.getFullYear();
@@ -123,7 +136,7 @@ const AvailabilityCalendar: React.FC<AvailabilityCalendarProps> = ({
                         <button
                             key={day.dateStr}
                             disabled={!day.isInRange}
-                            onClick={() => onDateToggle(day.dateStr)}
+                            onClick={() => handleDateClick(day.dateStr)}
                             className={cn(
                                 "relative flex flex-col items-center justify-center h-16 sm:h-20 rounded-2xl border-2 transition-all duration-200 group",
                                 day.isSelected

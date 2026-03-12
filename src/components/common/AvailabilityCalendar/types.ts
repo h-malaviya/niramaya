@@ -10,7 +10,7 @@ export interface ICalendarAvailability {
 export interface AvailabilityCalendarProps {
     availabilities: ICalendarAvailability[];
     selectedDates: string[]; // YYYY-MM-DD
-    onDateToggle: (date: string) => void;
+    onDatesChange: (dates: string[]) => void;
     mode: Role;
     loading?: boolean;
 }

@@ -41,13 +41,6 @@ const DoctorAvailability: React.FC = () => {
         }
     });
 
-    const handleDateToggle = (date: string) => {
-        setSelectedDates(prev =>
-            prev.includes(date)
-                ? prev.filter(d => d !== date)
-                : [...prev, date]
-        );
-    };
 
     return (
         <DoctorLayout>
@@ -92,7 +85,7 @@ const DoctorAvailability: React.FC = () => {
                             <AvailabilityCalendar
                                 availabilities={availabilities}
                                 selectedDates={selectedDates}
-                                onDateToggle={handleDateToggle}
+                                onDatesChange={setSelectedDates}
                                 loading={isLoading}
                                 mode={calendarMode}
                             />
