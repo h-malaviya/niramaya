@@ -1,3 +1,5 @@
+import { Role } from "../../../types/role.enum";
+
 export interface ICalendarAvailability {
     date: string; // YYYY-MM-DD
     is_active: boolean;
@@ -9,6 +11,6 @@ export interface AvailabilityCalendarProps {
     availabilities: ICalendarAvailability[];
     selectedDates: string[]; // YYYY-MM-DD
     onDateToggle: (date: string) => void;
-    mode: 'doctor' | 'patient';
+    mode: Role;
     loading?: boolean;
 }

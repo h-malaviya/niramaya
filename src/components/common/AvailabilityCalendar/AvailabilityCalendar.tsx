@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { cn } from '../../../lib/utils';
 import { Calendar as CalendarIcon, ChevronLeft, ChevronRight } from 'lucide-react';
 import { AvailabilityCalendarProps } from './types';
+import { Role } from '../../../types/role.enum';
 
 const AvailabilityCalendar: React.FC<AvailabilityCalendarProps> = ({
     availabilities,
@@ -157,7 +158,7 @@ const AvailabilityCalendar: React.FC<AvailabilityCalendarProps> = ({
                                 <div className="mt-2 text-[7px] sm:text-[8px] font-black uppercase tracking-tighter">
                                     {isActive ? (
                                         <span className={day.isSelected ? "text-primary-100" : "text-primary-600"}>
-                                            {mode === 'doctor' ? (day.availability?.total_slots ?? 0) : (day.availability?.available_slots ?? 0)} Slots
+                                            {mode === Role.DOCTOR ? (day.availability?.total_slots ?? 0) : (day.availability?.available_slots ?? 0)} Slots
                                         </span>
                                     ) : hasData && !isActive ? (
                                         <span className={day.isSelected ? "text-primary-200" : "text-gray-400"}>OFF</span>
@@ -184,7 +185,7 @@ const AvailabilityCalendar: React.FC<AvailabilityCalendarProps> = ({
                     <div className="w-2 h-2 rounded-full bg-primary-600" />
                     <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Selected</span>
                 </div>
-                {mode === 'doctor' && (
+                {mode === Role.DOCTOR && (
                     <div className="flex items-center gap-2">
                         <div className="w-2 h-2 rounded-full bg-orange-200" />
                         <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Pending</span>

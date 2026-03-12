@@ -7,6 +7,8 @@ import AvailabilityCalendar from '../../../components/common/AvailabilityCalenda
 import AvailabilityForm from '../components/AvailabilityForm';
 import { toast } from 'react-hot-toast';
 import { getErrorMessage } from '../../../utils/api-error';
+import { getRoleFromToken } from '../../auth/utils/auth.utils';
+import { Role } from '../../../types/role.enum';
 
 const DoctorAvailability: React.FC = () => {
     const queryClient = useQueryClient();
@@ -19,6 +21,8 @@ const DoctorAvailability: React.FC = () => {
     });
 
     const availabilities = data?.data?.availabilities || [];
+    const userRole = getRoleFromToken() as Role;
+    const calendarMode = userRole === Role.PATIENT ? Role.PATIENT : Role.DOCTOR;
 
     // Update availability mutation
     const updateMutation = useMutation({
@@ -90,7 +94,7 @@ const DoctorAvailability: React.FC = () => {
                                 selectedDates={selectedDates}
                                 onDateToggle={handleDateToggle}
                                 loading={isLoading}
-                                mode="doctor"
+                                mode={calendarMode}
                             />
 
                             {!selectedDates.length && (
