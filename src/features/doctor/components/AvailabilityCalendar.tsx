@@ -1,7 +1,7 @@
-import React, { useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { cn } from '../../../lib/utils';
 import { IDoctorAvailability } from '../types/availability.types';
-import { Calendar as CalendarIcon, CheckCircle2, XCircle } from 'lucide-react';
+import { Calendar as CalendarIcon, CheckCircle2, XCircle, ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface AvailabilityCalendarProps {
     availabilities: IDoctorAvailability[];
@@ -16,115 +16,163 @@ const AvailabilityCalendar: React.FC<AvailabilityCalendarProps> = ({
     onDateToggle,
     loading = false
 }) => {
-    // Generate next 30 days starting from today in IST
-    const days = useMemo(() => {
-        const result = [];
+    const [viewDate, setViewDate] = useState(new Date());
+
+    const { calendarDays, monthLabel } = useMemo(() => {
+        const year = viewDate.getFullYear();
+        const month = viewDate.getMonth();
+
+        const firstDayOfMonth = new Date(year, month, 1);
+        const lastDayOfMonth = new Date(year, month + 1, 0);
+
+        const startPadding = firstDayOfMonth.getDay(); // 0 is Sunday
+        const totalDays = lastDayOfMonth.getDate();
+
+        const days = [];
+
+        // IST Reference for 30-day window
         const now = new Date();
-
-        // Calculate current date in IST
-        // IST is UTC + 5:30
         const istOffset = 5.5 * 60 * 60 * 1000;
+        const todayUtc = new Date(now.getTime() + istOffset);
+        todayUtc.setUTCHours(0, 0, 0, 0);
+        const maxDateUtc = new Date(todayUtc.getTime() + 29 * 24 * 60 * 60 * 1000);
 
-        for (let i = 0; i < 30; i++) {
-            const dateObj = new Date(now.getTime() + istOffset + (i * 24 * 60 * 60 * 1000));
+        // Grid padding (Previous month's trailing days)
+        for (let i = 0; i < startPadding; i++) {
+            days.push(null);
+        }
 
-            // Get YYYY-MM-DD from the UTC values of this offsetted Date object
-            const y = dateObj.getUTCFullYear();
-            const m = String(dateObj.getUTCMonth() + 1).padStart(2, '0');
-            const d = String(dateObj.getUTCDate()).padStart(2, '0');
-            const dateStr = `${y}-${m}-${d}`;
+        // Actual days of the month
+        for (let d = 1; d <= totalDays; d++) {
+            const dateObj = new Date(year, month, d);
+            const dateStr = `${dateObj.getFullYear()}-${String(dateObj.getMonth() + 1).padStart(2, '0')}-${String(dateObj.getDate()).padStart(2, '0')}`;
+
+            // Interaction window check
+            const currentDayUtc = new Date(Date.UTC(year, month, d, 0, 0, 0, 0));
+            const isToday = currentDayUtc.getTime() === todayUtc.getTime();
+            const isInRange = currentDayUtc >= todayUtc && currentDayUtc <= maxDateUtc;
 
             const availability = availabilities.find(a => a.date === dateStr);
             const isSelected = selectedDates.includes(dateStr);
 
-            result.push({
+            days.push({
                 dateStr,
-                dayName: dateObj.toLocaleDateString('en-US', { weekday: 'short', timeZone: 'UTC' }),
-                dayNum: dateObj.getUTCDate(),
-                monthName: dateObj.toLocaleDateString('en-US', { month: 'short', timeZone: 'UTC' }),
+                dayNum: d,
+                isToday,
+                isInRange,
                 availability,
                 isSelected
             });
         }
-        return result;
-    }, [availabilities, selectedDates]);
+
+        return {
+            calendarDays: days,
+            monthLabel: viewDate.toLocaleString('default', { month: 'long', year: 'numeric' })
+        };
+    }, [viewDate, availabilities, selectedDates]);
+
+    const changeMonth = (offset: number) => {
+        setViewDate(new Date(viewDate.getFullYear(), viewDate.getMonth() + offset, 1));
+    };
 
     if (loading) {
         return (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-6 gap-3 animate-pulse">
-                {[...Array(30)].map((_, i) => (
-                    <div key={i} className="h-24 bg-gray-100 rounded-2xl border border-gray-50" />
-                ))}
+            <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-6 animate-pulse">
+                <div className="h-8 w-48 bg-gray-100 rounded-lg mb-6" />
+                <div className="grid grid-cols-7 gap-2">
+                    {[...Array(35)].map((_, i) => (
+                        <div key={i} className="h-16 bg-gray-50 rounded-xl" />
+                    ))}
+                </div>
             </div>
         );
     }
 
     return (
         <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-6">
-            <div className="flex items-center gap-3 mb-6">
-                <div className="p-2 bg-primary-50 rounded-xl">
-                    <CalendarIcon className="w-5 h-5 text-primary-600" />
+            <div className="flex items-center justify-between mb-8">
+                <div className="flex items-center gap-3">
+                    <div className="p-2 bg-primary-50 rounded-xl">
+                        <CalendarIcon className="w-5 h-5 text-primary-600" />
+                    </div>
+                    <div>
+                        <h3 className="font-bold text-gray-900">{monthLabel}</h3>
+                        <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest leading-none mt-0.5">30-Day Interaction Window</p>
+                    </div>
                 </div>
-                <div>
-                    <h3 className="font-bold text-gray-900">30-Day Schedule</h3>
-                    <p className="text-xs text-gray-500 font-medium">Select one or more dates to manage availability</p>
+                <div className="flex items-center gap-1">
+                    <button onClick={() => changeMonth(-1)} className="p-2 hover:bg-gray-50 rounded-lg transition-colors text-gray-400">
+                        <ChevronLeft className="w-5 h-5" />
+                    </button>
+                    <button onClick={() => changeMonth(1)} className="p-2 hover:bg-gray-50 rounded-lg transition-colors text-gray-400">
+                        <ChevronRight className="w-5 h-5" />
+                    </button>
                 </div>
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
-                {days.map((day) => {
+            <div className="grid grid-cols-7 gap-1 mb-2">
+                {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(d => (
+                    <div key={d} className="text-center py-2">
+                        <span className="text-[10px] font-black text-gray-300 uppercase tracking-widest">{d}</span>
+                    </div>
+                ))}
+            </div>
+
+            <div className="grid grid-cols-7 gap-1.5">
+                {calendarDays.map((day, idx) => {
+                    if (!day) return <div key={`empty-${idx}`} className="h-20" />;
+
                     const isActive = day.availability?.is_active ?? false;
                     const hasData = !!day.availability;
 
                     return (
                         <button
                             key={day.dateStr}
+                            disabled={!day.isInRange}
                             onClick={() => onDateToggle(day.dateStr)}
                             className={cn(
-                                "relative flex flex-col items-center justify-center p-3 rounded-2xl border-2 transition-all duration-200 group",
+                                "relative flex flex-col items-center justify-center h-20 rounded-2xl border-2 transition-all duration-200 group",
                                 day.isSelected
-                                    ? "bg-primary-600 border-primary-600 text-white shadow-lg shadow-primary-200"
-                                    : "bg-white border-gray-50 hover:border-primary-100 hover:bg-primary-50/30"
+                                    ? "bg-primary-600 border-primary-600 text-white shadow-lg shadow-primary-200 z-10 scale-105"
+                                    : !day.isInRange
+                                        ? "bg-gray-50/50 border-transparent text-gray-300 cursor-not-allowed"
+                                        : "bg-white border-gray-50 hover:border-primary-100 hover:bg-primary-50/30"
                             )}
                         >
                             <span className={cn(
-                                "text-[10px] font-black uppercase tracking-widest leading-none mb-1",
-                                day.isSelected ? "text-primary-100" : "text-gray-400"
+                                "text-sm font-black mb-1",
+                                day.isToday && !day.isSelected && "text-primary-600 underline underline-offset-4 decoration-2"
                             )}>
-                                {day.monthName}
-                            </span>
-                            <span className="text-xl font-black mb-0.5 leading-none">{day.dayNum}</span>
-                            <span className={cn(
-                                "text-[10px] font-bold uppercase tracking-tight",
-                                day.isSelected ? "text-primary-100" : "text-gray-500"
-                            )}>
-                                {day.dayName}
+                                {day.dayNum}
                             </span>
 
-                            {/* Status Indicators */}
-                            <div className="absolute top-2 right-2">
-                                {hasData ? (
-                                    isActive ? (
-                                        <CheckCircle2 className={cn("w-3 h-3", day.isSelected ? "text-primary-200" : "text-green-500")} />
+                            {/* Status Dots */}
+                            {day.isInRange && (
+                                <div className="flex gap-1">
+                                    {hasData ? (
+                                        isActive ? (
+                                            <div className={cn("w-1.5 h-1.5 rounded-full", day.isSelected ? "bg-primary-200" : "bg-green-500")} />
+                                        ) : (
+                                            <div className={cn("w-1.5 h-1.5 rounded-full", day.isSelected ? "bg-white/40" : "bg-gray-300")} />
+                                        )
                                     ) : (
-                                        <XCircle className={cn("w-3 h-3", day.isSelected ? "text-primary-300" : "text-gray-300")} />
-                                    )
-                                ) : null}
-                            </div>
-
-                            {/* Slot Count Badge */}
-                            {isActive && day.availability?.total_slots !== undefined && (
-                                <div className={cn(
-                                    "mt-2 px-1.5 py-0.5 rounded-lg text-[8px] font-black",
-                                    day.isSelected ? "bg-white/20 text-white" : "bg-primary-50 text-primary-700"
-                                )}>
-                                    {day.availability.total_slots} SLOTS
+                                        <div className="w-1.5 h-1.5 rounded-full bg-orange-200 animate-pulse" />
+                                    )}
                                 </div>
                             )}
 
-                            {!hasData && (
-                                <div className="mt-2 px-1.5 py-0.5 rounded-lg text-[8px] font-black bg-gray-100 text-gray-400">
-                                    PENDING
+                            {/* Slot Count or Status Label */}
+                            {day.isInRange && (
+                                <div className="mt-2 text-[8px] font-black uppercase tracking-tighter">
+                                    {isActive && day.availability?.total_slots !== undefined ? (
+                                        <span className={day.isSelected ? "text-primary-100" : "text-primary-600"}>
+                                            {day.availability.total_slots} Slots
+                                        </span>
+                                    ) : hasData && !isActive ? (
+                                        <span className={day.isSelected ? "text-primary-200" : "text-gray-400"}>OFF</span>
+                                    ) : !hasData ? (
+                                        <span className="text-orange-400">Pending</span>
+                                    ) : null}
                                 </div>
                             )}
                         </button>
@@ -132,18 +180,26 @@ const AvailabilityCalendar: React.FC<AvailabilityCalendarProps> = ({
                 })}
             </div>
 
-            <div className="mt-6 flex flex-wrap gap-4 text-[10px] font-bold text-gray-400 uppercase tracking-widest pt-6 border-t border-gray-50">
+            <div className="mt-8 flex flex-wrap gap-x-6 gap-y-3 pt-6 border-t border-gray-50">
                 <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full bg-green-500" />
-                    <span>Available</span>
+                    <div className="w-2.5 h-2.5 rounded-full bg-green-500" />
+                    <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Active</span>
                 </div>
                 <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full bg-gray-200" />
-                    <span>Unavailable</span>
+                    <div className="w-2.5 h-2.5 rounded-full bg-gray-200" />
+                    <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Inactive</span>
                 </div>
                 <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full bg-primary-600" />
-                    <span>Selected</span>
+                    <div className="w-2.5 h-2.5 rounded-full bg-primary-600" />
+                    <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Selected</span>
+                </div>
+                <div className="flex items-center gap-2">
+                    <div className="w-2.5 h-2.5 rounded-full bg-orange-200" />
+                    <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Pending</span>
+                </div>
+                <div className="ml-auto flex items-center gap-2">
+                    <div className="w-4 h-[2px] bg-primary-600" />
+                    <span className="text-[9px] font-bold text-primary-600 uppercase tracking-widest italic">Today</span>
                 </div>
             </div>
         </div>
