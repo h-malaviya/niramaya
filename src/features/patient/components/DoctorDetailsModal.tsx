@@ -126,7 +126,7 @@ export default function DoctorDetailsModal({ doctor, onClose }: DoctorDetailsMod
                         Close
                     </button>
                     <Link
-                        to={`${APP_ROUTES.APPOINTMENTS.BOOK}?doctorId=${doctor.id}`}
+                        to={APP_ROUTES.PATIENT.BOOK_APPOINTMENT.replace(':doctorId', doctor.user_id)}
                         className="btn bg-primary-600 hover:bg-primary-700 flex-[2] h-14 rounded-2xl text-white font-bold shadow-lg shadow-primary-200 border-none flex items-center justify-center leading-none"
                     >
                         Book Appointment

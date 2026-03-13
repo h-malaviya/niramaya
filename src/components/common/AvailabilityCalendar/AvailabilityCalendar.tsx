@@ -96,8 +96,9 @@ const AvailabilityCalendar: React.FC<AvailabilityCalendarProps> = ({
     }
 
     return (
-        <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-6 overflow-hidden">
-            <div className="flex items-center justify-between mb-8">
+        <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-6">
+            {/* Header: month nav — always visible */}
+            <div className="flex items-center justify-between mb-6 shrink-0">
                 <div className="flex items-center gap-3">
                     <div className="p-2 bg-primary-50 rounded-xl">
                         <CalendarIcon className="w-5 h-5 text-primary-600" />
@@ -117,7 +118,8 @@ const AvailabilityCalendar: React.FC<AvailabilityCalendarProps> = ({
                 </div>
             </div>
 
-            <div className="grid grid-cols-7 gap-1 mb-2">
+            {/* Day-of-week headers — always visible */}
+            <div className="grid grid-cols-7 gap-1 mb-2 shrink-0">
                 {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(d => (
                     <div key={d} className="text-center py-2">
                         <span className="text-[10px] font-black text-gray-300 uppercase tracking-widest">{d}</span>
@@ -125,67 +127,77 @@ const AvailabilityCalendar: React.FC<AvailabilityCalendarProps> = ({
                 ))}
             </div>
 
-            <div className="grid grid-cols-7 gap-1.5">
-                {calendarDays.map((day, idx) => {
-                    if (!day) return <div key={`empty-${idx}`} className="h-20" />;
+            {/* Date grid — no scroll, no fixed height, natural size */}
+            <div>
+                <div className="grid grid-cols-7 gap-1.5 pb-2">
+                    {calendarDays.map((day, idx) => {
+                        if (!day) return <div key={`empty-${idx}`} className="aspect-square sm:aspect-auto sm:h-20" />;
 
-                    const isActive = day.availability?.is_active ?? false;
-                    const hasData = !!day.availability;
+                        const isActive = day.availability?.is_active ?? false;
+                        const hasData = !!day.availability;
+                        const isUnselectable = mode === Role.PATIENT && hasData && !isActive;
 
-                    return (
-                        <button
-                            key={day.dateStr}
-                            disabled={!day.isInRange}
-                            onClick={() => handleDateClick(day.dateStr)}
-                            className={cn(
-                                "relative flex flex-col items-center justify-center h-16 sm:h-20 rounded-2xl border-2 transition-all duration-200 group",
-                                day.isSelected
-                                    ? "bg-primary-600 border-primary-600 text-white shadow-lg shadow-primary-200 z-10 scale-105"
-                                    : !day.isInRange
-                                        ? "bg-gray-50/50 border-transparent text-gray-300 cursor-not-allowed"
-                                        : "bg-white border-gray-50 hover:border-primary-100 hover:bg-primary-50/30"
-                            )}
-                        >
-                            <span className={cn(
-                                "text-sm font-black mb-1",
-                                day.isToday && !day.isSelected && "text-primary-600 underline underline-offset-4 decoration-2"
-                            )}>
-                                {day.dayNum}
-                            </span>
+                        return (
+                            <button
+                                key={day.dateStr}
+                                disabled={!day.isInRange || isUnselectable}
+                                onClick={() => handleDateClick(day.dateStr)}
+                                className={cn(
+                                    "relative flex flex-col items-center justify-center aspect-square sm:aspect-auto sm:h-20 rounded-none sm:rounded-2xl border-2 transition-all duration-200",
+                                    day.isSelected
+                                        ? "bg-primary-600 border-primary-600 text-white shadow-md ring-2 ring-offset-1 ring-primary-400"
+                                        : !day.isInRange
+                                            ? "bg-gray-50/50 border-transparent text-gray-300 cursor-not-allowed"
+                                            : isUnselectable
+                                                ? "bg-red-50/50 border-red-100/50 text-red-300 cursor-not-allowed"
+                                                : "bg-white border-gray-50 hover:border-primary-100 hover:bg-primary-50/30"
+                                )}
+                            >
+                                <span className={cn(
+                                    "text-sm font-black mb-1",
+                                    day.isToday && !day.isSelected && "text-primary-600 underline underline-offset-4 decoration-2"
+                                )}>
+                                    {day.dayNum}
+                                </span>
 
-                            {day.isInRange && (
-                                <div className="flex gap-1">
-                                    {hasData ? (
-                                        isActive ? (
-                                            <div className={cn("w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full", day.isSelected ? "bg-primary-200" : "bg-green-500")} />
+                                {day.isInRange && (
+                                    <div className="flex gap-1">
+                                        {hasData ? (
+                                            isActive ? (
+                                                <div className={cn("w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full", day.isSelected ? "bg-primary-200" : "bg-green-500")} />
+                                            ) : (
+                                                <div className={cn("w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full", day.isSelected ? "bg-white/40" : "bg-red-400")} />
+                                            )
                                         ) : (
-                                            <div className={cn("w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full", day.isSelected ? "bg-white/40" : "bg-gray-300")} />
-                                        )
-                                    ) : (
-                                        <div className="w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full bg-orange-200 animate-pulse" />
-                                    )}
-                                </div>
-                            )}
+                                            <div className="w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full bg-orange-200 animate-pulse" />
+                                        )}
+                                    </div>
+                                )}
 
-                            {day.isInRange && (
-                                <div className="mt-2 text-[7px] sm:text-[8px] font-black uppercase tracking-tighter">
-                                    {isActive ? (
-                                        <span className={day.isSelected ? "text-primary-100" : "text-primary-600"}>
-                                            {mode === Role.DOCTOR ? (day.availability?.total_slots ?? 0) : (day.availability?.available_slots ?? 0)} Slots
-                                        </span>
-                                    ) : hasData && !isActive ? (
-                                        <span className={day.isSelected ? "text-primary-200" : "text-gray-400"}>OFF</span>
-                                    ) : !hasData ? (
-                                        <span className="text-orange-400">N/A</span>
-                                    ) : null}
-                                </div>
-                            )}
-                        </button>
-                    );
-                })}
+                                {/* Slot count / unavailable text — hidden on mobile, shown on sm+ */}
+                                {day.isInRange && (
+                                    <div className="hidden sm:block mt-1 text-[7px] sm:text-[8px] font-black uppercase tracking-tighter">
+                                        {isActive ? (
+                                            <span className={day.isSelected ? "text-primary-100" : "text-primary-600"}>
+                                                {mode === Role.DOCTOR ? (day.availability?.total_slots ?? 0) : (day.availability?.available_slots ?? 0)} Slots
+                                            </span>
+                                        ) : hasData && !isActive ? (
+                                            <span className={day.isSelected ? "text-primary-200" : "text-red-400"}>
+                                                {mode === Role.PATIENT ? 'Unavailable' : 'OFF'}
+                                            </span>
+                                        ) : !hasData ? (
+                                            <span className="text-orange-400">N/A</span>
+                                        ) : null}
+                                    </div>
+                                )}
+                            </button>
+                        );
+                    })}
+                </div>
             </div>
 
-            <div className="mt-8 flex flex-wrap gap-x-4 gap-y-3 pt-6 border-t border-gray-50">
+            {/* Legend — always at bottom */}
+            <div className="mt-4 flex flex-wrap gap-x-4 gap-y-3 pt-4 border-t border-gray-100">
                 <div className="flex items-center gap-2">
                     <div className="w-2 h-2 rounded-full bg-green-500" />
                     <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Active</span>
@@ -202,6 +214,12 @@ const AvailabilityCalendar: React.FC<AvailabilityCalendarProps> = ({
                     <div className="flex items-center gap-2">
                         <div className="w-2 h-2 rounded-full bg-orange-200" />
                         <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Pending</span>
+                    </div>
+                )}
+                {mode === Role.PATIENT && (
+                    <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 rounded-full bg-red-400" />
+                        <span className="text-[9px] font-bold text-red-400 uppercase tracking-widest">Unavailable</span>
                     </div>
                 )}
             </div>
