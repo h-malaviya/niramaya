@@ -3,7 +3,8 @@ import { API } from "../../../constants/api-routes";
 import { 
     IGetDoctorAvailabilityApiResponse, 
     IBookAppointmentApiResponse,
-    IBookAppointmentRequest
+    IBookAppointmentRequest,
+    IBookingStatusApiResponse
 } from "../types/booking.types";
 
 export const appointmentService = {
@@ -41,5 +42,16 @@ export const appointmentService = {
             }
         );
         return response.data;
+    },
+
+    getBookingStatus: async (sessionId: string): Promise<IBookingStatusApiResponse> => {
+        const url = API.PATIENTS.GET_APPOINTMENT_STATUS.replace(':sessionId', sessionId);
+        const response = await apiClient.get<IBookingStatusApiResponse>(url);
+        return response.data;
+    },
+
+    cancelBooking: async (sessionId: string): Promise<void> => {
+        const url = API.PATIENTS.CANCEL_APPOINTMENT.replace(':sessionId', sessionId);
+        await apiClient.post(url);
     }
 };

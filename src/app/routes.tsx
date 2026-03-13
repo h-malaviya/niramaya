@@ -16,6 +16,8 @@ import PatientDoctors from "../features/patient/pages/PatientDoctors";
 import PatientAppointments from "../features/patient/pages/PatientAppointments";
 import PatientProfile from "../features/patient/pages/PatientProfile";
 import BookAppointment from "../features/patient/pages/BookAppointment";
+import BookingSuccess from "../features/patient/pages/BookingSuccess";
+import BookingCancel from "../features/patient/pages/BookingCancel";
 
 import ProtectedRoute from "../features/auth/components/ProtectedRoute";
 import GuestRoute from "../features/auth/components/GuestRoute";
@@ -141,6 +143,22 @@ const router = createBrowserRouter([
                 <PatientLayout>
                     <BookAppointment />
                 </PatientLayout>
+            </ProtectedRoute>
+        ),
+    },
+    {
+        path: APP_ROUTES.PATIENT.BOOKING_SUCCESS,
+        element: (
+            <ProtectedRoute allowedRoles={[Role.PATIENT]}>
+                <BookingSuccess />
+            </ProtectedRoute>
+        ),
+    },
+    {
+        path: APP_ROUTES.PATIENT.BOOKING_CANCEL,
+        element: (
+            <ProtectedRoute allowedRoles={[Role.PATIENT]}>
+                <BookingCancel />
             </ProtectedRoute>
         ),
     },
