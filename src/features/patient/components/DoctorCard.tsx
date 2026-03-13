@@ -102,7 +102,7 @@ export default function DoctorCard({ doctor, onViewProfile }: DoctorCardProps) {
                         View Profile
                     </button>
                     <Link
-                        to={`${APP_ROUTES.APPOINTMENTS.BOOK}?doctorId=${doctor.id}`}
+                        to={APP_ROUTES.PATIENT.BOOK_APPOINTMENT.replace(':doctorId', doctor.user_id)}
                         className="btn bg-primary-600 hover:bg-primary-700 btn-sm h-10 rounded-xl px-6 text-white shadow-lg shadow-primary-200 flex-1 sm:flex-none font-bold text-xs border-none flex items-center justify-center leading-none"
                         onClick={(e) => e.stopPropagation()}
                     >

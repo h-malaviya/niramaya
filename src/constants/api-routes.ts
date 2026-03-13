@@ -30,4 +30,11 @@ export const API = {
         GET_AVAILABILITY: '/doctors/availability',
         EDIT_AVAILABILITY: '/doctors/availability/edit',
     },
+    COMMON: {
+        GET_DOCTORS: '/patients/doctors',
+    },
+    PATIENTS: {
+        GET_DOCTOR_AVAILABILITY: '/patients/availability/:doctorId',
+        BOOK_APPOINTMENT: '/appointment/book',
+    }
 };
