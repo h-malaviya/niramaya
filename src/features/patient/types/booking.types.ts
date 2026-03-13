@@ -46,3 +46,26 @@ export interface IBookAppointmentResponse {
 }
 
 export type IBookAppointmentApiResponse = IApiResponse<IBookAppointmentResponse>;
+
+export interface IBookingStatusResponse {
+    appointment: {
+        id: string;
+        start_at: string;
+        end_at: string;
+        status: string;
+        doctor_name: string;
+        description: string;
+        name: string;
+        email: string;
+        phone: string;
+    };
+    payment: {
+        amount: number;
+        currency: string;
+        payment_status: string;
+        receipt_url: string | null;
+        payment_method: string;
+    };
+}
+
+export type IBookingStatusApiResponse = IApiResponse<IBookingStatusResponse>;

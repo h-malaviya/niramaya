@@ -36,5 +36,7 @@ export const API = {
     PATIENTS: {
         GET_DOCTOR_AVAILABILITY: '/patients/availability/:doctorId',
         BOOK_APPOINTMENT: '/appointment/book',
+        GET_APPOINTMENT_STATUS: '/appointment/status/:sessionId',
+        CANCEL_APPOINTMENT: '/appointment/cancel/:sessionId',
     }
 };

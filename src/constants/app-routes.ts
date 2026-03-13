@@ -20,5 +20,7 @@ export const APP_ROUTES = {
         APPOINTMENTS: '/patient/appointments',
         PROFILE: '/patient/profile',
         BOOK_APPOINTMENT: '/patient/book-appointment/:doctorId',
+        BOOKING_SUCCESS: '/patient/appointment/success',
+        BOOKING_CANCEL: '/patient/appointment/cancel',
     },
 };
