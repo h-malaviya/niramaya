@@ -1,42 +1,43 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { 
-    Calendar, 
-    Search, 
-    ChevronDown, 
-    History, 
-    Clock, 
+import {
+    Calendar,
+    Search,
+    ChevronDown,
+    History,
+    Clock,
     CalendarDays,
     ArrowUpDown,
     Timer
 } from 'lucide-react';
 import { format, subDays } from 'date-fns';
 import { appointmentService } from '../services/appointment.service';
-import { IAppointment, IGetAppointmentsQuery, AppointmentStatus } from '../../../types/appointment.types';
+import { IAppointment, IGetAppointmentsQuery, AppointmentStatus, DoctorAppointmentTabs } from '../../../types/appointment.types';
 import AppointmentCard from '../../../components/appointments/AppointmentCard';
 import AppointmentModal from '../../../components/appointments/AppointmentModal';
 import Pagination from '../../../components/common/Pagination';
 import { cn } from '../../../lib/utils';
 import DoctorLayout from '../../../components/layouts/DoctorLayout';
+import { Role } from '../../../types/role.enum';
 
 const TABS = [
-    { id: 'ongoing', label: 'Ongoing', icon: Clock },
-    { id: 'scheduled', label: 'Scheduled', icon: CalendarDays },
-    { id: 'history', label: 'History', icon: History },
+    { id: DoctorAppointmentTabs.ONGOING, label: 'Ongoing', icon: Clock },
+    { id: DoctorAppointmentTabs.SCHEDULED, label: 'Scheduled', icon: CalendarDays },
+    { id: DoctorAppointmentTabs.HISTORY, label: 'History', icon: History },
 ];
 
 const DoctorAppointments: React.FC = () => {
-    const [activeTab, setActiveTab] = useState('ongoing');
+    const [activeTab, setActiveTab] = useState<string>(DoctorAppointmentTabs.ONGOING);
     const [appointments, setAppointments] = useState<IAppointment[]>([]);
     const [pagination, setPagination] = useState({ current_page: 1, total_pages: 1 });
     const [loading, setLoading] = useState(true);
     const [timeLeft, setTimeLeft] = useState<string>('00:00');
     const [isOngoingTimerComplete, setIsOngoingTimerComplete] = useState(false);
-    
+
     // Filters
     const [fromDate, setFromDate] = useState<string>('');
     const [toDate, setToDate] = useState<string>('');
     const [sortBy, setSortBy] = useState<'nearest' | 'farthest'>('nearest');
-    
+
     // Modal
     const [selectedAppointment, setSelectedAppointment] = useState<IAppointment | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -85,8 +86,8 @@ const DoctorAppointments: React.FC = () => {
     // Timer Logic for Ongoing Session
     useEffect(() => {
         let interval: any;
-        
-        if (activeTab === 'ongoing' && appointments.length > 0 && !loading) {
+
+        if (activeTab === DoctorAppointmentTabs.ONGOING && appointments.length > 0 && !loading) {
             const firstApp = appointments[0];
             const end = new Date(firstApp.end_time.replace('Z', ''));
 
@@ -129,7 +130,7 @@ const DoctorAppointments: React.FC = () => {
                         <h1 className="text-4xl font-black text-gray-900 tracking-tight mb-2">My Appointments</h1>
                         <p className="text-sm font-bold text-gray-400 uppercase tracking-widest">Manage your daily schedule and patients</p>
                     </div>
-                    
+
                     {/* Role Badge */}
                     <div className="flex items-center gap-2 bg-primary-50 px-4 py-2 rounded-2xl border border-primary-100">
                         <div className="w-2 h-2 rounded-full bg-primary-600 animate-pulse" />
@@ -164,16 +165,16 @@ const DoctorAppointments: React.FC = () => {
                     </div>
 
                     {/* Filters Section */}
-                    {activeTab !== 'ongoing' && (
+                    {activeTab !== DoctorAppointmentTabs.ONGOING && (
                         <div className="p-8 pb-0 flex flex-wrap items-center gap-6">
                             <div className="flex items-center gap-3">
                                 <div className="flex flex-col gap-1.5">
                                     <label className="text-[10px] font-black text-gray-400 uppercase tracking-tight ml-1">From Date</label>
                                     <div className="relative">
-                                        <input 
-                                            type="date" 
+                                        <input
+                                            type="date"
                                             value={fromDate}
-                                            max={activeTab === 'history' ? yesterday : undefined}
+                                            max={activeTab === DoctorAppointmentTabs.HISTORY ? yesterday : undefined}
                                             onChange={(e) => {
                                                 const newFrom = e.target.value;
                                                 setFromDate(newFrom);
@@ -190,10 +191,10 @@ const DoctorAppointments: React.FC = () => {
                                 <div className="flex flex-col gap-1.5">
                                     <label className="text-[10px] font-black text-gray-400 uppercase tracking-tight ml-1">To Date</label>
                                     <div className="relative">
-                                        <input 
-                                            type="date" 
+                                        <input
+                                            type="date"
                                             value={toDate}
-                                            min={fromDate || (activeTab === 'history' ? undefined : undefined)}
+                                            min={fromDate || (activeTab === DoctorAppointmentTabs.HISTORY ? undefined : undefined)}
                                             onChange={(e) => setToDate(e.target.value)}
                                             className="h-12 pl-10 pr-4 rounded-2xl bg-gray-50 border-none text-xs font-bold text-gray-700 focus:ring-2 focus:ring-primary-100 transition-all cursor-pointer"
                                         />
@@ -205,12 +206,12 @@ const DoctorAppointments: React.FC = () => {
                             <div className="flex flex-col gap-1.5 ml-auto">
                                 <label className="text-[10px] font-black text-gray-400 uppercase tracking-tight ml-1">Sort By</label>
                                 <div className="relative">
-                                    <select 
+                                    <select
                                         value={sortBy}
                                         onChange={(e) => setSortBy(e.target.value as any)}
                                         className="h-12 pl-10 pr-10 rounded-2xl bg-gray-50 border-none text-xs font-bold text-gray-700 appearance-none focus:ring-2 focus:ring-primary-100 transition-all cursor-pointer min-w-[160px]"
                                     >
-                                        {activeTab === 'history' ? (
+                                        {activeTab === DoctorAppointmentTabs.HISTORY ? (
                                             <>
                                                 <option value="nearest">Latest First</option>
                                                 <option value="farthest">Oldest First</option>
@@ -228,7 +229,7 @@ const DoctorAppointments: React.FC = () => {
                             </div>
 
                             {(fromDate || toDate) && (
-                                <button 
+                                <button
                                     onClick={() => { setFromDate(''); setToDate(''); }}
                                     className="mt-6 text-[10px] font-black text-primary-600 uppercase hover:text-primary-700 px-2 py-1"
                                 >
@@ -250,16 +251,16 @@ const DoctorAppointments: React.FC = () => {
                             <>
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 mb-10">
                                     {appointments.map((app, index) => {
-                                        const isOngoingTab = activeTab === 'ongoing';
-                                        const enhancedApp = isOngoingTab 
-                                            ? { ...app, status: AppointmentStatus.ONGOING } 
+                                        const isOngoingTab = activeTab === DoctorAppointmentTabs.ONGOING;
+                                        const enhancedApp = isOngoingTab
+                                            ? { ...app, status: AppointmentStatus.ONGOING }
                                             : app;
-                                            
+
                                         return (
                                             <div key={app.id} className="relative">
-                                                <AppointmentCard 
-                                                    appointment={enhancedApp} 
-                                                    role="DOCTOR" 
+                                                <AppointmentCard
+                                                    appointment={enhancedApp}
+                                                    role={Role.DOCTOR}
                                                     onClick={() => handleAppointmentClick(enhancedApp)}
                                                 />
                                                 {isOngoingTab && index === 0 && (
@@ -271,11 +272,11 @@ const DoctorAppointments: React.FC = () => {
                                         );
                                     })}
                                 </div>
-                                
-                                <Pagination 
-                                    currentPage={pagination.current_page} 
-                                    totalPages={pagination.total_pages} 
-                                    onPageChange={(page) => fetchAppointments(page)} 
+
+                                <Pagination
+                                    currentPage={pagination.current_page}
+                                    totalPages={pagination.total_pages}
+                                    onPageChange={(page) => fetchAppointments(page)}
                                 />
                             </>
                         ) : (
@@ -291,7 +292,7 @@ const DoctorAppointments: React.FC = () => {
                 </div>
 
                 {/* Status Bar for Ongoing */}
-                {activeTab === 'ongoing' && appointments.length > 0 && (
+                {activeTab === DoctorAppointmentTabs.ONGOING && appointments.length > 0 && (
                     <div className="fixed bottom-10 right-10 z-50 animate-in slide-in-from-right-10 duration-500">
                         <div className="bg-gray-900 text-white rounded-[32px] px-8 py-5 shadow-2xl flex items-center gap-6 border border-white/10 backdrop-blur-md">
                             <div className="flex items-center gap-4 pr-6 border-r border-white/10">
@@ -320,11 +321,11 @@ const DoctorAppointments: React.FC = () => {
                 )}
             </div>
 
-            <AppointmentModal 
+            <AppointmentModal
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
                 appointment={selectedAppointment}
-                role="DOCTOR"
+                role={Role.DOCTOR}
             />
         </DoctorLayout>
     );

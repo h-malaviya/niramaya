@@ -1,5 +1,6 @@
 import React from 'react';
 import { IAppointment, AppointmentStatus } from '../../types/appointment.types';
+import { Role } from '../../types/role.enum';
 import { format } from 'date-fns';
 import {
     X,
@@ -23,7 +24,7 @@ import { APP_ROUTES } from '../../constants/app-routes';
 
 interface AppointmentModalProps {
     appointment: IAppointment | null;
-    role: 'DOCTOR' | 'PATIENT';
+    role: Role;
     isOpen: boolean;
     onClose: () => void;
 }
@@ -33,7 +34,7 @@ const AppointmentModal: React.FC<AppointmentModalProps> = ({ appointment, role, 
 
     if (!isOpen || !appointment) return null;
 
-    const isDoctor = role === 'DOCTOR';
+    const isDoctor = role === Role.DOCTOR;
     const parseTime = (isoStr: string) => {
         // Remove 'Z' if present to treat the time as local, 
         // because the backend already shifted it for presentation.
