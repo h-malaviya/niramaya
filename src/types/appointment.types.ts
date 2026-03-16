@@ -10,6 +10,18 @@ export enum AppointmentStatus {
     ONGOING = 'ONGOING',
 }
 
+export enum PatientAppointmentTabs {
+    SCHEDULED = 'scheduled',
+    PENDING_PAYMENT = 'pending_payment',
+    HISTORY = 'history'
+}
+
+export enum DoctorAppointmentTabs {
+    ONGOING = 'ongoing',
+    SCHEDULED = 'scheduled',
+    HISTORY = 'history'
+}
+
 export interface IMedicalReport {
     id: string;
     report_url: string;
@@ -49,7 +61,7 @@ export interface IAppointment {
     queue_token?: number;
     prescription?: IPrescription;
     rating_details?: IRating;
-    
+
     // Doctor side fields
     patient_id?: string;
     patient_name?: string;

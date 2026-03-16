@@ -1,35 +1,40 @@
 import React from 'react';
 import { IAppointment, AppointmentStatus } from '../../types/appointment.types';
+import { Role } from '../../types/role.enum';
 import { format } from 'date-fns';
-import { 
-    X, 
-    Clock, 
-    Calendar, 
-    User, 
-    FileText, 
-    Activity, 
-    Thermometer, 
-    Weight, 
-    ArrowUp, 
-    Baby, 
+import {
+    X,
+    Clock,
+    Calendar,
+    User,
+    FileText,
+    Activity,
+    Thermometer,
+    Weight,
+    ArrowUp,
+    Baby,
     Type,
     ClipboardList,
     ExternalLink
 } from 'lucide-react';
 import StatusBadge from './StatusBadge';
 import { cn } from '../../lib/utils';
+import { useNavigate } from 'react-router-dom';
+import { APP_ROUTES } from '../../constants/app-routes';
 
 interface AppointmentModalProps {
     appointment: IAppointment | null;
-    role: 'DOCTOR' | 'PATIENT';
+    role: Role;
     isOpen: boolean;
     onClose: () => void;
 }
 
 const AppointmentModal: React.FC<AppointmentModalProps> = ({ appointment, role, isOpen, onClose }) => {
+    const navigate = useNavigate();
+
     if (!isOpen || !appointment) return null;
 
-    const isDoctor = role === 'DOCTOR';
+    const isDoctor = role === Role.DOCTOR;
     const parseTime = (isoStr: string) => {
         // Remove 'Z' if present to treat the time as local, 
         // because the backend already shifted it for presentation.
@@ -51,24 +56,24 @@ const AppointmentModal: React.FC<AppointmentModalProps> = ({ appointment, role, 
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
             <div className="absolute inset-0 bg-gray-900/60 backdrop-blur-sm" onClick={onClose} />
-            
+
             <div className="relative w-full max-w-2xl bg-white rounded-[40px] shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-300 max-h-[90vh] flex flex-col m-4">
                 {/* Header */}
                 <div className="relative h-32 bg-primary-600 p-8">
-                    <button 
+                    <button
                         onClick={onClose}
                         className="absolute top-6 right-6 w-10 h-10 rounded-2xl bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors border border-white/20"
                     >
                         <X className="w-5 h-5" />
                     </button>
-                    
+
                     <div className="flex items-center gap-6">
                         <div className="w-20 h-20 rounded-3xl bg-white p-1 shadow-xl">
                             <div className="w-full h-full rounded-[20px] bg-gray-50 overflow-hidden">
                                 {(isDoctor ? appointment.patient_avatar : appointment.doctor_avatar) ? (
-                                    <img 
-                                        src={isDoctor ? appointment.patient_avatar : appointment.doctor_avatar} 
-                                        alt="Profile" 
+                                    <img
+                                        src={isDoctor ? appointment.patient_avatar : appointment.doctor_avatar}
+                                        alt="Profile"
                                         className="w-full h-full object-cover"
                                     />
                                 ) : (
@@ -102,15 +107,15 @@ const AppointmentModal: React.FC<AppointmentModalProps> = ({ appointment, role, 
                 <div className="p-8 overflow-y-auto no-scrollbar flex-1">
                     {/* Time Info */}
                     <div className="grid grid-cols-2 gap-4 mb-8">
-                        <InfoCard 
-                            icon={Calendar} 
-                            label="Date" 
-                            value={format(startTime, 'EEEE, dd MMMM yyyy')} 
+                        <InfoCard
+                            icon={Calendar}
+                            label="Date"
+                            value={format(startTime, 'EEEE, dd MMMM yyyy')}
                         />
-                        <InfoCard 
-                            icon={Clock} 
-                            label="Time Slot" 
-                            value={`${format(startTime, 'hh:mm a')} - ${format(endTime, 'hh:mm a')}`} 
+                        <InfoCard
+                            icon={Clock}
+                            label="Time Slot"
+                            value={`${format(startTime, 'hh:mm a')} - ${format(endTime, 'hh:mm a')}`}
                         />
                     </div>
 
@@ -164,9 +169,9 @@ const AppointmentModal: React.FC<AppointmentModalProps> = ({ appointment, role, 
                                                 <p className="text-[10px] font-bold text-gray-400 capitalize">Uploaded: {format(new Date(report.created_at), 'dd MMM yyyy')}</p>
                                             </div>
                                         </div>
-                                        <a 
-                                            href={report.report_url} 
-                                            target="_blank" 
+                                        <a
+                                            href={report.report_url}
+                                            target="_blank"
                                             rel="noreferrer"
                                             className="w-10 h-10 rounded-xl bg-gray-50 hover:bg-primary-600 hover:text-white text-gray-400 flex items-center justify-center transition-all border border-gray-100 hover:border-primary-600"
                                         >
@@ -189,9 +194,12 @@ const AppointmentModal: React.FC<AppointmentModalProps> = ({ appointment, role, 
                                     <Activity className="w-4 h-4 text-primary-500" />
                                     Prescription
                                 </h3>
-                                <button 
-                                    disabled
-                                    className="w-full h-14 rounded-2xl bg-primary-50 text-primary-600 border border-primary-100 text-xs font-black uppercase tracking-widest cursor-not-allowed flex items-center justify-center gap-2 group"
+                                <button
+                                    onClick={() => {
+                                        onClose();
+                                        navigate(APP_ROUTES.DOCTOR.PRESCRIPTION.replace(':appointmentId', appointment.id));
+                                    }}
+                                    className="w-full h-14 rounded-2xl bg-primary-50 hover:bg-primary-100 text-primary-600 border border-primary-100 hover:border-primary-200 text-xs font-black uppercase tracking-widest flex items-center justify-center gap-2 transition-colors active:scale-[0.98]"
                                 >
                                     <FileText className="w-4 h-4" />
                                     Send Prescription
@@ -206,9 +214,12 @@ const AppointmentModal: React.FC<AppointmentModalProps> = ({ appointment, role, 
                                     <Activity className="w-4 h-4 text-primary-500" />
                                     Prescription
                                 </h3>
-                                <button 
-                                    disabled
-                                    className="w-full h-14 rounded-2xl bg-primary-50 text-primary-600 border border-primary-100 text-xs font-black uppercase tracking-widest cursor-not-allowed flex items-center justify-center gap-2"
+                                <button
+                                    onClick={() => {
+                                        onClose();
+                                        navigate(APP_ROUTES.PATIENT.PRESCRIPTION.replace(':appointmentId', appointment.id));
+                                    }}
+                                    className="w-full h-14 rounded-2xl bg-primary-50 hover:bg-primary-100 text-primary-600 border border-primary-100 hover:border-primary-200 text-xs font-black uppercase tracking-widest flex items-center justify-center gap-2 transition-colors active:scale-[0.98]"
                                 >
                                     <ExternalLink className="w-4 h-4" />
                                     View Prescription
@@ -220,7 +231,7 @@ const AppointmentModal: React.FC<AppointmentModalProps> = ({ appointment, role, 
 
                 {/* Footer Action */}
                 <div className="p-8 pt-0">
-                    <button 
+                    <button
                         onClick={onClose}
                         className="w-full h-14 rounded-3xl bg-gray-900 text-white text-xs font-black uppercase tracking-widest hover:bg-gray-800 transition-colors"
                     >

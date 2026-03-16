@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { 
-    CalendarDays, 
+import {
+    CalendarDays,
     Calendar,
-    ChevronDown, 
-    History, 
+    ChevronDown,
+    History,
     CreditCard,
     ArrowUpDown,
     Star,
@@ -12,30 +12,31 @@ import {
 } from 'lucide-react';
 import { format, subDays } from 'date-fns';
 import { appointmentService } from '../services/appointment.service';
-import { IAppointment, AppointmentStatus, IGetAppointmentsQuery } from '../../../types/appointment.types';
+import { IAppointment, AppointmentStatus, IGetAppointmentsQuery, PatientAppointmentTabs } from '../../../types/appointment.types';
 import AppointmentCard from '../../../components/appointments/AppointmentCard';
 import AppointmentModal from '../../../components/appointments/AppointmentModal';
 import Pagination from '../../../components/common/Pagination';
 import { cn } from '../../../lib/utils';
+import { Role } from '../../../types/role.enum';
 
 const TABS = [
-    { id: 'scheduled', label: 'Scheduled', icon: CalendarDays },
-    { id: 'pending_payment', label: 'Pending Payment', icon: CreditCard },
-    { id: 'history', label: 'History', icon: History },
+    { id: PatientAppointmentTabs.SCHEDULED, label: 'Scheduled', icon: CalendarDays },
+    { id: PatientAppointmentTabs.PENDING_PAYMENT, label: 'Pending Payment', icon: CreditCard },
+    { id: PatientAppointmentTabs.HISTORY, label: 'History', icon: History },
 ];
 
 const PatientAppointments: React.FC = () => {
-    const [activeTab, setActiveTab] = useState('scheduled');
+    const [activeTab, setActiveTab] = useState<string>(PatientAppointmentTabs.SCHEDULED);
     const [appointments, setAppointments] = useState<IAppointment[]>([]);
     const [pagination, setPagination] = useState({ current_page: 1, total_pages: 1 });
     const [loading, setLoading] = useState(true);
-    
+
     // Filters
     const [fromDate, setFromDate] = useState<string>('');
     const [toDate, setToDate] = useState<string>('');
     const [historyStatus, setHistoryStatus] = useState<AppointmentStatus[]>([]);
     const [sortBy, setSortBy] = useState<'nearest' | 'farthest'>('nearest');
-    
+
     // Modals
     const [selectedAppointment, setSelectedAppointment] = useState<IAppointment | null>(null);
     const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
@@ -53,12 +54,12 @@ const PatientAppointments: React.FC = () => {
                 sort_by: sortBy
             };
 
-            if (activeTab === 'scheduled') {
-            if (fromDate) params.from = fromDate;
-            if (toDate) params.to = toDate;
+            if (activeTab === PatientAppointmentTabs.SCHEDULED) {
+                if (fromDate) params.from = fromDate;
+                if (toDate) params.to = toDate;
             }
 
-            if (activeTab === 'history' && historyStatus.length > 0) {
+            if (activeTab === PatientAppointmentTabs.HISTORY && historyStatus.length > 0) {
                 params.status = historyStatus;
             }
 
@@ -143,10 +144,10 @@ const PatientAppointments: React.FC = () => {
                         <div className="flex flex-col gap-1.5">
                             <label className="text-[10px] font-black text-gray-400 uppercase tracking-tight ml-1">From Date</label>
                             <div className="relative">
-                                <input 
-                                    type="date" 
+                                <input
+                                    type="date"
                                     value={fromDate}
-                                    max={activeTab === 'history' ? yesterday : undefined}
+                                    max={activeTab === PatientAppointmentTabs.HISTORY ? yesterday : undefined}
                                     onChange={(e) => {
                                         const newFrom = e.target.value;
                                         setFromDate(newFrom);
@@ -163,10 +164,10 @@ const PatientAppointments: React.FC = () => {
                         <div className="flex flex-col gap-1.5">
                             <label className="text-[10px] font-black text-gray-400 uppercase tracking-tight ml-1">To Date</label>
                             <div className="relative">
-                                <input 
-                                    type="date" 
+                                <input
+                                    type="date"
                                     value={toDate}
-                                    min={fromDate || (activeTab === 'history' ? undefined : undefined)}
+                                    min={fromDate || (activeTab === PatientAppointmentTabs.HISTORY ? undefined : undefined)}
                                     onChange={(e) => setToDate(e.target.value)}
                                     className="h-12 pl-10 pr-4 rounded-2xl bg-gray-50 border-none text-xs font-bold text-gray-700 focus:ring-2 focus:ring-primary-100 transition-all cursor-pointer"
                                 />
@@ -176,7 +177,7 @@ const PatientAppointments: React.FC = () => {
                     </div>
 
                     {/* History Status Filters */}
-                    {activeTab === 'history' && (
+                    {activeTab === PatientAppointmentTabs.HISTORY && (
                         <div className="flex flex-col gap-1.5">
                             <label className="text-[10px] font-black text-gray-400 uppercase tracking-tight ml-1">Status</label>
                             <div className="flex items-center gap-2">
@@ -184,7 +185,7 @@ const PatientAppointments: React.FC = () => {
                                     <button
                                         key={status}
                                         onClick={() => {
-                                            setHistoryStatus(prev => 
+                                            setHistoryStatus(prev =>
                                                 prev.includes(status) ? prev.filter(s => s !== status) : [...prev, status]
                                             );
                                         }}
@@ -201,16 +202,16 @@ const PatientAppointments: React.FC = () => {
                             </div>
                         </div>
                     )}
-                    
+
                     <div className="flex flex-col gap-1.5 ml-auto">
                         <label className="text-[10px] font-black text-gray-400 uppercase tracking-tight ml-1">Sort By</label>
                         <div className="relative">
-                            <select 
+                            <select
                                 value={sortBy}
                                 onChange={(e) => setSortBy(e.target.value as any)}
                                 className="h-12 pl-10 pr-10 rounded-2xl bg-gray-50 border-none text-xs font-bold text-gray-700 appearance-none focus:ring-2 focus:ring-primary-100 transition-all cursor-pointer min-w-[160px]"
                             >
-                                {activeTab === 'history' ? (
+                                {activeTab === PatientAppointmentTabs.HISTORY ? (
                                     <>
                                         <option value="nearest">Latest First</option>
                                         <option value="farthest">Oldest First</option>
@@ -228,7 +229,7 @@ const PatientAppointments: React.FC = () => {
                     </div>
 
                     {(fromDate || toDate) && (
-                        <button 
+                        <button
                             onClick={() => { setFromDate(''); setToDate(''); }}
                             className="mt-6 text-[10px] font-black text-primary-600 uppercase hover:text-primary-700 px-2 py-1"
                         >
@@ -248,20 +249,20 @@ const PatientAppointments: React.FC = () => {
                         <>
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 mb-10">
                                 {appointments.map((app) => (
-                                    <AppointmentCard 
+                                    <AppointmentCard
                                         key={app.id}
-                                        appointment={app} 
-                                        role="PATIENT" 
+                                        appointment={app}
+                                        role={Role.PATIENT}
                                         onClick={() => { setSelectedAppointment(app); setIsDetailModalOpen(true); }}
                                         onAction={() => handleActionClick(app)}
                                     />
                                 ))}
                             </div>
-                            {(activeTab === 'scheduled' || activeTab === 'history') && (
-                                <Pagination 
-                                    currentPage={pagination.current_page} 
-                                    totalPages={pagination.total_pages} 
-                                    onPageChange={(page) => fetchAppointments(page)} 
+                            {(activeTab === PatientAppointmentTabs.SCHEDULED || activeTab === PatientAppointmentTabs.HISTORY) && (
+                                <Pagination
+                                    currentPage={pagination.current_page}
+                                    totalPages={pagination.total_pages}
+                                    onPageChange={(page) => fetchAppointments(page)}
                                 />
                             )}
                         </>
@@ -278,22 +279,22 @@ const PatientAppointments: React.FC = () => {
             </div>
 
             {/* Appointment Detail Modal */}
-            <AppointmentModal 
+            <AppointmentModal
                 isOpen={isDetailModalOpen}
                 onClose={() => setIsDetailModalOpen(false)}
                 appointment={selectedAppointment}
-                role="PATIENT"
+                role={Role.PATIENT}
             />
 
             {/* Review Modal */}
             {isReviewModalOpen && selectedAppointment && (
                 <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
                     <div className="absolute inset-0 bg-gray-900/60 backdrop-blur-sm" onClick={() => setIsReviewModalOpen(false)} />
-                    
+
                     <div className="relative w-full max-w-md bg-white rounded-[40px] shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-300 max-h-[90vh] flex flex-col m-4">
                         {/* Header Section (Consistent with AppointmentModal) */}
                         <div className="relative h-24 bg-primary-600 px-6 py-4 flex items-center shrink-0">
-                            <button 
+                            <button
                                 onClick={() => setIsReviewModalOpen(false)}
                                 className="absolute right-6 top-1/2 -translate-y-1/2 w-10 h-10 rounded-xl bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-all backdrop-blur-md border border-white/10 group active:scale-90"
                             >
@@ -315,29 +316,29 @@ const PatientAppointments: React.FC = () => {
                         <div className="px-6 py-6 overflow-y-auto flex-1">
                             <div className="flex flex-col items-center text-center">
                                 <p className="text-[10px] font-black text-gray-400 mb-4 uppercase tracking-widest leading-relaxed">
-                                    How was your experience with <br/>
+                                    How was your experience with <br />
                                     <span className="text-gray-900 text-xs">
-                                        {selectedAppointment && selectedAppointment.doctor_name?.toLowerCase().startsWith('dr.') 
-                                            ? selectedAppointment.doctor_name 
+                                        {selectedAppointment && selectedAppointment.doctor_name?.toLowerCase().startsWith('dr.')
+                                            ? selectedAppointment.doctor_name
                                             : `Dr. ${selectedAppointment?.doctor_name}`}
                                     </span>?
                                 </p>
-                                
+
                                 {/* Stars */}
                                 <div className="flex items-center gap-2 mb-6">
                                     {[1, 2, 3, 4, 5].map((star) => (
-                                        <button 
-                                            key={star} 
+                                        <button
+                                            key={star}
                                             onClick={() => setReviewRating(star)}
                                             className="transition-transform active:scale-95 group"
                                         >
-                                            <Star 
+                                            <Star
                                                 className={cn(
                                                     "w-10 h-10 transition-all duration-300",
-                                                    star <= reviewRating 
-                                                        ? "fill-amber-400 text-amber-400 drop-shadow-[0_0_8px_rgba(251,191,36,0.3)]" 
+                                                    star <= reviewRating
+                                                        ? "fill-amber-400 text-amber-400 drop-shadow-[0_0_8px_rgba(251,191,36,0.3)]"
                                                         : "text-gray-100 group-hover:text-gray-200"
-                                                )} 
+                                                )}
                                             />
                                         </button>
                                     ))}
@@ -345,7 +346,7 @@ const PatientAppointments: React.FC = () => {
 
                                 <div className="w-full flex flex-col gap-1.5 mb-6">
                                     <label className="text-[10px] font-black text-gray-400 uppercase tracking-tight ml-2 text-left">Your Experience (Optional)</label>
-                                    <textarea 
+                                    <textarea
                                         placeholder="Tell us what you liked or what could be improved..."
                                         value={reviewText}
                                         onChange={(e) => setReviewText(e.target.value)}
@@ -354,13 +355,13 @@ const PatientAppointments: React.FC = () => {
                                 </div>
 
                                 <div className="w-full grid grid-cols-2 gap-3 pb-2">
-                                    <button 
+                                    <button
                                         className="h-12 rounded-xl bg-gray-50 text-gray-500 text-[10px] font-black uppercase tracking-widest hover:bg-gray-100 transition-all active:scale-95"
                                         onClick={() => setIsReviewModalOpen(false)}
                                     >
                                         Discard
                                     </button>
-                                    <button 
+                                    <button
                                         className="h-12 rounded-xl bg-primary-600 text-white text-[10px] font-black uppercase tracking-widest shadow-lg shadow-primary-200 hover:bg-primary-700 transition-all active:scale-95"
                                         onClick={() => setIsReviewModalOpen(false)}
                                     >

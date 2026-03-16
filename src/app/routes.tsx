@@ -10,10 +10,12 @@ import DoctorDashboard from "../features/doctor/pages/DoctorDashboard";
 import DoctorAppointments from "../features/doctor/pages/DoctorAppointments";
 import DoctorAvailability from "../features/doctor/pages/DoctorAvailability";
 import DoctorProfile from "../features/doctor/pages/DoctorProfile";
+import PrescriptionPage from "../features/doctor/pages/PrescriptionPage";
 
 // Patient Pages
 import PatientDoctors from "../features/patient/pages/PatientDoctors";
 import PatientAppointments from "../features/patient/pages/PatientAppointments";
+import PatientPrescriptionPage from "../features/patient/pages/PatientPrescriptionPage";
 import PatientProfile from "../features/patient/pages/PatientProfile";
 import BookAppointment from "../features/patient/pages/BookAppointment";
 import BookingSuccess from "../features/patient/pages/BookingSuccess";
@@ -90,6 +92,14 @@ const router = createBrowserRouter([
         ),
     },
     {
+        path: APP_ROUTES.DOCTOR.PRESCRIPTION,
+        element: (
+            <ProtectedRoute allowedRoles={[Role.DOCTOR]}>
+                <PrescriptionPage />
+            </ProtectedRoute>
+        ),
+    },
+    {
         path: APP_ROUTES.DOCTOR.AVAILABILITY,
         element: (
             <ProtectedRoute allowedRoles={[Role.DOCTOR]}>
@@ -133,6 +143,14 @@ const router = createBrowserRouter([
                 <PatientLayout>
                     <PatientAppointments />
                 </PatientLayout>
+            </ProtectedRoute>
+        ),
+    },
+    {
+        path: APP_ROUTES.PATIENT.PRESCRIPTION,
+        element: (
+            <ProtectedRoute allowedRoles={[Role.PATIENT]}>
+                <PatientPrescriptionPage />
             </ProtectedRoute>
         ),
     },
