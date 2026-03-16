@@ -59,6 +59,7 @@ const BookAppointment: React.FC = () => {
     const [showOverlapModal, setShowOverlapModal] = useState(false);
     const [pendingCheckoutUrl, setPendingCheckoutUrl] = useState<string | null>(null);
     const [overlapWarningMessage, setOverlapWarningMessage] = useState('');
+    const [showProfileModal, setShowProfileModal] = useState(false);
 
     useEffect(() => {
         window.scrollTo(0, 0);
@@ -159,8 +160,14 @@ const BookAppointment: React.FC = () => {
             }
             const p = profileRes.data;
             const pp = p.patient_profile;
+            
+            // Step 2: Mandatory profile check
+            if (!pp?.height || !pp?.weight || !pp?.blood_group) {
+                setShowProfileModal(true);
+                return;
+            }
 
-            // Step 2: Book appointment with all required fields
+            // Step 3: Book appointment with all required fields
             const res = await appointmentService.bookAppointment({
                 doctor_id: doctorId!,
                 start_at: selectedSlot.start_time,
@@ -248,7 +255,12 @@ const BookAppointment: React.FC = () => {
                                     </h2>
                                     {selectedDayData && (
                                         <span className="ml-auto text-[11px] font-black bg-primary-50 text-primary-600 px-2.5 py-1 rounded-full tracking-wider">
-                                            {selectedDayData.slots.filter(s => s.status === SlotStatus.AVAILABLE).length} FREE
+                                            {selectedDayData.slots.filter(s => {
+                                                const isAvail = s.status === SlotStatus.AVAILABLE;
+                                                const isToday = selectedDate === new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD local
+                                                const isPast = isToday && new Date(s.start_time.replace('Z', '')).getTime() < new Date().getTime();
+                                                return isAvail && !isPast;
+                                            }).length} FREE
                                         </span>
                                     )}
                                 </div>
@@ -262,13 +274,20 @@ const BookAppointment: React.FC = () => {
                                             selectedDayData.slots.map((slot, i) => {
                                                 const avail = slot.status === SlotStatus.AVAILABLE;
                                                 const picked = selectedSlot?.start_time === slot.start_time;
+                                                
+                                                // Disable past slots for today (Enforce local browser date & naive time comparison)
+                                                const isToday = selectedDate === new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD local
+                                                const isPast = isToday && new Date(slot.start_time.replace('Z', '')).getTime() < new Date().getTime();
+                                                const canPick = avail && !isPast;
+
                                                 return (
                                                     <SlotButton
                                                         key={i}
                                                         slot={slot}
                                                         available={avail}
+                                                        isPast={isPast}
                                                         selected={picked}
-                                                        onClick={() => avail && handleSlotClick(slot)}
+                                                        onClick={() => canPick && handleSlotClick(slot)}
                                                     />
                                                 );
                                             })
@@ -413,6 +432,13 @@ const BookAppointment: React.FC = () => {
                     setPendingCheckoutUrl(null);
                 }}
             />
+
+            {/* Profile Completion Prompt Modal */}
+            <ProfilePromptModal
+                isOpen={showProfileModal}
+                onClose={() => setShowProfileModal(false)}
+                onGoToProfile={() => navigate(APP_ROUTES.PATIENT.PROFILE)}
+            />
         </div>
     );
 };
@@ -465,18 +491,19 @@ const EmptySlotPrompt: React.FC = () => (
 interface SlotButtonProps {
     slot: ISlot;
     available: boolean;
+    isPast: boolean;
     selected: boolean;
     onClick: () => void;
 }
-const SlotButton: React.FC<SlotButtonProps> = ({ slot, available, selected, onClick }) => (
+const SlotButton: React.FC<SlotButtonProps> = ({ slot, available, isPast, selected, onClick }) => (
     <button
-        disabled={!available}
+        disabled={!available || isPast}
         onClick={onClick}
         className={cn(
             'w-full flex items-center justify-between px-4 py-3.5 rounded-2xl border-2 transition-all duration-200 text-left group',
             selected
                 ? 'bg-primary-600 border-primary-600 text-white shadow-md shadow-primary-200/50'
-                : available
+                : available && !isPast
                     ? 'bg-white border-dark-50 hover:border-primary-300 hover:bg-primary-50/40 shadow-sm'
                     : 'bg-dark-50/50 border-transparent opacity-50 cursor-not-allowed'
         )}
@@ -493,7 +520,11 @@ const SlotButton: React.FC<SlotButtonProps> = ({ slot, available, selected, onCl
             </span>
         </div>
 
-        {!available ? (
+        {isPast ? (
+            <span className="text-[10px] font-black bg-gray-100 text-gray-500 px-2 py-1 rounded-full shrink-0 border border-gray-200">
+                Past
+            </span>
+        ) : !available ? (
             <span className="text-[10px] font-black bg-red-50 text-red-500 px-2 py-1 rounded-full shrink-0 border border-red-100">
                 Booked
             </span>
@@ -654,6 +685,61 @@ const OverlapWarningModal: React.FC<OverlapWarningModalProps> = ({ isOpen, messa
                                 onClick={onConfirm}
                             >
                                 Confirm &amp; Pay
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+/* Profile Prompt Modal Component */
+interface ProfilePromptModalProps {
+    isOpen: boolean;
+    onClose: () => void;
+    onGoToProfile: () => void;
+}
+const ProfilePromptModal: React.FC<ProfilePromptModalProps> = ({ isOpen, onClose, onGoToProfile }) => {
+    if (!isOpen) return null;
+
+    return (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            {/* Backdrop */}
+            <div 
+                className="absolute inset-0 bg-dark-900/60 backdrop-blur-sm transition-opacity" 
+                onClick={onClose}
+            />
+            
+            {/* Modal */}
+            <div className="relative bg-white w-full max-w-md rounded-3xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-300">
+                <div className="p-6 sm:p-8">
+                    <div className="flex flex-col items-center text-center">
+                        <div className="w-16 h-16 bg-primary-50 rounded-2xl flex items-center justify-center mb-6 text-primary-600">
+                            <Sparkles className="w-8 h-8" />
+                        </div>
+                        
+                        <h3 className="text-xl font-black text-dark-900 mb-3">
+                            Profile Incomplete
+                        </h3>
+                        
+                        <p className="text-dark-500 text-sm leading-relaxed mb-8">
+                            Please update your profile with your height, weight, and blood group to book an appointment.
+                        </p>
+                        
+                        <div className="flex flex-col sm:flex-row gap-3 w-full">
+                            <Button
+                                variant="secondary"
+                                className="flex-1 rounded-xl font-bold order-2 sm:order-1"
+                                onClick={onClose}
+                            >
+                                Not Now
+                            </Button>
+                            <Button
+                                className="flex-1 rounded-xl bg-primary-600 hover:bg-primary-700 text-white font-bold order-1 sm:order-2"
+                                onClick={onGoToProfile}
+                            >
+                                Profile
                             </Button>
                         </div>
                     </div>
