@@ -41,4 +41,7 @@ export const API = {
         CANCEL_APPOINTMENT: '/appointment/cancel/:sessionId',
         GET_APPOINTMENTS: '/patients/appointments',
     },
+    RATING: {
+        BASE: '/ratings',
+    },
 };

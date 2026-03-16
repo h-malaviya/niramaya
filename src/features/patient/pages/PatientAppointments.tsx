@@ -12,12 +12,15 @@ import {
 } from 'lucide-react';
 import { format, subDays } from 'date-fns';
 import { appointmentService } from '../services/appointment.service';
+import { ratingService } from '../services/rating.service';
 import { IAppointment, AppointmentStatus, IGetAppointmentsQuery, PatientAppointmentTabs } from '../../../types/appointment.types';
+import { ICreateRatingRequest } from '../../../types/rating.types';
 import AppointmentCard from '../../../components/appointments/AppointmentCard';
 import AppointmentModal from '../../../components/appointments/AppointmentModal';
 import Pagination from '../../../components/common/Pagination';
 import { cn } from '../../../lib/utils';
 import { Role } from '../../../types/role.enum';
+import { toast } from 'react-hot-toast';
 
 const TABS = [
     { id: PatientAppointmentTabs.SCHEDULED, label: 'Scheduled', icon: CalendarDays },
@@ -43,6 +46,8 @@ const PatientAppointments: React.FC = () => {
     const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
     const [reviewRating, setReviewRating] = useState(0);
     const [reviewText, setReviewText] = useState('');
+    const [isSubmittingReview, setIsSubmittingReview] = useState(false);
+    const [reviewError, setReviewError] = useState('');
 
     const fetchAppointments = useCallback(async (page = 1) => {
         setLoading(true);
@@ -96,7 +101,47 @@ const PatientAppointments: React.FC = () => {
             console.log("Redirecting to payment for:", app.id);
         } else if (app.status === AppointmentStatus.COMPLETED && !app.has_review) {
             setSelectedAppointment(app);
+            setReviewRating(0);
+            setReviewText('');
+            setReviewError('');
             setIsReviewModalOpen(true);
+        }
+    };
+
+    const handleSubmitReview = async () => {
+        if (!selectedAppointment) return;
+
+        if (reviewRating === 0) {
+            setReviewError("Please select a rating");
+            return;
+        }
+
+        if (reviewText.length > 500) {
+            setReviewError("Review cannot exceed 500 characters");
+            return;
+        }
+
+        setIsSubmittingReview(true);
+        setReviewError('');
+        try {
+            const payload: ICreateRatingRequest = {
+                appointment_id: selectedAppointment.id,
+                rating: reviewRating,
+                review: reviewText.trim() || undefined
+            };
+
+            const response = await ratingService.createRating(payload);
+            if (response.success) {
+                toast.success(response.message || "Review submitted successfully");
+                setIsReviewModalOpen(false);
+                fetchAppointments(pagination.current_page);
+            } else {
+                setReviewError(response.error || "Failed to submit review");
+            }
+        } catch (error: any) {
+            setReviewError(error.response?.data?.error || error.message || "Something went wrong");
+        } finally {
+            setIsSubmittingReview(false);
         }
     };
 
@@ -289,14 +334,15 @@ const PatientAppointments: React.FC = () => {
             {/* Review Modal */}
             {isReviewModalOpen && selectedAppointment && (
                 <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
-                    <div className="absolute inset-0 bg-gray-900/60 backdrop-blur-sm" onClick={() => setIsReviewModalOpen(false)} />
+                    <div className="absolute inset-0 bg-gray-900/60 backdrop-blur-sm" onClick={() => !isSubmittingReview && setIsReviewModalOpen(false)} />
 
                     <div className="relative w-full max-w-md bg-white rounded-[40px] shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-300 max-h-[90vh] flex flex-col m-4">
                         {/* Header Section (Consistent with AppointmentModal) */}
                         <div className="relative h-24 bg-primary-600 px-6 py-4 flex items-center shrink-0">
                             <button
                                 onClick={() => setIsReviewModalOpen(false)}
-                                className="absolute right-6 top-1/2 -translate-y-1/2 w-10 h-10 rounded-xl bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-all backdrop-blur-md border border-white/10 group active:scale-90"
+                                disabled={isSubmittingReview}
+                                className="absolute right-6 top-1/2 -translate-y-1/2 w-10 h-10 rounded-xl bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-all backdrop-blur-md border border-white/10 group active:scale-90 disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 <X className="w-5 h-5 group-hover:rotate-90 transition-transform" />
                             </button>
@@ -325,47 +371,81 @@ const PatientAppointments: React.FC = () => {
                                 </p>
 
                                 {/* Stars */}
-                                <div className="flex items-center gap-2 mb-6">
-                                    {[1, 2, 3, 4, 5].map((star) => (
-                                        <button
-                                            key={star}
-                                            onClick={() => setReviewRating(star)}
-                                            className="transition-transform active:scale-95 group"
-                                        >
-                                            <Star
-                                                className={cn(
-                                                    "w-10 h-10 transition-all duration-300",
-                                                    star <= reviewRating
-                                                        ? "fill-amber-400 text-amber-400 drop-shadow-[0_0_8px_rgba(251,191,36,0.3)]"
-                                                        : "text-gray-100 group-hover:text-gray-200"
-                                                )}
-                                            />
-                                        </button>
-                                    ))}
+                                <div className="flex flex-col items-center gap-2 mb-6">
+                                    <div className="flex items-center gap-2">
+                                        {[1, 2, 3, 4, 5].map((star) => (
+                                            <button
+                                                key={star}
+                                                onClick={() => {
+                                                    setReviewRating(star);
+                                                    setReviewError('');
+                                                }}
+                                                disabled={isSubmittingReview}
+                                                className="transition-transform active:scale-95 group disabled:opacity-50 disabled:cursor-not-allowed"
+                                            >
+                                                <Star
+                                                    className={cn(
+                                                        "w-10 h-10 transition-all duration-300",
+                                                        star <= reviewRating
+                                                            ? "fill-amber-400 text-amber-400 drop-shadow-[0_0_8px_rgba(251,191,36,0.3)]"
+                                                            : "text-gray-100 group-hover:text-gray-200"
+                                                    )}
+                                                />
+                                            </button>
+                                        ))}
+                                    </div>
+                                    {reviewError && reviewError.includes("rating") && (
+                                        <p className="text-[10px] font-black text-rose-500 uppercase tracking-tight">{reviewError}</p>
+                                    )}
                                 </div>
 
                                 <div className="w-full flex flex-col gap-1.5 mb-6">
-                                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-tight ml-2 text-left">Your Experience (Optional)</label>
+                                    <div className="flex justify-between items-end ml-2 mr-2">
+                                        <label className="text-[10px] font-black text-gray-400 uppercase tracking-tight text-left">Your Experience (Optional)</label>
+                                        <span className={cn(
+                                            "text-[9px] font-black uppercase tracking-tight",
+                                            reviewText.length > 500 ? "text-rose-500" : "text-gray-400"
+                                        )}>
+                                            {reviewText.length}/500
+                                        </span>
+                                    </div>
                                     <textarea
                                         placeholder="Tell us what you liked or what could be improved..."
                                         value={reviewText}
-                                        onChange={(e) => setReviewText(e.target.value)}
-                                        className="w-full h-32 bg-gray-50 rounded-2xl p-4 border-none text-sm font-bold text-gray-700 focus:ring-2 focus:ring-primary-100 transition-all resize-none overflow-y-auto whitespace-pre-wrap break-words"
+                                        disabled={isSubmittingReview}
+                                        onChange={(e) => {
+                                            setReviewText(e.target.value);
+                                            if (e.target.value.length <= 500) setReviewError('');
+                                        }}
+                                        className={cn(
+                                            "w-full h-32 bg-gray-50 rounded-2xl p-4 border-none text-sm font-bold text-gray-700 focus:ring-2 transition-all resize-none overflow-y-auto whitespace-pre-wrap break-words disabled:opacity-50",
+                                            reviewError && !reviewError.includes("rating") ? "ring-2 ring-rose-100" : "focus:ring-primary-100"
+                                        )}
                                     />
+                                    {reviewError && !reviewError.includes("rating") && (
+                                        <p className="text-[10px] font-black text-rose-500 uppercase tracking-tight text-left ml-2">{reviewError}</p>
+                                    )}
                                 </div>
 
                                 <div className="w-full grid grid-cols-2 gap-3 pb-2">
                                     <button
-                                        className="h-12 rounded-xl bg-gray-50 text-gray-500 text-[10px] font-black uppercase tracking-widest hover:bg-gray-100 transition-all active:scale-95"
+                                        className="h-12 rounded-xl bg-gray-50 text-gray-500 text-[10px] font-black uppercase tracking-widest hover:bg-gray-100 transition-all active:scale-95 disabled:opacity-50"
                                         onClick={() => setIsReviewModalOpen(false)}
+                                        disabled={isSubmittingReview}
                                     >
                                         Discard
                                     </button>
                                     <button
-                                        className="h-12 rounded-xl bg-primary-600 text-white text-[10px] font-black uppercase tracking-widest shadow-lg shadow-primary-200 hover:bg-primary-700 transition-all active:scale-95"
-                                        onClick={() => setIsReviewModalOpen(false)}
+                                        className="h-12 rounded-xl bg-primary-600 text-white text-[10px] font-black uppercase tracking-widest shadow-lg shadow-primary-200 hover:bg-primary-700 transition-all active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2"
+                                        onClick={handleSubmitReview}
+                                        disabled={isSubmittingReview}
                                     >
-                                        Submit
+                                        {isSubmittingReview ? (
+                                            <>
+                                                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                                Submitting...
+                                            </>
+                                        ) : "Submit"}
                                     </button>
                                 </div>
                             </div>
