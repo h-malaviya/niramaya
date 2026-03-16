@@ -25,6 +25,7 @@ export const API = {
     DOCTORS: {
         BASE: "/doctors",
         PATIENT_LIST: "/doctors/list",
+        GET_APPOINTMENTS: '/doctors/appointments',
     },
     DOCTOR_EXTRA: {
         GET_AVAILABILITY: '/doctors/availability',
@@ -38,5 +39,6 @@ export const API = {
         BOOK_APPOINTMENT: '/appointment/book',
         GET_APPOINTMENT_STATUS: '/appointment/status/:sessionId',
         CANCEL_APPOINTMENT: '/appointment/cancel/:sessionId',
-    }
+        GET_APPOINTMENTS: '/patients/appointments',
+    },
 };

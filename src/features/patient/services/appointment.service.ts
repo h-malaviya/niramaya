@@ -6,6 +6,7 @@ import {
     IBookAppointmentRequest,
     IBookingStatusApiResponse
 } from "../types/booking.types";
+import { IGetAppointmentsQuery, IGetAppointmentsApiResponse } from "../../../types/appointment.types";
 
 export const appointmentService = {
     getDoctorAvailability: async (doctorId: string): Promise<IGetDoctorAvailabilityApiResponse> => {
@@ -53,5 +54,12 @@ export const appointmentService = {
     cancelBooking: async (sessionId: string): Promise<void> => {
         const url = API.PATIENTS.CANCEL_APPOINTMENT.replace(':sessionId', sessionId);
         await apiClient.post(url);
+    },
+
+    getAppointments: async (params: IGetAppointmentsQuery): Promise<IGetAppointmentsApiResponse> => {
+        const response = await apiClient.get<IGetAppointmentsApiResponse>(API.PATIENTS.GET_APPOINTMENTS, {
+            params
+        });
+        return response.data;
     }
 };
