@@ -30,6 +30,7 @@ export const API = {
     DOCTOR_EXTRA: {
         GET_AVAILABILITY: '/doctors/availability',
         EDIT_AVAILABILITY: '/doctors/availability/edit',
+        GET_ANALYTICS: '/doctors/analytics',
     },
     COMMON: {
         GET_DOCTORS: '/patients/doctors',
