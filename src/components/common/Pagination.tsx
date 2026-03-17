@@ -45,8 +45,8 @@ const Pagination: React.FC<PaginationProps> = ({
         <div className={cn("flex flex-wrap items-center justify-center gap-3", className)}>
             <button
                 onClick={() => onPageChange(currentPage - 1)}
-                disabled={currentPage === 1}
-                className="flex items-center gap-1.5 px-4 py-2.5 rounded-2xl border border-gray-100 bg-white text-gray-600 font-bold text-xs hover:bg-gray-50 disabled:opacity-40 disabled:grayscale transition-all shadow-sm group"
+                disabled={Number(currentPage) <= 1}
+                className="flex items-center gap-1.5 px-4 py-2.5 rounded-2xl border border-gray-100 bg-white text-gray-600 font-bold text-xs hover:bg-gray-50 disabled:opacity-40 disabled:grayscale disabled:cursor-not-allowed transition-all shadow-sm group"
             >
                 <ChevronLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
                 Prev
@@ -77,8 +77,8 @@ const Pagination: React.FC<PaginationProps> = ({
 
             <button
                 onClick={() => onPageChange(currentPage + 1)}
-                disabled={currentPage === totalPages}
-                className="flex items-center gap-1.5 px-4 py-2.5 rounded-2xl border border-gray-100 bg-white text-gray-600 font-bold text-xs hover:bg-gray-50 disabled:opacity-40 disabled:grayscale transition-all shadow-sm group"
+                disabled={Number(currentPage) >= Number(totalPages)}
+                className="flex items-center gap-1.5 px-4 py-2.5 rounded-2xl border border-gray-100 bg-white text-gray-600 font-bold text-xs hover:bg-gray-50 disabled:opacity-40 disabled:grayscale disabled:cursor-not-allowed transition-all shadow-sm group"
             >
                 Next
                 <ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />

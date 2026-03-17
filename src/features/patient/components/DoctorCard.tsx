@@ -72,7 +72,7 @@ export default function DoctorCard({ doctor, onViewProfile }: DoctorCardProps) {
                     <div className="bg-gray-50/80 rounded-xl p-3 border border-gray-50">
                         <div className="flex items-start gap-2">
                             <Info className="w-3.5 h-3.5 text-primary-500 mt-0.5 shrink-0" />
-                            <p className="text-xs text-gray-600 leading-relaxed line-clamp-2 italic">
+                            <p className="text-xs text-gray-600 leading-relaxed line-clamp-2 italic break-all flex-1 min-w-0">
                                 "{bio || `Highly dedicated ${specialties?.[0]?.toLowerCase().replace(/_/g, ' ') || 'medical professional'} with a commitment to patient-centric care and clinical excellence.`}"
                             </p>
                         </div>

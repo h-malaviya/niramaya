@@ -17,6 +17,7 @@ const DoctorProfile: React.FC = () => {
     const [isEditing, setIsEditing] = useState(false);
     const [isQRModalOpen, setIsQRModalOpen] = useState(false);
     const { profile, isFetchingProfile, updateProfile, isUpdating } = useProfile(Role.DOCTOR);
+    const [isBioExpanded, setIsBioExpanded] = useState(false);
     const fileInputRef = React.useRef<HTMLInputElement>(null);
 
     const plan = getPlanFromToken();
@@ -158,9 +159,21 @@ const DoctorProfile: React.FC = () => {
                                     <Award className="w-6 h-6 text-amber-500" />
                                     Professional Bio
                                 </h3>
-                                <p className="text-gray-600 leading-relaxed font-semibold">
-                                    {doctorDetails?.bio || "No bio added yet."}
+                                <p className="text-gray-600 leading-relaxed font-semibold break-all whitespace-pre-wrap">
+                                    {doctorDetails?.bio ? (
+                                        doctorDetails.bio.length > 250 && !isBioExpanded 
+                                            ? `${doctorDetails.bio.slice(0, 250)}...` 
+                                            : doctorDetails.bio
+                                    ) : "No bio added yet."}
                                 </p>
+                                {doctorDetails?.bio && doctorDetails.bio.length > 250 && (
+                                    <button 
+                                        onClick={() => setIsBioExpanded(!isBioExpanded)}
+                                        className="text-primary-600 text-[10px] font-black uppercase tracking-widest mt-3 hover:text-primary-700 transition-colors flex items-center gap-1.5 px-3 py-1.5 bg-primary-50 rounded-xl w-fit"
+                                    >
+                                        {isBioExpanded ? "Show Less" : "Read More"}
+                                    </button>
+                                )}
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
