@@ -115,7 +115,7 @@ const AppointmentModal: React.FC<AppointmentModalProps> = ({ appointment, role, 
                         <InfoCard
                             icon={Clock}
                             label="Time Slot"
-                            value={`${format(startTime, 'hh:mm a')} - ${format(endTime, 'hh:mm a')}`}
+                            value={`${format(startTime, 'HH:mm')} - ${format(endTime, 'HH:mm')}`}
                         />
                     </div>
 
@@ -149,6 +149,21 @@ const AppointmentModal: React.FC<AppointmentModalProps> = ({ appointment, role, 
                             </p>
                         </div>
                     </div>
+
+                    {/* AI Generated Summary (Doctor Only) */}
+                    {isDoctor && (
+                        <div className="mb-8">
+                            <h3 className="text-xs font-black text-orange-600 uppercase tracking-widest mb-4 flex items-center gap-2">
+                                <Activity className="w-4 h-4" />
+                                AI-Generated Summary
+                            </h3>
+                            <div className="bg-orange-50/50 rounded-2xl p-5 border border-orange-100 shadow-sm">
+                                <p className="text-sm text-orange-900/80 leading-relaxed font-medium">
+                                    {appointment.ai_generated_summary || 'No AI summary available.'}
+                                </p>
+                            </div>
+                        </div>
+                    )}
 
                     {/* Medical Reports */}
                     <div className="mb-8">

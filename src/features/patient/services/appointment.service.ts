@@ -7,6 +7,7 @@ import {
     IBookingStatusApiResponse
 } from "../types/booking.types";
 import { IGetAppointmentsQuery, IGetAppointmentsApiResponse } from "../../../types/appointment.types";
+import { IApiResponse } from "../../../types/global.types";
 
 export const appointmentService = {
     getDoctorAvailability: async (doctorId: string): Promise<IGetDoctorAvailabilityApiResponse> => {
@@ -60,6 +61,31 @@ export const appointmentService = {
         const response = await apiClient.get<IGetAppointmentsApiResponse>(API.PATIENTS.GET_APPOINTMENTS, {
             params
         });
+        return response.data;
+    },
+
+    updateMedicalReports: async (payload: {
+        appointmentId: string;
+        existingReportIds: string[];
+        newFiles: File[];
+    }): Promise<IApiResponse<void>> => {
+        const formData = new FormData();
+        formData.append('appointmentId', payload.appointmentId);
+        formData.append('existing_reports', JSON.stringify(payload.existingReportIds));
+
+        payload.newFiles.forEach((file) => {
+            formData.append('reports', file);
+        });
+
+        const response = await apiClient.patch<IApiResponse<void>>(
+            API.PATIENTS.EDIT_REPORTS,
+            formData,
+            {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            }
+        );
         return response.data;
     }
 };
