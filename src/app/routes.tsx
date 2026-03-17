@@ -20,6 +20,7 @@ import PatientProfile from "../features/patient/pages/PatientProfile";
 import BookAppointment from "../features/patient/pages/BookAppointment";
 import BookingSuccess from "../features/patient/pages/BookingSuccess";
 import BookingCancel from "../features/patient/pages/BookingCancel";
+import EditMedicalReports from "../features/patient/pages/EditMedicalReports";
 
 import ProtectedRoute from "../features/auth/components/ProtectedRoute";
 import GuestRoute from "../features/auth/components/GuestRoute";
@@ -186,6 +187,16 @@ const router = createBrowserRouter([
             <ProtectedRoute allowedRoles={[Role.PATIENT]}>
                 <PatientLayout>
                     <PatientProfile />
+                </PatientLayout>
+            </ProtectedRoute>
+        ),
+    },
+    {
+        path: APP_ROUTES.PATIENT.EDIT_REPORTS,
+        element: (
+            <ProtectedRoute allowedRoles={[Role.PATIENT]}>
+                <PatientLayout>
+                    <EditMedicalReports />
                 </PatientLayout>
             </ProtectedRoute>
         ),

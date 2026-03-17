@@ -67,7 +67,7 @@ const AppointmentCard: React.FC<AppointmentCardProps> = ({ appointment, role, on
                 <div className="flex items-center gap-2 text-gray-500">
                     <Clock className="w-3.5 h-3.5 text-primary-500" />
                     <span className="text-[11px] font-bold">
-                        {format(startTime, 'hh:mm a')} - {format(endTime, 'hh:mm a')}
+                        {format(startTime, 'HH:mm')} - {format(endTime, 'HH:mm')}
                     </span>
                 </div>
             </div>
@@ -145,6 +145,22 @@ const AppointmentCard: React.FC<AppointmentCardProps> = ({ appointment, role, on
                             className="px-4 py-1.5 rounded-xl border border-primary-600 text-primary-600 text-[10px] font-black uppercase hover:bg-primary-50 transition-colors whitespace-nowrap"
                         >
                             Give Review
+                        </button>
+                    )}
+
+                    {/* Patient Actions: Edit Reports */}
+                    {appointment.status === AppointmentStatus.SCHEDULED && !isDoctor && (
+                        <button
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                navigate(APP_ROUTES.PATIENT.EDIT_REPORTS.replace(':appointmentId', appointment.id), {
+                                    state: { appointment } // Pass appointment data to avoid refetching
+                                });
+                            }}
+                            className="px-4 py-1.5 rounded-xl border border-orange-500 text-orange-600 text-[10px] font-black uppercase hover:bg-orange-50 transition-colors whitespace-nowrap flex items-center gap-1.5"
+                        >
+                            <FileText className="w-3 h-3" />
+                            Edit Reports
                         </button>
                     )}
                 </div>

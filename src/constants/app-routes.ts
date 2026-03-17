@@ -24,5 +24,6 @@ export const APP_ROUTES = {
         BOOK_APPOINTMENT: '/patient/book-appointment/:doctorId',
         BOOKING_SUCCESS: '/patient/appointment/success',
         BOOKING_CANCEL: '/patient/appointment/cancel',
+        EDIT_REPORTS: '/patient/appointments/:appointmentId/edit-reports',
     },
 };

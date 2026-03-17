@@ -57,6 +57,7 @@ export interface IAppointment {
     start_time: string; // ISO String
     end_time: string;   // ISO String
     description?: string;
+    ai_generated_summary?: string;
     medical_reports: IMedicalReport[];
     queue_token?: number;
     prescription?: IPrescription;
