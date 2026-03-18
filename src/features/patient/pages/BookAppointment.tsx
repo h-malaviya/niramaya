@@ -17,7 +17,6 @@ import {
 import AvailabilityCalendar from '../../../components/common/AvailabilityCalendar/AvailabilityCalendar';
 import { ICalendarAvailability } from '../../../components/common/AvailabilityCalendar/types';
 import { Button } from '../../../components/ui/Button';
-import { Textarea } from '../../../components/ui/Textarea';
 import { Badge } from '../../../components/ui/Badge';
 
 import { appointmentService } from '../services/appointment.service';
@@ -28,9 +27,15 @@ import { Role } from '../../../types/role.enum';
 import { cn } from '../../../lib/utils';
 import { APP_ROUTES } from '../../../constants/app-routes';
 
+// AI Integration
+import BookingAISelectionModal from '../components/BookingAISelectionModal';
+import AIChatOverlay from '../components/AIChatOverlay';
+import { aiService } from '../services/ai.service';
+import { BookingContext } from '../types/ai.types';
+
 /* ─────────────────────────────────────────────────────────────
    Helpers
-───────────────────────────────────────────────────────────── */
+ ───────────────────────────────────────────────────────────── */
 const fmt = (iso: string) =>
     new Date(iso).toLocaleTimeString('en-GB', {
         hour: '2-digit',
@@ -44,7 +49,7 @@ const slotMins = (start: string, end: string) =>
 
 /* ─────────────────────────────────────────────────────────────
    Component
-───────────────────────────────────────────────────────────── */
+ ───────────────────────────────────────────────────────────── */
 const BookAppointment: React.FC = () => {
     const { doctorId } = useParams<{ doctorId: string }>();
     const navigate = useNavigate();
@@ -54,11 +59,12 @@ const BookAppointment: React.FC = () => {
     const [availabilities, setAvailabilities] = useState<IDayAvailability[]>([]);
     const [selectedDate, setSelectedDate] = useState('');
     const [selectedSlot, setSelectedSlot] = useState<ISlot | null>(null);
-    const [description, setDescription] = useState('');
     const [reports, setReports] = useState<File[]>([]);
-    const [showOverlapModal, setShowOverlapModal] = useState(false);
-    const [pendingCheckoutUrl, setPendingCheckoutUrl] = useState<string | null>(null);
-    const [overlapWarningMessage, setOverlapWarningMessage] = useState('');
+    // AI Integration States
+    const [showAIModal, setShowAIModal] = useState(false);
+    const [showChatOverlay, setShowChatOverlay] = useState(false);
+    const [patientInfo, setPatientInfo] = useState<any>(null);
+
     const [showProfileModal, setShowProfileModal] = useState(false);
 
     useEffect(() => {
@@ -146,55 +152,64 @@ const BookAppointment: React.FC = () => {
     const removeReport = (i: number) =>
         setReports(prev => prev.filter((_, idx) => idx !== i));
 
-    const handleBooking = async () => {
+    const handleContinueBooking = async () => {
         if (!selectedSlot) { toast.error('Please select a slot'); return; }
-        if (!description.trim()) { toast.error('Please describe your reason for visit'); return; }
+        
         try {
             setBooking(true);
-
-            // Step 1: Fetch patient profile to get required personal/health fields
             const profileRes = await profileService.getPatientProfile();
             if (!profileRes.success || !profileRes.data) {
                 toast.error('Failed to fetch patient profile. Please try again.');
                 return;
             }
             const p = profileRes.data;
-            const pp = p.patient_profile;
+            setPatientInfo(p);
             
-            // Step 2: Mandatory profile check
+            const pp = p.patient_profile;
             if (!pp?.height || !pp?.weight || !pp?.blood_group) {
                 setShowProfileModal(true);
                 return;
             }
 
-            // Step 3: Book appointment with all required fields
-            const res = await appointmentService.bookAppointment({
-                doctor_id: doctorId!,
-                start_at: selectedSlot.start_time,
-                end_at: selectedSlot.end_time,
-                description,
-                medical_reports: reports,
-                name: `${p.first_name} ${p.last_name}`.trim(),
-                email: p.email ?? '',
-                phone: p.phone_number ?? '',
-                gender: p.gender ?? '',
-                height: pp?.height?.toString() ?? '',
-                weight: pp?.weight?.toString() ?? '',
-                blood_group: pp?.blood_group ?? '',
-            });
-
-            // Step 3: Redirect or show warning
-            if (res.success && res.data?.checkoutUrl) {
-                if (res.message && res.message.toLowerCase().includes('warning')) {
-                    setOverlapWarningMessage(res.message);
-                    setPendingCheckoutUrl(res.data.checkoutUrl);
-                    setShowOverlapModal(true);
-                } else {
-                    window.location.href = res.data.checkoutUrl;
-                }
-            }
+            setShowAIModal(true);
         } catch (e: any) {
-            toast.error(e.response?.data?.message || 'Booking failed');
+            toast.error(e.response?.data?.message || 'Failed to initialize booking');
+        } finally {
+            setBooking(false);
+        }
+    };
+
+    const getBookingContext = (): BookingContext => {
+        const p = patientInfo;
+        return {
+            doctor_id: doctorId!,
+            start_at: selectedSlot!.start_time,
+            end_at: selectedSlot!.end_time,
+            name: `${p.first_name} ${p.last_name}`.trim(),
+            email: p.email ?? '',
+            phone: p.phone_number ?? '',
+            gender: p.gender ?? '',
+        };
+    };
+
+    const handleStartVoiceCall = async () => {
+        const p = patientInfo;
+        if (!p.phone_number) {
+            toast.error("Phone number missing in profile. Please update your profile page first.");
+            navigate(APP_ROUTES.PATIENT.PROFILE);
+            return;
+        }
+
+        try {
+            setBooking(true);
+            const context = getBookingContext();
+            const res = await aiService.triggerVoiceCall(context, reports);
+            if (res.success) {
+                toast.success("Voice call initiated! You will receive a call shortly.");
+                setShowAIModal(false);
+            }
+        } catch (error: any) {
+            toast.error(error.response?.data?.message || error.message || "Failed to start voice call");
         } finally {
             setBooking(false);
         }
@@ -226,10 +241,7 @@ const BookAppointment: React.FC = () => {
                 <section className="space-y-3">
                     <StepLabel step={1} label="Choose a date & time slot" />
 
-                    {/* Both columns fixed at 600px — content scrolls inside, nothing ever grows */}
                     <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] xl:grid-cols-[1fr_420px] gap-4 lg:gap-6">
-
-                        {/* LEFT — Calendar: natural auto height */}
                         <div>
                             <PanelCard>
                                 <AvailabilityCalendar
@@ -242,10 +254,8 @@ const BookAppointment: React.FC = () => {
                             </PanelCard>
                         </div>
 
-                        {/* RIGHT — Slots: same fixed height, list scrolls inside */}
                         <div style={{ height: 684.83 }}>
                             <PanelCard className="h-full flex flex-col overflow-hidden">
-                                {/* Header */}
                                 <div className="flex items-center gap-2.5 mb-5 shrink-0">
                                     <div className="p-2 rounded-xl bg-primary-50 text-primary-600">
                                         <Clock className="w-4 h-4" />
@@ -257,15 +267,14 @@ const BookAppointment: React.FC = () => {
                                         <span className="ml-auto text-[11px] font-black bg-primary-50 text-primary-600 px-2.5 py-1 rounded-full tracking-wider">
                                             {selectedDayData.slots.filter(s => {
                                                 const isAvail = s.status === SlotStatus.AVAILABLE;
-                                                const isToday = selectedDate === new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD local
+                                                const isToday = selectedDate === new Date().toLocaleDateString('en-CA');
                                                 const isPast = isToday && new Date(s.start_time.replace('Z', '')).getTime() < new Date().getTime();
                                                 return isAvail && !isPast;
-                                            }).length} FREE
+                                            }).length} Available
                                         </span>
                                     )}
                                 </div>
 
-                                {/* Slot list — fills remaining height and scrolls */}
                                 {!selectedDate ? (
                                     <EmptySlotPrompt />
                                 ) : (
@@ -274,9 +283,7 @@ const BookAppointment: React.FC = () => {
                                             selectedDayData.slots.map((slot, i) => {
                                                 const avail = slot.status === SlotStatus.AVAILABLE;
                                                 const picked = selectedSlot?.start_time === slot.start_time;
-                                                
-                                                // Disable past slots for today (Enforce local browser date & naive time comparison)
-                                                const isToday = selectedDate === new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD local
+                                                const isToday = selectedDate === new Date().toLocaleDateString('en-CA');
                                                 const isPast = isToday && new Date(slot.start_time.replace('Z', '')).getTime() < new Date().getTime();
                                                 const canPick = avail && !isPast;
 
@@ -302,7 +309,6 @@ const BookAppointment: React.FC = () => {
                                     </div>
                                 )}
 
-                                {/* Selected slot confirmation pill */}
                                 {selectedSlot && (
                                     <div className="mt-4 shrink-0 flex items-center gap-3 p-3.5 rounded-2xl bg-emerald-50 border border-emerald-100 animate-in slide-in-from-bottom-2 duration-300">
                                         <div className="w-9 h-9 rounded-xl bg-emerald-500 flex items-center justify-center shrink-0 shadow-sm shadow-emerald-200">
@@ -332,54 +338,29 @@ const BookAppointment: React.FC = () => {
                     </div>
                 </section>
 
-                {/* ── Step 2 & 3: Form (only after slot is selected) ── */}
+                {/* ── Step 2 & 3: Form ── */}
                 {selectedSlot && (
                     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-3 duration-500">
-
-                        {/* Two form panels — stacked on mobile, side-by-side on desktop, SAME HEIGHT */}
                         <section className="space-y-3">
-                            <StepLabel step={2} label="Describe your visit & attach reports" />
+                            <StepLabel step={2} label="Attach medical reports" />
 
-                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6 lg:items-stretch">
-
-                                {/* Description */}
-                                <PanelCard className="flex flex-col gap-3" style={{ height: 280 }}>
-                                    <div className="flex items-center gap-2.5 shrink-0">
-                                        <div className="p-2 rounded-xl bg-primary-50 text-primary-600">
-                                            <FileText className="w-4 h-4" />
-                                        </div>
-                                        <h2 className="font-black text-dark-900 text-sm tracking-wide">
-                                            Reason for Visit
-                                        </h2>
-                                    </div>
-                                    <Textarea style={{ height: 170 }}
-                                        placeholder="Describe your symptoms, concerns..."
-                                        value={description}
-                                        onChange={e => setDescription(e.target.value)}
-                                        className="flex-1 resize-none rounded-2xl border-2 border-dark-50 focus:border-primary-400 bg-slate-50 p-4 text-sm text-dark-800 placeholder-dark-300 transition-all outline-none overflow-y-auto"
-                                        required
-                                    />
-                                    <p className="text-[11px] text-dark-300 font-semibold text-right shrink-0">
-                                        {description.length} chars
-                                    </p>
-                                </PanelCard>
-
+                            <div className="grid grid-cols-1 gap-4 lg:gap-6 lg:items-stretch">
                                 {/* Reports */}
-                                <PanelCard className="flex flex-col gap-3" style={{ height: 280 }}>
+                                <PanelCard className="flex flex-col gap-3 min-h-[200px]">
                                     <div className="flex items-center gap-2.5 shrink-0">
                                         <div className="p-2 rounded-xl bg-primary-50 text-primary-600">
                                             <Upload className="w-4 h-4" />
                                         </div>
                                         <h2 className="font-black text-dark-900 text-sm tracking-wide">
-                                            Medical Reports
+                                            Medical Reports (Optional)
                                         </h2>
                                         <Badge className="ml-auto text-[10px] font-black bg-dark-50 text-dark-500 border-none px-2.5 py-1 tracking-wider shrink-0">
                                             {reports.length}/5
                                         </Badge>
                                     </div>
 
-                                    <div className="flex-1 rounded-2xl border-2 border-dashed border-dark-100 bg-slate-50 p-3 overflow-y-auto">
-                                        <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
+                                    <div className="flex-1 rounded-2xl border-2 border-dashed border-dark-100 bg-slate-50 p-6">
+                                        <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3">
                                             {reports.map((file, i) => (
                                                 <ReportCard
                                                     key={i}
@@ -391,6 +372,11 @@ const BookAppointment: React.FC = () => {
                                                 <UploadCard onChange={handleFileChange} />
                                             )}
                                         </div>
+                                        {reports.length === 0 && (
+                                            <div className="flex flex-col items-center justify-center py-4 text-center">
+                                                <p className="text-xs text-dark-300 font-bold uppercase tracking-wider">No reports added yet</p>
+                                            </div>
+                                        )}
                                     </div>
                                     <p className="text-[11px] text-dark-300 font-semibold shrink-0">
                                         PDF, JPG, PNG — max 5 files
@@ -399,19 +385,17 @@ const BookAppointment: React.FC = () => {
                             </div>
                         </section>
 
-                        {/* ── Step 3: Confirm ── */}
                         <section className="space-y-3">
-                            <StepLabel step={3} label="Confirm & pay" />
-                            {/* Action Bar */}
+                            <StepLabel step={3} label="Finish Booking" />
                             {selectedSlot && (
                                 <div className="mt-8">
                                     <ConfirmBar
                                         doctorId={doctorId}
                                         slot={selectedSlot}
-                                        canBook={!!description.trim()}
+                                        canBook={true}
                                         booking={booking}
-                                        onCancel={() => { setSelectedSlot(null); setDescription(''); }}
-                                        onBook={handleBooking}
+                                        onCancel={() => { setSelectedSlot(null); setReports([]); }}
+                                        onBook={handleContinueBooking}
                                     />
                                 </div>
                             )}
@@ -420,19 +404,32 @@ const BookAppointment: React.FC = () => {
                 )}
             </div>
 
-            {/* Overlap Warning Modal */}
-            <OverlapWarningModal
-                isOpen={showOverlapModal}
-                message={overlapWarningMessage}
-                onConfirm={() => {
-                    if (pendingCheckoutUrl) window.location.href = pendingCheckoutUrl;
+            {/* AI Selection Modal */}
+            <BookingAISelectionModal
+                isOpen={showAIModal}
+                onClose={() => setShowAIModal(false)}
+                onSelectChat={() => {
+                    setShowAIModal(false);
+                    setShowChatOverlay(true);
                 }}
-                onCancel={() => {
-                    setShowOverlapModal(false);
-                    setPendingCheckoutUrl(null);
-                }}
+                onSelectVoice={handleStartVoiceCall}
             />
 
+            {/* Chat Overlay */}
+            {showChatOverlay && (
+                <AIChatOverlay
+                    isOpen={showChatOverlay}
+                    onClose={() => setShowChatOverlay(false)}
+                    doctorId={doctorId!}
+                    bookingContext={getBookingContext()}
+                    files={reports}
+                    onSuccess={(url) => {
+                        setShowChatOverlay(false);
+                        window.location.href = url;
+                    }}
+                    patientImageUrl={patientInfo?.profile_image}
+                />
+            )}
             {/* Profile Completion Prompt Modal */}
             <ProfilePromptModal
                 isOpen={showProfileModal}
@@ -445,7 +442,7 @@ const BookAppointment: React.FC = () => {
 
 /* ─────────────────────────────────────────────────────────────
    Sub-components
-───────────────────────────────────────────────────────────── */
+ ───────────────────────────────────────────────────────────── */
 
 /* Step label */
 const StepLabel: React.FC<{ step: number; label: string }> = ({ step, label }) => (
@@ -546,7 +543,7 @@ const ReportCard: React.FC<ReportCardProps> = ({ file, onRemove }) => (
     <div className="relative group rounded-xl border border-dark-100 bg-white p-2 flex flex-col items-center justify-center text-center overflow-hidden shadow-sm hover:shadow-md transition-shadow aspect-square">
         <button
             onClick={onRemove}
-            className="absolute top-1.5 right-1.5 w-5 h-5 bg-red-500 text-white rounded-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all hover:scale-110 active:scale-90 shadow-sm"
+            className="absolute top-1.5 right-1.5 z-10 w-5 h-5 bg-red-500 text-white rounded-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all hover:scale-110 active:scale-90 shadow-sm"
         >
             <X className="w-2.5 h-2.5" />
         </button>
@@ -586,113 +583,50 @@ interface ConfirmBarProps {
     onBook: () => void;
 }
 const ConfirmBar: React.FC<ConfirmBarProps> = ({
-    doctorId, slot, canBook, booking, onCancel, onBook
+    slot, canBook, booking, onCancel, onBook
 }) => (
-    <div className="relative overflow-hidden rounded-3xl bg-primary-600 text-white shadow-xl shadow-primary-200/50">
-        {/* Subtle glow */}
+    <div className="relative overflow-hidden rounded-[2rem] bg-dark-900 text-white shadow-2xl shadow-dark-200/50">
         <div className="absolute inset-0 pointer-events-none">
-            <div className="absolute -top-8 -right-8 w-48 h-48 bg-white/10 blur-[60px] rounded-full" />
+            <div className="absolute -top-8 -right-8 w-48 h-48 bg-primary-600/20 blur-[60px] rounded-full" />
+            <div className="absolute -bottom-8 -left-8 w-48 h-48 bg-emerald-600/10 blur-[60px] rounded-full" />
         </div>
 
-        <div className="relative z-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-5 sm:p-6 lg:p-8">
-            {/* Left info */}
-            <div className="flex items-center gap-4">
-                <div className="w-11 h-11 rounded-2xl bg-white/15 flex items-center justify-center shrink-0">
-                    <Sparkles className="w-5 h-5 text-white" />
+        <div className="relative z-10 flex flex-col sm:flex-row items-center justify-between gap-6 p-6 sm:p-8">
+            <div className="flex items-center gap-5">
+                <div className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center shrink-0">
+                    <Sparkles className="w-6 h-6 text-primary-400" />
                 </div>
                 <div>
-                    <p className="text-primary-100 text-[10px] font-black uppercase tracking-[0.2em] leading-none mb-1">
-                        Confirm Booking
+                    <p className="text-primary-400 text-[10px] font-black uppercase tracking-[0.3em] leading-none mb-2">
+                        Ready to proceed
                     </p>
-                    <h3 className="text-lg sm:text-xl font-black tracking-tight">
-                        {fmt(slot.start_time)} → {fmt(slot.end_time)}
+                    <h3 className="text-xl sm:text-2xl font-black tracking-tight">
+                        {fmt(slot.start_time)} <span className="text-white/30 text-lg mx-1">→</span> {fmt(slot.end_time)}
                     </h3>
-                    <p className="text-primary-200 text-xs font-semibold mt-0.5">
-                        Ref: {doctorId?.slice(-6).toUpperCase() ?? '------'}
-                    </p>
                 </div>
             </div>
 
-            {/* Actions */}
             <div className="flex items-center gap-3 w-full sm:w-auto shrink-0">
                 <Button
                     variant="secondary"
-                    size="lg"
-                    className="flex-1 sm:flex-none px-6 rounded-2xl bg-white/10 hover:bg-white/20 border-white/20 text-white font-bold transition-all"
+                    className="flex-1 sm:flex-none px-6 h-14 rounded-2xl bg-white/5 hover:bg-white/10 border-white/10 text-white font-bold transition-all"
                     onClick={onCancel}
                 >
                     Cancel
                 </Button>
                 <Button
-                    size="lg"
-                    className="flex-1 sm:flex-none px-8 rounded-2xl bg-white hover:bg-primary-50 text-primary-700 font-black border-none shadow-lg transition-all hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0"
+                    className="flex-1 sm:flex-none px-10 h-14 rounded-2xl bg-primary-600 hover:bg-primary-500 text-white font-black border-none shadow-xl shadow-primary-900/40 transition-all hover:-translate-y-1 active:translate-y-0"
                     onClick={onBook}
                     loading={booking}
                     disabled={!canBook || booking}
                 >
-                    <span>Pay &amp; Confirm</span>
-                    <ChevronRight className="w-5 h-5 ml-1.5" />
+                    <span>Continue Booking</span>
+                    <ChevronRight className="w-5 h-5 ml-2" />
                 </Button>
             </div>
         </div>
     </div>
 );
-
-/* Overlap Warning Modal Component */
-interface OverlapWarningModalProps {
-    isOpen: boolean;
-    message: string;
-    onConfirm: () => void;
-    onCancel: () => void;
-}
-const OverlapWarningModal: React.FC<OverlapWarningModalProps> = ({ isOpen, message, onConfirm, onCancel }) => {
-    if (!isOpen) return null;
-
-    return (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-            {/* Backdrop */}
-            <div 
-                className="absolute inset-0 bg-dark-900/60 backdrop-blur-sm transition-opacity" 
-                onClick={onCancel}
-            />
-            
-            {/* Modal */}
-            <div className="relative bg-white w-full max-w-md rounded-3xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-300">
-                <div className="p-6 sm:p-8">
-                    <div className="flex flex-col items-center text-center">
-                        <div className="w-16 h-16 bg-yellow-100 rounded-2xl flex items-center justify-center mb-6 text-yellow-600">
-                            <AlertCircle className="w-8 h-8" />
-                        </div>
-                        
-                        <h3 className="text-xl font-black text-dark-900 mb-3">
-                            Appointment Overlap
-                        </h3>
-                        
-                        <p className="text-dark-500 text-sm leading-relaxed mb-8">
-                            {message || "You already have an appointment booked for this time slot. Are you sure you want to proceed with another one?"}
-                        </p>
-                        
-                        <div className="flex flex-col sm:flex-row gap-3 w-full">
-                            <Button
-                                variant="secondary"
-                                className="flex-1 rounded-xl font-bold order-2 sm:order-1"
-                                onClick={onCancel}
-                            >
-                                Back to Calendar
-                            </Button>
-                            <Button
-                                className="flex-1 rounded-xl bg-primary-600 hover:bg-primary-700 text-white font-bold order-1 sm:order-2"
-                                onClick={onConfirm}
-                            >
-                                Confirm &amp; Pay
-                            </Button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
-};
 
 /* Profile Prompt Modal Component */
 interface ProfilePromptModalProps {
@@ -705,13 +639,11 @@ const ProfilePromptModal: React.FC<ProfilePromptModalProps> = ({ isOpen, onClose
 
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-            {/* Backdrop */}
             <div 
                 className="absolute inset-0 bg-dark-900/60 backdrop-blur-sm transition-opacity" 
                 onClick={onClose}
             />
             
-            {/* Modal */}
             <div className="relative bg-white w-full max-w-md rounded-3xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-300">
                 <div className="p-6 sm:p-8">
                     <div className="flex flex-col items-center text-center">

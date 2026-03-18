@@ -87,5 +87,10 @@ export const appointmentService = {
             }
         );
         return response.data;
+    },
+    getPaymentUrl: async (appointmentId: string): Promise<IApiResponse<{ url: string }>> => {
+        const url = API.PATIENTS.GET_PAYMENT_URL.replace(':appointmentId', appointmentId);
+        const response = await apiClient.get<IApiResponse<{ url: string }>>(url);
+        return response.data;
     }
 };
