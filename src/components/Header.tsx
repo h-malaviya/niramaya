@@ -27,7 +27,7 @@ const Header = () => {
                         setActiveSection(entry.target.id);
                     }
                 });
-            }, { threshold: 0.5, rootMargin: '-10% 0px -10% 0px' });
+            }, { threshold: 0.2, rootMargin: '-20% 0px -20% 0px' });
 
             sectionIds.forEach(id => {
                 const el = document.getElementById(id);
@@ -67,6 +67,7 @@ const Header = () => {
         const element = document.getElementById(id);
 
         if (element) {
+            setActiveSection(id);
             element.scrollIntoView({ behavior: 'smooth' });
         }
     };
@@ -81,8 +82,8 @@ const Header = () => {
                 : 'bg-transparent py-5'
                 }`}
         >
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="flex items-center justify-between">
+            <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="flex items-center justify-between gap-8 md:gap-12">
                     {/* Logo */}
                     <Link
                         to={APP_ROUTES.HOME}
@@ -102,7 +103,7 @@ const Header = () => {
                     </Link>
 
                     {/* Desktop Nav */}
-                    <nav className="hidden md:flex items-center gap-4">
+                    <nav className="hidden md:flex items-center gap-6 lg:gap-8">
                         {navLinks.map((link) => {
                             const sectionId = link.href.substring(1);
                             const isActive = isHomePage && activeSection === sectionId;
@@ -131,7 +132,7 @@ const Header = () => {
                     </nav>
 
                     {/* CTA Button */}
-                    <div className="hidden md:flex items-center gap-4">
+                    <div className="hidden md:flex items-center gap-6">
                         <Link
                             to={APP_ROUTES.AUTH.LOGIN}
                             className={`px-5 py-2.5 rounded-xl text-sm font-bold transition-all border ${isScrolled

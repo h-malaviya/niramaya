@@ -7,7 +7,7 @@ const plans = [
     {
         name: DoctorPlan.ELITE,
         badge: 'For New Doctors',
-        price: '₹499',
+        price: '₹1000',
         period: '/month',
         description: 'Perfect for doctors starting their practice. Get listed and let patients find you via QR code scanning.',
         features: [
@@ -15,9 +15,9 @@ const plans = [
             { text: 'Unique QR code generation', ok: true },
             { text: 'Custom availability management', ok: true },
             { text: 'Appointment management dashboard', ok: true },
-            { text: 'Basic profile page', ok: true },
+            { text: 'Profile with View and Regenerate QR code', ok: true },
+            { text: 'Doctor analytics dashboard', ok: true },
             { text: 'Website listing visibility', ok: false },
-            { text: 'Advanced analytics dashboard', ok: false },
             { text: 'Priority search ranking', ok: false },
         ],
         popular: false,
@@ -25,15 +25,15 @@ const plans = [
     {
         name: DoctorPlan.PRO,
         badge: 'Most Popular',
-        price: '₹1,499',
+        price: '₹5000',
         period: '/month',
         description: 'For established doctors who want maximum visibility and advanced features to grow their practice.',
         features: [
-            { text: 'Everything in Elite plan', ok: true },
+            { text: 'Appointment management and Listing', ok: true },
             { text: 'Website listing for patients', ok: true },
-            { text: 'Advanced analytics dashboard', ok: true },
+            { text: 'Doctor analytics dashboard', ok: true },
             { text: 'Priority in search results', ok: true },
-            { text: 'Enhanced doctor profile', ok: true },
+            { text: 'Doctor profile without QR code', ok: true },
             { text: 'In-app patient booking flow', ok: true },
             { text: 'Revenue tracking & reports', ok: true },
             { text: 'Premium support', ok: true },
@@ -69,7 +69,7 @@ const PricingPlans = ({ onSelectPlan }: PricingPlansProps) => {
     };
 
     return (
-        <section id="pricing" className="py-12 relative overflow-hidden bg-transparent">
+        <section id="pricing" className="w-full py-12 relative overflow-hidden bg-transparent">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
                 <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }} className="text-center max-w-4xl mx-auto mb-12">
                     <h2 className="font-display text-4xl font-extrabold text-dark-900 mb-4">

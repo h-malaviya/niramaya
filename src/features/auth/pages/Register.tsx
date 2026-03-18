@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { RegisterForm } from "../components/RegisterForm";
 import { Card } from "../../../components/ui/Card";
 import PricingPlans from "../../../components/PricingPlans";
 import { Role } from "../../../types/role.enum";
 import { DoctorPlan } from "../types/auth.types";
 import { UserCircle2, Stethoscope, ArrowLeft } from "lucide-react";
+import { APP_ROUTES } from "../../../constants/app-routes";
 
 const Register: React.FC = () => {
+    const navigate = useNavigate();
     const [searchParams] = useSearchParams();
     const [step, setStep] = useState<"role" | "plan" | "details">("role");
     const [selectedRole, setSelectedRole] = useState<Role | null>(null);
@@ -57,21 +59,25 @@ const Register: React.FC = () => {
             }
         } else if (step === "plan") {
             setStep("role");
+        } else if (step === "role") {
+            navigate(APP_ROUTES.HOME);
         }
     };
 
     return (
-        <div className="min-h-screen bg-background w-full overflow-x-hidden">
-            <main className="pt-12 pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
-                {step !== "role" && (
-                    <button
-                        onClick={handleBack}
-                        className="flex items-center text-dark-600 hover:text-primary-600 transition-colors mb-8 font-semibold group"
-                    >
-                        <ArrowLeft className="mr-2 h-5 w-5 transition-transform group-hover:-translate-x-1" />
-                        Back
-                    </button>
-                )}
+        <div className="min-h-screen bg-background w-full overflow-x-hidden flex flex-col pt-8 sm:pt-12 relative overflow-hidden">
+            {/* Absolute Back Button to match PricingPlans style */}
+            <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 mb-4">
+                <button
+                    onClick={handleBack}
+                    className="flex items-center text-dark-600 hover:text-primary-600 transition-colors font-semibold group w-fit"
+                >
+                    <ArrowLeft className="mr-2 h-5 w-5 transition-transform group-hover:-translate-x-1" />
+                    Back
+                </button>
+            </div>
+
+            <main className="flex-grow pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
 
                 <AnimatePresence mode="wait">
                     {step === "role" && (

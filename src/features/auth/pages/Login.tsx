@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { LogIn, Mail, Lock, Loader2, UserCircle2 } from "lucide-react";
+import { LogIn, Mail, Lock, Loader2, UserCircle2, ArrowLeft } from "lucide-react";
 import { useAuth } from "../hooks/useAuth";
 import { APP_ROUTES } from "../../../constants/app-routes";
 import { validateEmail, PASSWORD_REGEX } from "../../../lib/utils";
@@ -64,13 +64,25 @@ const Login: React.FC = () => {
     };
 
     return (
-        <div className="min-h-screen bg-background flex items-center justify-center p-4 py-12">
-            <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="w-full max-w-md"
-            >
-                <div className="text-center mb-8">
+        <div className="min-h-screen bg-background flex flex-col p-4 py-8 sm:py-12 relative overflow-hidden">
+            {/* Absolute Back Button to match PricingPlans style */}
+            <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 mb-4">
+                <Link
+                    to={APP_ROUTES.HOME}
+                    className="flex items-center text-dark-600 hover:text-primary-600 transition-colors font-semibold group w-fit"
+                >
+                    <ArrowLeft className="mr-2 h-5 w-5 transition-transform group-hover:-translate-x-1" />
+                    Back
+                </Link>
+            </div>
+
+            <div className="flex-grow flex items-center justify-center">
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="w-full max-w-md"
+                >
+                    <div className="text-center mb-8">
                     <motion.div
                         initial={{ scale: 0.5 }}
                         animate={{ scale: 1 }}
@@ -152,6 +164,7 @@ const Login: React.FC = () => {
                     </div>
                 </Card>
             </motion.div>
+            </div>
         </div>
     );
 };
