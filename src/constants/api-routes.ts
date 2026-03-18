@@ -42,6 +42,9 @@ export const API = {
         CANCEL_APPOINTMENT: '/appointment/cancel/:sessionId',
         GET_APPOINTMENTS: '/patients/appointments',
         EDIT_REPORTS: '/appointment/edit-reports',
+        CHAT: '/patients/chat',
+        VOICE_CALL: '/patients/voice/start',
+        GET_PAYMENT_URL: '/appointment/:appointmentId/url',
     },
     RATING: {
         BASE: '/ratings',

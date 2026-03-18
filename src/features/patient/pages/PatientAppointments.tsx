@@ -95,10 +95,20 @@ const PatientAppointments: React.FC = () => {
         setHistoryStatus([]);
     };
 
-    const handleActionClick = (app: IAppointment) => {
+    const handleActionClick = async (app: IAppointment) => {
         if (app.status === AppointmentStatus.PAYMENT_PENDING) {
-            // Placeholder: Link to Stripe / Payment logic
-            console.log("Redirecting to payment for:", app.id);
+            try {
+                const response = await appointmentService.getPaymentUrl(app.id);
+                if (response.success && response.data?.url) {
+                    window.location.href = response.data.url;
+                } else {
+                    toast.error(response.error || "Failed to fetch payment URL");
+                    fetchAppointments(pagination.current_page);
+                }
+            } catch (error: any) {
+                toast.error(error.response?.data?.error || error.message || "Something went wrong");
+                fetchAppointments(pagination.current_page);
+            }
         } else if (app.status === AppointmentStatus.COMPLETED && !app.has_review) {
             setSelectedAppointment(app);
             setReviewRating(0);
