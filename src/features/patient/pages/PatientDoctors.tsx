@@ -15,7 +15,7 @@ import { useProfile } from '../../../features/auth/hooks/useProfile';
 import { cn } from '../../../lib/utils';
 
 export default function PatientDoctors() {
-    const { profile } = useProfile(Role.PATIENT);
+    useProfile(Role.PATIENT);
     const [doctors, setDoctors] = useState<DoctorProfile[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -36,16 +36,6 @@ export default function PatientDoctors() {
         minFee: 10,
         maxFee: 1000000,
     });
-
-    const [isInitialCityApplied, setIsInitialCityApplied] = useState(false);
-
-    // Update city filter when profile is loaded
-    useEffect(() => {
-        if (profile?.city && !filters.city && !isInitialCityApplied) {
-            setFilters(prev => ({ ...prev, city: profile.city }));
-            setIsInitialCityApplied(true);
-        }
-    }, [profile?.city, filters.city, isInitialCityApplied]);
 
     const [searchQuery, setSearchQuery] = useState('');
     const [debouncedSearch, setDebouncedSearch] = useState('');

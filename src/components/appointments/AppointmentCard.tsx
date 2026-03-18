@@ -28,11 +28,11 @@ const AppointmentCard: React.FC<AppointmentCardProps> = ({ appointment, role, on
     return (
         <div
             onClick={onClick}
-            className="group relative flex flex-col bg-white rounded-3xl border border-gray-100 p-5 hover:border-primary-100 hover:shadow-xl hover:shadow-primary-50/20 transition-all cursor-pointer overflow-hidden"
+            className="group relative flex flex-col bg-white rounded-3xl border border-gray-100 p-4 sm:p-5 hover:border-primary-100 hover:shadow-xl hover:shadow-primary-50/20 transition-all cursor-pointer overflow-hidden"
         >
-            <div className="flex items-start justify-between mb-4">
+            <div className="flex flex-col xs:flex-row items-start justify-between gap-4 mb-4">
                 <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-2xl bg-gray-50 flex items-center justify-center overflow-hidden border border-gray-100 group-hover:border-primary-100 transition-colors">
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-gray-50 flex items-center justify-center shrink-0 overflow-hidden border border-gray-100 group-hover:border-primary-100 transition-colors">
                         {(isDoctor ? appointment.patient_avatar : appointment.doctor_avatar) ? (
                             <img
                                 src={isDoctor ? appointment.patient_avatar : appointment.doctor_avatar}
@@ -40,60 +40,64 @@ const AppointmentCard: React.FC<AppointmentCardProps> = ({ appointment, role, on
                                 className="w-full h-full object-cover"
                             />
                         ) : (
-                            <User className="w-6 h-6 text-gray-300" />
+                            <User className="w-5 h-5 sm:w-6 sm:h-6 text-gray-300" />
                         )}
                     </div>
-                    <div>
-                        <h4 className="text-sm font-black text-gray-900 group-hover:text-primary-600 transition-colors">
+                    <div className="min-w-0">
+                        <h4 className="text-sm font-black text-gray-900 group-hover:text-primary-600 transition-colors truncate">
                             {isDoctor ? appointment.patient_name : appointment.doctor_name}
                         </h4>
                         {!isDoctor && appointment.doctor_specialties && (
-                            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-tight">
+                            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-tight truncate">
                                 {appointment.doctor_specialties.join(", ")}
                             </p>
                         )}
                     </div>
                 </div>
-                <StatusBadge status={appointment.status} />
+                <div className="shrink-0 self-end xs:self-start">
+                    <StatusBadge status={appointment.status} />
+                </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-3 mb-4">
+            <div className="grid grid-cols-1 xs:grid-cols-2 gap-3 mb-4">
                 <div className="flex items-center gap-2 text-gray-500">
-                    <Calendar className="w-3.5 h-3.5 text-primary-500" />
+                    <Calendar className="w-3.5 h-3.5 text-primary-500 shrink-0" />
                     <span className="text-[11px] font-bold">
                         {format(startTime, 'dd MMM, yyyy')}
                     </span>
                 </div>
                 <div className="flex items-center gap-2 text-gray-500">
-                    <Clock className="w-3.5 h-3.5 text-primary-500" />
+                    <Clock className="w-3.5 h-3.5 text-primary-500 shrink-0" />
                     <span className="text-[11px] font-bold">
                         {format(startTime, 'HH:mm')} - {format(endTime, 'HH:mm')}
                     </span>
                 </div>
             </div>
 
-            <div className="mt-auto flex items-center justify-between pt-4 border-t border-dashed border-gray-100">
-                {isDoctor ? (
-                    <div className="flex items-center gap-2">
-                        {appointment.patient_age && (
-                            <span className="text-[10px] font-bold text-gray-400 uppercase">Age: {appointment.patient_age}</span>
-                        )}
-                        {appointment.gender && (
-                            <span className="text-[10px] font-bold text-gray-400 uppercase">• {appointment.gender}</span>
-                        )}
-                    </div>
-                ) : (
-                    <div className="flex items-center gap-2">
-                        {appointment.fees && (
-                            <span className="flex items-center text-[11px] font-bold text-gray-900">
-                                <IndianRupee className="w-3 h-3" />
-                                {appointment.fees}
-                            </span>
-                        )}
-                    </div>
-                )}
+            <div className="mt-auto flex flex-col xs:flex-row xs:items-center justify-between gap-4 pt-4 border-t border-dashed border-gray-100">
+                <div className="flex items-center gap-2">
+                    {isDoctor ? (
+                        <>
+                            {appointment.patient_age && (
+                                <span className="text-[10px] font-bold text-gray-400 uppercase">Age: {appointment.patient_age}</span>
+                            )}
+                            {appointment.gender && (
+                                <span className="text-[10px] font-bold text-gray-400 uppercase">• {appointment.gender}</span>
+                            )}
+                        </>
+                    ) : (
+                        <>
+                            {appointment.fees && (
+                                <span className="flex items-center text-[11px] font-bold text-gray-900">
+                                    <IndianRupee className="w-3 h-3" />
+                                    {appointment.fees}
+                                </span>
+                            )}
+                        </>
+                    )}
+                </div>
 
-                <div className="flex items-center gap-2 mt-2 sm:mt-0 sm:ml-auto">
+                <div className="flex flex-wrap items-center gap-2">
                     {/* Doctor Actions */}
                     {isDoctor && (appointment.status === AppointmentStatus.COMPLETED || appointment.status === AppointmentStatus.ONGOING) && (
                         <button
@@ -101,7 +105,7 @@ const AppointmentCard: React.FC<AppointmentCardProps> = ({ appointment, role, on
                                 e.stopPropagation();
                                 navigate(APP_ROUTES.DOCTOR.PRESCRIPTION.replace(':appointmentId', appointment.id));
                             }}
-                            className="px-4 py-1.5 rounded-xl bg-primary-50 text-primary-600 border border-primary-100 text-[10px] font-black uppercase hover:bg-primary-100 transition-colors flex items-center gap-1.5"
+                            className="px-3 sm:px-4 py-1.5 rounded-xl bg-primary-50 text-primary-600 border border-primary-100 text-[10px] font-black uppercase hover:bg-primary-100 transition-colors flex items-center gap-1.5"
                         >
                             <FileText className="w-3 h-3" />
                             Prescription
@@ -115,7 +119,7 @@ const AppointmentCard: React.FC<AppointmentCardProps> = ({ appointment, role, on
                                 e.stopPropagation();
                                 navigate(APP_ROUTES.PATIENT.PRESCRIPTION.replace(':appointmentId', appointment.id));
                             }}
-                            className="px-4 py-1.5 rounded-xl bg-primary-50 text-primary-600 border border-primary-100 text-[10px] font-black uppercase hover:bg-primary-100 transition-colors flex items-center gap-1.5"
+                            className="px-3 sm:px-4 py-1.5 rounded-xl bg-primary-50 text-primary-600 border border-primary-100 text-[10px] font-black uppercase hover:bg-primary-100 transition-colors flex items-center gap-1.5"
                         >
                             <ExternalLink className="w-3 h-3" />
                             Prescription
@@ -129,7 +133,7 @@ const AppointmentCard: React.FC<AppointmentCardProps> = ({ appointment, role, on
                                 e.stopPropagation();
                                 onAction?.(e);
                             }}
-                            className="px-4 py-1.5 rounded-xl bg-primary-600 text-white text-[10px] font-black uppercase hover:bg-primary-700 transition-colors shadow-lg shadow-primary-200 whitespace-nowrap"
+                            className="px-3 sm:px-4 py-1.5 rounded-xl bg-primary-600 text-white text-[10px] font-black uppercase hover:bg-primary-700 transition-colors shadow-lg shadow-primary-200 whitespace-nowrap"
                         >
                             Pay Now
                         </button>
@@ -142,7 +146,7 @@ const AppointmentCard: React.FC<AppointmentCardProps> = ({ appointment, role, on
                                 e.stopPropagation();
                                 onAction?.(e);
                             }}
-                            className="px-4 py-1.5 rounded-xl border border-primary-600 text-primary-600 text-[10px] font-black uppercase hover:bg-primary-50 transition-colors whitespace-nowrap"
+                            className="px-3 sm:px-4 py-1.5 rounded-xl border border-primary-600 text-primary-600 text-[10px] font-black uppercase hover:bg-primary-50 transition-colors whitespace-nowrap"
                         >
                             Give Review
                         </button>
@@ -157,7 +161,7 @@ const AppointmentCard: React.FC<AppointmentCardProps> = ({ appointment, role, on
                                     state: { appointment } // Pass appointment data to avoid refetching
                                 });
                             }}
-                            className="px-4 py-1.5 rounded-xl border border-orange-500 text-orange-600 text-[10px] font-black uppercase hover:bg-orange-50 transition-colors whitespace-nowrap flex items-center gap-1.5"
+                            className="px-3 sm:px-4 py-1.5 rounded-xl border border-orange-500 text-orange-600 text-[10px] font-black uppercase hover:bg-orange-50 transition-colors whitespace-nowrap flex items-center gap-1.5"
                         >
                             <FileText className="w-3 h-3" />
                             Edit Reports

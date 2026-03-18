@@ -140,35 +140,37 @@ const DoctorAppointments: React.FC = () => {
 
                 {/* Main Tabs Container */}
                 <div className="bg-white rounded-[40px] border border-gray-100 shadow-xl shadow-gray-200/50 overflow-hidden">
-                    {/* Tabs Navigation */}
-                    <div className="flex items-center border-b border-gray-50 px-8">
-                        {TABS.map((tab) => {
-                            const Icon = tab.icon;
-                            const isActive = activeTab === tab.id;
-                            return (
-                                <button
-                                    key={tab.id}
-                                    onClick={() => handleTabChange(tab.id)}
-                                    className={cn(
-                                        "relative flex items-center gap-2 px-6 py-6 transition-all group",
-                                        isActive ? "text-primary-600" : "text-gray-400 hover:text-gray-600"
-                                    )}
-                                >
-                                    <Icon className={cn("w-4 h-4 transition-transform group-hover:scale-110", isActive && "scale-110")} />
-                                    <span className="text-xs font-black uppercase tracking-widest">{tab.label}</span>
-                                    {isActive && (
-                                        <div className="absolute bottom-0 left-6 right-6 h-1 bg-primary-600 rounded-t-full shadow-[0_-4px_12px_rgba(37,99,235,0.4)]" />
-                                    )}
-                                </button>
-                            );
-                        })}
+                    {/* Tabs Navigation - Scrollable on mobile */}
+                    <div className="overflow-x-auto no-scrollbar">
+                        <div className="flex items-center border-b border-gray-50 px-8 min-w-max">
+                            {TABS.map((tab) => {
+                                const Icon = tab.icon;
+                                const isActive = activeTab === tab.id;
+                                return (
+                                    <button
+                                        key={tab.id}
+                                        onClick={() => handleTabChange(tab.id)}
+                                        className={cn(
+                                            "relative flex items-center gap-2 px-6 py-6 transition-all group",
+                                            isActive ? "text-primary-600" : "text-gray-400 hover:text-gray-600"
+                                        )}
+                                    >
+                                        <Icon className={cn("w-4 h-4 transition-transform group-hover:scale-110", isActive && "scale-110")} />
+                                        <span className="text-xs font-black uppercase tracking-widest">{tab.label}</span>
+                                        {isActive && (
+                                            <div className="absolute bottom-0 left-6 right-6 h-1 bg-primary-600 rounded-t-full shadow-[0_-4px_12px_rgba(37,99,235,0.4)]" />
+                                        )}
+                                    </button>
+                                );
+                            })}
+                        </div>
                     </div>
 
                     {/* Filters Section */}
                     {activeTab !== DoctorAppointmentTabs.ONGOING && (
-                        <div className="p-8 pb-0 flex flex-wrap items-center gap-6">
-                            <div className="flex items-center gap-3">
-                                <div className="flex flex-col gap-1.5">
+                        <div className="p-8 pb-0 flex flex-col sm:flex-row flex-wrap items-center gap-6">
+                            <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto justify-center sm:justify-start">
+                                <div className="flex flex-col gap-1.5 w-full xs:w-auto flex-1 xs:flex-none">
                                     <label className="text-[10px] font-black text-gray-400 uppercase tracking-tight ml-1">From Date</label>
                                     <div className="relative">
                                         <input
@@ -182,13 +184,15 @@ const DoctorAppointments: React.FC = () => {
                                                     setToDate('');
                                                 }
                                             }}
-                                            className="h-12 pl-10 pr-4 rounded-2xl bg-gray-50 border-none text-xs font-bold text-gray-700 focus:ring-2 focus:ring-primary-100 transition-all cursor-pointer"
+                                            className="h-12 w-full xs:w-40 pl-10 pr-4 rounded-2xl bg-gray-50 border-none text-[11px] font-bold text-gray-700 focus:ring-2 focus:ring-primary-100 transition-all cursor-pointer"
                                         />
                                         <Calendar className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
                                     </div>
                                 </div>
-                                <div className="h-px w-3 bg-gray-200 mt-6" />
-                                <div className="flex flex-col gap-1.5">
+
+                                <div className="hidden xs:block h-px w-3 bg-gray-200 mt-6" />
+
+                                <div className="flex flex-col gap-1.5 w-full xs:w-auto flex-1 xs:flex-none">
                                     <label className="text-[10px] font-black text-gray-400 uppercase tracking-tight ml-1">To Date</label>
                                     <div className="relative">
                                         <input
@@ -196,20 +200,20 @@ const DoctorAppointments: React.FC = () => {
                                             value={toDate}
                                             min={fromDate || (activeTab === DoctorAppointmentTabs.HISTORY ? undefined : undefined)}
                                             onChange={(e) => setToDate(e.target.value)}
-                                            className="h-12 pl-10 pr-4 rounded-2xl bg-gray-50 border-none text-xs font-bold text-gray-700 focus:ring-2 focus:ring-primary-100 transition-all cursor-pointer"
+                                            className="h-12 w-full xs:w-40 pl-10 pr-4 rounded-2xl bg-gray-50 border-none text-[11px] font-bold text-gray-700 focus:ring-2 focus:ring-primary-100 transition-all cursor-pointer"
                                         />
                                         <Calendar className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
                                     </div>
                                 </div>
                             </div>
 
-                            <div className="flex flex-col gap-1.5 ml-auto">
+                            <div className="flex flex-col gap-1.5 w-full sm:w-auto sm:ml-auto items-center sm:items-start">
                                 <label className="text-[10px] font-black text-gray-400 uppercase tracking-tight ml-1">Sort By</label>
-                                <div className="relative">
+                                <div className="relative w-full sm:min-w-[160px]">
                                     <select
                                         value={sortBy}
                                         onChange={(e) => setSortBy(e.target.value as any)}
-                                        className="h-12 pl-10 pr-10 rounded-2xl bg-gray-50 border-none text-xs font-bold text-gray-700 appearance-none focus:ring-2 focus:ring-primary-100 transition-all cursor-pointer min-w-[160px]"
+                                        className="h-12 w-full pl-10 pr-10 rounded-2xl bg-gray-50 border-none text-xs font-bold text-gray-700 appearance-none focus:ring-2 focus:ring-primary-100 transition-all cursor-pointer"
                                     >
                                         {activeTab === DoctorAppointmentTabs.HISTORY ? (
                                             <>
@@ -231,7 +235,7 @@ const DoctorAppointments: React.FC = () => {
                             {(fromDate || toDate) && (
                                 <button
                                     onClick={() => { setFromDate(''); setToDate(''); }}
-                                    className="mt-6 text-[10px] font-black text-primary-600 uppercase hover:text-primary-700 px-2 py-1"
+                                    className="text-[10px] font-black text-primary-600 uppercase hover:text-primary-700 px-2 py-1 sm:mt-6"
                                 >
                                     Clear Filters
                                 </button>

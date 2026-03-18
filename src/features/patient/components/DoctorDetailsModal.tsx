@@ -100,7 +100,7 @@ export default function DoctorDetailsModal({ doctor, onClose }: DoctorDetailsMod
                     <div className="space-y-8">
                         <div>
                             <h3 className="text-sm font-black text-primary-600 mb-3 uppercase tracking-widest">About Doctor</h3>
-                            <p className="text-gray-600 leading-relaxed text-sm">
+                            <p className="text-gray-600 leading-relaxed text-sm break-all">
                                 {bio || `Dr. ${first_name} ${last_name} is a highly experienced ${specialties?.[0] || 'General Practitioner'} dedicated to providing compassionate and comprehensive healthcare. With over ${experience || 5} years in the field, they have helped numerous patients achieve better health outcomes through personalized care plans.`}
                             </p>
                         </div>

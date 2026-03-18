@@ -160,128 +160,137 @@ const PatientAppointments: React.FC = () => {
 
 
             <div className="bg-white rounded-[40px] border border-gray-100 shadow-xl shadow-gray-200/50 overflow-hidden">
-                <div className="flex items-center border-b border-gray-50 px-8">
-                    {TABS.map((tab) => {
-                        const Icon = tab.icon;
-                        const isActive = activeTab === tab.id;
-                        return (
-                            <button
-                                key={tab.id}
-                                onClick={() => handleTabChange(tab.id)}
-                                className={cn(
-                                    "relative flex items-center gap-2 px-6 py-6 transition-all group",
-                                    isActive ? "text-primary-600" : "text-gray-400 hover:text-gray-600"
-                                )}
-                            >
-                                <Icon className={cn("w-4 h-4 transition-transform group-hover:scale-110", isActive && "scale-110")} />
-                                <span className="text-xs font-black uppercase tracking-widest">{tab.label}</span>
-                                {isActive && (
-                                    <div className="absolute bottom-0 left-6 right-6 h-1 bg-primary-600 rounded-t-full shadow-[0_-4px_12px_rgba(37,99,235,0.4)]" />
-                                )}
-                            </button>
-                        );
-                    })}
+                {/* Tabs Navigation - Scrollable on mobile */}
+                <div className="overflow-x-auto no-scrollbar">
+                    <div className="flex items-center border-b border-gray-50 px-8 min-w-max">
+                        {TABS.map((tab) => {
+                            const Icon = tab.icon;
+                            const isActive = activeTab === tab.id;
+                            return (
+                                <button
+                                    key={tab.id}
+                                    onClick={() => handleTabChange(tab.id)}
+                                    className={cn(
+                                        "relative flex items-center gap-2 px-6 py-6 transition-all group",
+                                        isActive ? "text-primary-600" : "text-gray-400 hover:text-gray-600"
+                                    )}
+                                >
+                                    <Icon className={cn("w-4 h-4 transition-transform group-hover:scale-110", isActive && "scale-110")} />
+                                    <span className="text-xs font-black uppercase tracking-widest">{tab.label}</span>
+                                    {isActive && (
+                                        <div className="absolute bottom-0 left-6 right-6 h-1 bg-primary-600 rounded-t-full shadow-[0_-4px_12px_rgba(37,99,235,0.4)]" />
+                                    )}
+                                </button>
+                            );
+                        })}
+                    </div>
                 </div>
 
                 {/* Filters Section */}
-                <div className="p-8 pb-0 flex flex-wrap items-center gap-6">
-                    <div className="flex items-center gap-3">
-                        <div className="flex flex-col gap-1.5">
-                            <label className="text-[10px] font-black text-gray-400 uppercase tracking-tight ml-1">From Date</label>
-                            <div className="relative">
-                                <input
-                                    type="date"
-                                    value={fromDate}
-                                    max={activeTab === PatientAppointmentTabs.HISTORY ? yesterday : undefined}
-                                    onChange={(e) => {
-                                        const newFrom = e.target.value;
-                                        setFromDate(newFrom);
-                                        if (toDate && newFrom > toDate) {
-                                            setToDate('');
-                                        }
-                                    }}
-                                    className="h-12 pl-10 pr-4 rounded-2xl bg-gray-50 border-none text-xs font-bold text-gray-700 focus:ring-2 focus:ring-primary-100 transition-all cursor-pointer"
-                                />
-                                <Calendar className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
-                            </div>
-                        </div>
-                        <div className="h-px w-3 bg-gray-200 mt-6" />
-                        <div className="flex flex-col gap-1.5">
-                            <label className="text-[10px] font-black text-gray-400 uppercase tracking-tight ml-1">To Date</label>
-                            <div className="relative">
-                                <input
-                                    type="date"
-                                    value={toDate}
-                                    min={fromDate || (activeTab === PatientAppointmentTabs.HISTORY ? undefined : undefined)}
-                                    onChange={(e) => setToDate(e.target.value)}
-                                    className="h-12 pl-10 pr-4 rounded-2xl bg-gray-50 border-none text-xs font-bold text-gray-700 focus:ring-2 focus:ring-primary-100 transition-all cursor-pointer"
-                                />
-                                <Calendar className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* History Status Filters */}
-                    {activeTab === PatientAppointmentTabs.HISTORY && (
-                        <div className="flex flex-col gap-1.5">
-                            <label className="text-[10px] font-black text-gray-400 uppercase tracking-tight ml-1">Status</label>
-                            <div className="flex items-center gap-2">
-                                {[AppointmentStatus.COMPLETED, AppointmentStatus.PAYMENT_FAILED].map(status => (
-                                    <button
-                                        key={status}
-                                        onClick={() => {
-                                            setHistoryStatus(prev =>
-                                                prev.includes(status) ? prev.filter(s => s !== status) : [...prev, status]
-                                            );
+                {activeTab !== PatientAppointmentTabs.PENDING_PAYMENT && (
+                    <div className="p-8 pb-0 flex flex-col sm:flex-row flex-wrap items-center gap-6">
+                        <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto justify-center sm:justify-start">
+                            <div className="flex flex-col gap-1.5 w-full xs:w-auto flex-1 xs:flex-none">
+                                <label className="text-[10px] font-black text-gray-400 uppercase tracking-tight ml-1">From Date</label>
+                                <div className="relative">
+                                    <input
+                                        type="date"
+                                        value={fromDate}
+                                        max={activeTab === PatientAppointmentTabs.HISTORY ? yesterday : undefined}
+                                        onChange={(e) => {
+                                            const newFrom = e.target.value;
+                                            setFromDate(newFrom);
+                                            if (toDate && newFrom > toDate) {
+                                                setToDate('');
+                                            }
                                         }}
-                                        className={cn(
-                                            "px-4 py-2 rounded-xl text-[10px] font-bold uppercase transition-all border",
-                                            historyStatus.includes(status)
-                                                ? "bg-primary-600 border-primary-600 text-white"
-                                                : "bg-gray-50 border-gray-100 text-gray-400 hover:bg-gray-100"
-                                        )}
-                                    >
-                                        {status.replace('_', ' ')}
-                                    </button>
-                                ))}
+                                        className="h-12 w-full xs:w-40 pl-10 pr-4 rounded-2xl bg-gray-50 border-none text-[11px] font-bold text-gray-700 focus:ring-2 focus:ring-primary-100 transition-all cursor-pointer"
+                                    />
+                                    <Calendar className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+                                </div>
+                            </div>
+
+                            <div className="hidden xs:block h-px w-3 bg-gray-200 mt-6" />
+
+                            <div className="flex flex-col gap-1.5 w-full xs:w-auto flex-1 xs:flex-none">
+                                <label className="text-[10px] font-black text-gray-400 uppercase tracking-tight ml-1">To Date</label>
+                                <div className="relative">
+                                    <input
+                                        type="date"
+                                        value={toDate}
+                                        min={fromDate || (activeTab === PatientAppointmentTabs.HISTORY ? undefined : undefined)}
+                                        onChange={(e) => setToDate(e.target.value)}
+                                        className="h-12 w-full xs:w-40 pl-10 pr-4 rounded-2xl bg-gray-50 border-none text-[11px] font-bold text-gray-700 focus:ring-2 focus:ring-primary-100 transition-all cursor-pointer"
+                                    />
+                                    <Calendar className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+                                </div>
                             </div>
                         </div>
-                    )}
 
-                    <div className="flex flex-col gap-1.5 ml-auto">
-                        <label className="text-[10px] font-black text-gray-400 uppercase tracking-tight ml-1">Sort By</label>
-                        <div className="relative">
-                            <select
-                                value={sortBy}
-                                onChange={(e) => setSortBy(e.target.value as any)}
-                                className="h-12 pl-10 pr-10 rounded-2xl bg-gray-50 border-none text-xs font-bold text-gray-700 appearance-none focus:ring-2 focus:ring-primary-100 transition-all cursor-pointer min-w-[160px]"
-                            >
-                                {activeTab === PatientAppointmentTabs.HISTORY ? (
-                                    <>
-                                        <option value="nearest">Latest First</option>
-                                        <option value="farthest">Oldest First</option>
-                                    </>
-                                ) : (
-                                    <>
-                                        <option value="nearest">Nearest First</option>
-                                        <option value="farthest">Farthest First</option>
-                                    </>
-                                )}
-                            </select>
-                            <ArrowUpDown className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
-                            <ChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+                        <div className="flex flex-col sm:flex-row items-center gap-6 justify-between w-full sm:w-auto sm:flex-grow">
+                            {/* History Status Filters */}
+                            {activeTab === PatientAppointmentTabs.HISTORY && (
+                                <div className="flex flex-col gap-1.5">
+                                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-tight ml-1">Status</label>
+                                    <div className="flex items-center gap-2">
+                                        {[AppointmentStatus.COMPLETED, AppointmentStatus.PAYMENT_FAILED].map(status => (
+                                            <button
+                                                key={status}
+                                                onClick={() => {
+                                                    setHistoryStatus(prev =>
+                                                        prev.includes(status) ? prev.filter(s => s !== status) : [...prev, status]
+                                                    );
+                                                }}
+                                                className={cn(
+                                                    "px-4 py-2 rounded-xl text-[10px] font-bold uppercase transition-all border",
+                                                    historyStatus.includes(status)
+                                                        ? "bg-primary-600 border-primary-600 text-white"
+                                                        : "bg-gray-50 border-gray-100 text-gray-400 hover:bg-gray-100"
+                                                )}
+                                            >
+                                                {status.replace('_', ' ')}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            <div className="flex flex-col gap-1.5 w-full sm:w-auto sm:ml-auto items-center sm:items-start">
+                                <label className="text-[10px] font-black text-gray-400 uppercase tracking-tight">Sort By</label>
+                                <div className="relative w-full sm:min-w-[160px]">
+                                    <select
+                                        value={sortBy}
+                                        onChange={(e) => setSortBy(e.target.value as any)}
+                                        className="h-12 w-full pl-10 pr-10 rounded-2xl bg-gray-50 border-none text-xs font-bold text-gray-700 appearance-none focus:ring-2 focus:ring-primary-100 transition-all cursor-pointer"
+                                    >
+                                        {activeTab === PatientAppointmentTabs.HISTORY ? (
+                                            <>
+                                                <option value="nearest">Latest First</option>
+                                                <option value="farthest">Oldest First</option>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <option value="nearest">Nearest First</option>
+                                                <option value="farthest">Farthest First</option>
+                                            </>
+                                        )}
+                                    </select>
+                                    <ArrowUpDown className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+                                    <ChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+                                </div>
+                            </div>
                         </div>
-                    </div>
 
-                    {(fromDate || toDate) && (
-                        <button
-                            onClick={() => { setFromDate(''); setToDate(''); }}
-                            className="mt-6 text-[10px] font-black text-primary-600 uppercase hover:text-primary-700 px-2 py-1"
-                        >
-                            Clear Filters
-                        </button>
-                    )}
-                </div>
+                        {(fromDate || toDate) && (
+                            <button
+                                onClick={() => { setFromDate(''); setToDate(''); }}
+                                className="text-[10px] font-black text-primary-600 uppercase hover:text-primary-700 px-2 py-1 sm:mt-6"
+                            >
+                                Clear Filters
+                            </button>
+                        )}
+                    </div>
+                )}
 
                 <div className="p-8">
                     {loading ? (

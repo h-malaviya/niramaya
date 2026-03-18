@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import Sidebar from '../dashboard/Sidebar';
-import { Menu, Search, User } from 'lucide-react';
-import { Input } from '../ui/Input';
+import { Menu, User } from 'lucide-react';
 
 interface DoctorLayoutProps {
     children: React.ReactNode;
@@ -31,14 +30,6 @@ const DoctorLayout: React.FC<DoctorLayoutProps> = ({ children }) => {
                         >
                             <Menu className="w-6 h-6" />
                         </button>
-                        <div className="hidden md:block w-72">
-                            <Input
-                                placeholder="Search appointments..."
-                                icon={<Search className="w-4 h-4" />}
-                                iconPosition="left"
-                                className="!h-10 border-none bg-gray-50"
-                            />
-                        </div>
                     </div>
 
                     <div className="flex items-center gap-3 lg:gap-6">
