@@ -6,9 +6,9 @@ import Footer from "../../../components/Footer";
 
 const Landing = () => {
     return (
-        <div className="min-h-screen w-full bg-background text-dark-900 flex flex-col items-center overflow-x-hidden">
+        <div className="min-h-screen w-full bg-background text-dark-900 flex flex-col overflow-x-hidden">
             <Header />
-            <main className="w-full flex flex-col items-center">
+            <main className="w-full flex-grow">
                 <Hero />
                 <AboutUs />
                 <PricingPlans />

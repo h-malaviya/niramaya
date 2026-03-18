@@ -1,4 +1,4 @@
-import { motion, Variants } from 'framer-motion';
+import { motion } from 'framer-motion';
 
 const features = [
     {
@@ -70,126 +70,237 @@ const features = [
     {
         icon: (
             <svg className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 18.75a6 6 0 006-6v-1.5m-6 7.5a6 6 0 01-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 01-3-3V4.5a3 3 0 116 0v8.25a3 3 0 01-3 3z" />
             </svg>
         ),
-        title: 'Email Verification',
+        title: 'AI Appointment Assistant',
         description:
-            'OTP-based email verification during signup ensures authentic users and secure account creation.',
-        color: 'from-amber-400 to-amber-600',
-        bgColor: 'bg-amber-50',
-        iconColor: 'text-amber-600',
+            'Our intelligent Chatbot and Voice Call Agent handle appointment bookings, answering queries and scheduling visits 24/7.',
+        color: 'from-accent-400 to-accent-600',
+        bgColor: 'bg-accent-50',
+        iconColor: 'text-accent-600',
     },
 ];
 
-const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-        opacity: 1,
-        transition: {
-            staggerChildren: 0.15,
-            delayChildren: 0.2,
-        },
-    },
-};
-
-const itemVariants: Variants = {
-    hidden: { opacity: 0, y: 50 },
-    visible: {
-        opacity: 1,
-        y: 0,
-        transition: { duration: 0.8, ease: 'easeOut' },
-    },
-};
-
 const AboutUs = () => {
     return (
-        <section id="about" className="py-24 sm:py-32 relative overflow-hidden">
-            {/* Background Decorations */}
-            <div className="absolute inset-0 pointer-events-none">
+        <section id="about" className="w-full py-24 sm:py-32 relative overflow-hidden bg-white/50">
+            {/* Artistic Background Elements */}
+            <div className="absolute inset-0 pointer-events-none overflow-hidden">
+                <div className="absolute -top-24 -left-24 w-96 h-96 bg-primary-100/40 rounded-full blur-3xl animate-pulse" />
+                <div className="absolute top-1/2 -right-24 w-80 h-80 bg-accent-100/30 rounded-full blur-3xl" />
+                <div className="absolute bottom-0 left-1/4 w-[600px] h-[600px] bg-primary-50/20 rounded-full blur-[120px]" />
             </div>
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-                {/* Section Header */}
-                <motion.div
-                    initial={{ opacity: 0, y: 30 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true, margin: '-100px' }}
-                    transition={{ duration: 0.7 }}
-                    className="text-center max-w-4xl mx-auto mb-20 sm:mb-24 pt-10"
-                >
-                    <span className="inline-block px-5 py-2 rounded-full bg-primary-50 text-primary-700 text-sm font-bold tracking-wide uppercase mb-6 border border-primary-200 shadow-sm">
-                        About Niramaya
-                    </span>
-                    <h2 className="font-display text-4xl sm:text-5xl lg:text-6xl font-extrabold text-dark-900 mb-8 leading-[1.15] tracking-tight">
-                        Revolutionizing <br className="hidden sm:block" />
-                        <span className="text-gradient">Healthcare Access</span>
-                    </h2>
-                    <p className="text-dark-600 text-xl leading-relaxed max-w-3xl mx-auto font-medium">
-                        Niramaya bridges the gap between patients and doctors with a smart, intuitive
-                        appointment booking platform. Whether through our website or a simple QR scan,
-                        quality healthcare is just a tap away.
-                    </p>
-                </motion.div>
+                {/* Section Header with unique layout */}
+                <div className="flex flex-col lg:flex-row items-center gap-16 mb-24">
+                    <motion.div
+                        initial={{ opacity: 0, x: -40 }}
+                        whileInView={{ opacity: 1, x: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.8 }}
+                        className="lg:w-1/2"
+                    >
+                        <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary-600 text-white text-xs font-bold tracking-widest uppercase mb-6 shadow-lg shadow-primary-200">
+                            <span className="w-1.5 h-1.5 rounded-full bg-white animate-ping" />
+                            Our Mission
+                        </span>
+                        <h2 className="font-display text-4xl sm:text-5xl lg:text-6xl font-black text-dark-900 mb-8 leading-[1.1] tracking-tight">
+                            Revolutionizing <br />
+                            <span className="text-primary-600 italic">Healthcare Access</span>
+                        </h2>
+                        <p className="text-dark-600 text-xl leading-relaxed font-medium">
+                            Niramaya bridges the gap between patients and doctors with a smart, intuitive
+                            appointment booking platform. Whether through our website or a simple QR scan,
+                            quality healthcare is just a tap away.
+                        </p>
+                        
+                        <div className="mt-10 flex items-center gap-8">
+                            <div className="flex flex-col">
+                                <span className="text-3xl font-black text-dark-900 tracking-tighter">10K+</span>
+                                <span className="text-xs font-bold text-primary-600 uppercase tracking-widest">Patients</span>
+                            </div>
+                            <div className="w-px h-10 bg-dark-100" />
+                            <div className="flex flex-col">
+                                <span className="text-3xl font-black text-dark-900 tracking-tighter">500+</span>
+                                <span className="text-xs font-bold text-primary-600 uppercase tracking-widest">Doctors</span>
+                            </div>
+                            <div className="w-px h-10 bg-dark-100" />
+                            <div className="flex flex-col">
+                                <span className="text-3xl font-black text-dark-900 tracking-tighter">4.9★</span>
+                                <span className="text-xs font-bold text-primary-600 uppercase tracking-widest">Rating</span>
+                            </div>
+                        </div>
+                    </motion.div>
 
-                {/* Features Grid */}
-                <motion.div
-                    variants={containerVariants}
-                    initial="hidden"
-                    whileInView="visible"
-                    viewport={{ once: true, margin: '-50px' }}
-                    className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 justify-items-center"
-                >
-                    {features.map((feature) => (
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.9, rotate: -2 }}
+                        whileInView={{ opacity: 1, scale: 1, rotate: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 1 }}
+                        className="lg:w-1/2 relative"
+                    >
+                        
+                        {/* Unified AI Intelligence Hub */}
+                        {/* Unified AI Dual-Agent Visual - Perfectly Responsive (320px - 2160px) */}
+                        <div className="relative w-full max-w-[500px] mx-auto overflow-visible min-h-[400px] sm:min-h-[450px] flex items-center justify-center">
+                            {/* Neural Bridge / Connection Flow */}
+                            <svg className="absolute inset-0 w-full h-full pointer-events-none z-10" viewBox="0 0 100 100" preserveAspectRatio="none">
+                                <defs>
+                                    <linearGradient id="neural-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                        <stop offset="0%" stopColor="#2563eb" stopOpacity="0.2" />
+                                        <stop offset="50%" stopColor="#3b82f6" stopOpacity="0.6" />
+                                        <stop offset="100%" stopColor="#ec4899" stopOpacity="0.2" />
+                                    </linearGradient>
+                                </defs>
+                                
+                                {/* Desktop/Laptop Curved Path (lg+) */}
+                                <motion.path 
+                                    className="hidden lg:block"
+                                    d="M25 35 Q50 50 75 65" 
+                                    stroke="url(#neural-gradient)" 
+                                    strokeWidth="0.5" 
+                                    fill="none"
+                                    strokeDasharray="4 2"
+                                    animate={{ strokeDashoffset: [0, -20] }}
+                                    transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
+                                />
+
+                                {/* Mobile/Tablet Vertical Path (<lg) */}
+                                <motion.path 
+                                    className="block lg:hidden"
+                                    d="M50 20 L50 80" 
+                                    stroke="url(#neural-gradient)" 
+                                    strokeWidth="1" 
+                                    fill="none"
+                                    strokeDasharray="4 4"
+                                    animate={{ strokeDashoffset: [0, -20] }}
+                                    transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+                                />
+                            </svg>
+
+                            {/* Node: Voice Agent */}
+                            <motion.div 
+                                animate={{ y: [0, -10, 0] }}
+                                transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+                                className="absolute top-[5%] lg:top-[20%] left-[50%] lg:left-[5%] translate-x-[-50%] lg:translate-x-0 z-20"
+                            >
+                                <div className="glass-card p-6 sm:p-8 rounded-[2rem] border-primary-100/50 shadow-2xl flex flex-col items-center gap-4 min-w-[160px] sm:min-w-[200px]">
+                                    <div className="relative">
+                                        <div className="absolute inset-0 bg-primary-400/20 blur-xl rounded-full" />
+                                        <div className="relative p-4 sm:p-5 bg-primary-100 rounded-2xl sm:rounded-3xl border border-primary-200">
+                                            <svg className="w-8 h-8 sm:w-10 sm:h-10 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V4.5a3 3 0 116 0v8.25a3 3 0 01-3 3z" />
+                                            </svg>
+                                        </div>
+                                    </div>
+                                    <div className="text-center">
+                                        <p className="text-xs sm:text-sm font-black text-primary-600 uppercase tracking-[0.2em] mb-1">Voice Agent</p>
+                                        <div className="flex justify-center gap-1 mt-2">
+                                            {[1, 2, 3].map((i) => (
+                                                <motion.div 
+                                                    key={i}
+                                                    animate={{ height: [4, 12, 4] }}
+                                                    transition={{ duration: 0.5, repeat: Infinity, delay: i * 0.1 }}
+                                                    className="w-1 bg-primary-400/50 rounded-full"
+                                                />
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+                            </motion.div>
+
+                            {/* Node: AI Chatbot */}
+                            <motion.div 
+                                animate={{ y: [0, 10, 0] }}
+                                transition={{ duration: 6, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
+                                className="absolute bottom-[5%] lg:bottom-[20%] left-[50%] lg:left-auto lg:right-[5%] translate-x-[-50%] lg:translate-x-0 z-20"
+                            >
+                                <div className="glass-card p-6 sm:p-8 rounded-[2rem] border-accent-100/50 shadow-2xl flex flex-col items-center gap-4 min-w-[160px] sm:min-w-[200px]">
+                                    <div className="relative">
+                                        <div className="absolute inset-0 bg-accent-400/20 blur-xl rounded-full" />
+                                        <div className="relative p-4 sm:p-5 bg-accent-100 rounded-2xl sm:rounded-3xl border border-accent-200">
+                                            <svg className="w-8 h-8 sm:w-10 sm:h-10 text-accent-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                                            </svg>
+                                        </div>
+                                    </div>
+                                    <div className="text-center">
+                                        <p className="text-xs sm:text-sm font-black text-accent-600 uppercase tracking-[0.2em] mb-1">AI Chatbot</p>
+                                        <div className="flex gap-1 mt-2 justify-center">
+                                            <div className="w-1.5 h-1.5 rounded-full bg-accent-400 animate-bounce" />
+                                            <div className="w-1.5 h-1.5 rounded-full bg-accent-400 animate-bounce [animation-delay:0.2s]" />
+                                            <div className="w-1.5 h-1.5 rounded-full bg-accent-400 animate-bounce [animation-delay:0.4s]" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </motion.div>
+                        </div>
+                    </motion.div>
+                </div>
+
+                {/* Features Layout - Asymmetrical and Dynamic */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+                    {features.map((feature, idx) => (
                         <motion.div
                             key={feature.title}
-                            variants={itemVariants}
-                            whileHover={{ y: -12, scale: 1.02, transition: { duration: 0.3 } }}
-                            className="glass-card rounded-2xl p-8 group cursor-default transition-shadow hover:shadow-2xl w-full max-w-sm"
+                            initial={{ opacity: 0, y: 30 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ duration: 0.6, delay: idx * 0.1 }}
+                            whileHover={{ y: -8, scale: 1.01 }}
+                            className="relative group h-full"
                         >
-                            <div
-                                className={`w-14 h-14 rounded-2xl ${feature.bgColor} flex items-center justify-center mb-5 ${feature.iconColor} group-hover:scale-110 transition-transform duration-300`}
-                            >
-                                {feature.icon}
+                            <div className="h-full glass-card p-10 rounded-[2rem] border-transparent hover:border-primary-100 hover:shadow-2xl hover:shadow-primary-600/5 transition-all duration-500">
+                                <div className={`w-14 h-14 rounded-2xl ${feature.bgColor} flex items-center justify-center mb-8 ${feature.iconColor} group-hover:scale-110 transition-transform duration-300 shadow-sm`}>
+                                    {feature.icon}
+                                </div>
+                                <h3 className="font-display text-2xl font-black text-dark-900 mb-4 group-hover:text-primary-600 transition-colors">
+                                    {feature.title}
+                                </h3>
+                                <p className="text-dark-500 leading-relaxed text-sm font-medium">
+                                    {feature.description}
+                                </p>
                             </div>
-                            <h3 className="font-display text-xl font-semibold text-dark-900 mb-3">
-                                {feature.title}
-                            </h3>
-                            <p className="text-dark-500 leading-relaxed text-[15px]">
-                                {feature.description}
-                            </p>
                         </motion.div>
                     ))}
-                </motion.div>
+                </div>
 
-                {/* Bottom CTA */}
+                {/* Bottom CTA Block - Integrated and Bold */}
                 <motion.div
-                    initial={{ opacity: 0, y: 40, scale: 0.95 }}
-                    whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                    initial={{ opacity: 0, y: 50 }}
+                    whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    transition={{ duration: 0.8, delay: 0.3 }}
-                    className="mt-16 sm:mt-24 text-center"
+                    transition={{ duration: 0.8 }}
+                    className="mt-32 relative"
                 >
-                    <div className="glass-card rounded-3xl p-10 sm:p-16 max-w-4xl mx-auto relative overflow-hidden">
-                        <div className="absolute inset-0 bg-primary-50/50" />
-                        <div className="relative z-10">
-                            <h3 className="font-display text-2xl sm:text-3xl font-bold text-dark-900 mb-4">
-                                Ready to transform your healthcare experience?
+                    <div className="bg-dark-950 rounded-[3rem] p-10 sm:p-20 overflow-hidden relative shadow-2xl shadow-primary-950/20">
+                        {/* Abstract background art inside CTA */}
+                        <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-primary-600/20 to-transparent pointer-events-none" />
+                        <div className="absolute top-[-50%] right-[-10%] w-[500px] h-[500px] bg-primary-500/10 rounded-full blur-[80px]" />
+                        
+                        <div className="relative z-10 flex flex-col items-center text-center max-w-3xl mx-auto">
+                            <h3 className="font-display text-3xl sm:text-5xl font-black text-white mb-8 leading-[1.1] tracking-tight">
+                                Ready to transform your <br />
+                                <span className="text-primary-400">healthcare experience?</span>
                             </h3>
-                            <p className="text-dark-500 text-lg mb-8 max-w-xl mx-auto">
+                            <p className="text-dark-300 text-lg sm:text-xl mb-12 font-medium opacity-80">
                                 Join thousands of patients and doctors who trust Niramaya for seamless appointment management.
                             </p>
-                            <motion.a
-                                href="#pricing"
-                                whileHover={{ scale: 1.05 }}
-                                whileTap={{ scale: 0.95 }}
-                                className="btn-gradient inline-flex items-center gap-2 px-8 py-4 rounded-2xl text-white font-semibold text-lg cursor-pointer"
-                            >
-                                Explore Plans
-                                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                                </svg>
-                            </motion.a>
+                            <div className="flex flex-col sm:flex-row gap-4 w-full justify-center">
+                                <motion.a
+                                    href="#pricing"
+                                    whileHover={{ scale: 1.05, y: -2 }}
+                                    whileTap={{ scale: 0.95 }}
+                                    className="btn-gradient px-10 py-5 rounded-2xl text-white font-black text-lg cursor-pointer flex items-center justify-center gap-3 group shadow-xl shadow-primary-900/20"
+                                >
+                                    Explore Plans
+                                    <svg className="w-6 h-6 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                                    </svg>
+                                </motion.a>
+                            </div>
                         </div>
                     </div>
                 </motion.div>
