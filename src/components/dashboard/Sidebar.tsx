@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { APP_ROUTES } from '../../constants/app-routes';
 import { useAuth } from '../../features/auth/hooks/useAuth';
+import { ConfirmationModal } from '../common/ConfirmationModal';
 import {
     LayoutDashboard,
     CalendarDays,
@@ -19,6 +20,7 @@ interface SidebarProps {
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
+    const [showLogoutModal, setShowLogoutModal] = useState(false);
     const navItems = [
         { name: 'Analytics', path: APP_ROUTES.DOCTOR.DASHBOARD, icon: LayoutDashboard },
         { name: 'Appointments', path: APP_ROUTES.DOCTOR.APPOINTMENTS, icon: CalendarDays },
@@ -84,7 +86,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
 
                 <div className="p-4 border-t border-gray-50">
                     <button
-                        onClick={() => logout()}
+                        onClick={() => setShowLogoutModal(true)}
                         disabled={isLoggingOut}
                         className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-red-500 hover:bg-red-50 transition-all duration-200 disabled:opacity-50"
                     >
@@ -93,6 +95,23 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
                     </button>
                 </div>
             </aside>
+
+            {/* Logout Confirmation Modal */}
+            <ConfirmationModal
+                isOpen={showLogoutModal}
+                onClose={() => setShowLogoutModal(false)}
+                onConfirm={() => {
+                    logout();
+                    setShowLogoutModal(false);
+                }}
+                title="Confirm Logout"
+                description="Are you sure you want to logout? You will need to sign in again to access your account."
+                confirmText="Logout"
+                cancelText="Keep me logged in"
+                variant="danger"
+                iconType="logout"
+                isLoading={isLoggingOut}
+            />
         </>
     );
 };

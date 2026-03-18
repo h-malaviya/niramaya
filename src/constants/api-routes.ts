@@ -10,6 +10,7 @@ export const API = {
         DOCTOR_SIGNUP: '/auth/doctor-signup',
         DOCTOR_VERIFY_SESSION: '/auth/doctor-signup/verify-session',
         VALIDATE_SESSION: '/auth/validate',
+        VALIDATE_SESSION_STREAM: '/auth/validate-stream',
         LOGOUT: '/auth/logout',
     },
     PROFILE: {

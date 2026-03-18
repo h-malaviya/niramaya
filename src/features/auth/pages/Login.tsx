@@ -8,6 +8,7 @@ import { validateEmail, PASSWORD_REGEX } from "../../../lib/utils";
 import { Card } from "../../../components/ui/Card";
 import { Input } from "../../../components/ui/Input";
 import { Button } from "../../../components/ui/Button";
+import { ConfirmationModal } from "../../../components/common/ConfirmationModal";
 
 const Login: React.FC = () => {
     const [formData, setFormData] = useState({
@@ -15,6 +16,7 @@ const Login: React.FC = () => {
         password: "",
     });
     const [errors, setErrors] = useState<Record<string, string>>({});
+    const [showForceLoginModal, setShowForceLoginModal] = useState(false);
     const { login, isLoggingIn } = useAuth();
 
     const validateField = (name: string, value: string) => {
@@ -38,7 +40,7 @@ const Login: React.FC = () => {
         setErrors((prev) => ({ ...prev, [name]: fieldError }));
     };
 
-    const handleSubmit = async (e: React.FormEvent, forceLogout: boolean = false) => {
+    const handleSubmit = async (e: React.FormEvent | null, forceLogout: boolean = false) => {
         if (e) e.preventDefault();
 
         const emailError = validateField("email", formData.email);
@@ -54,10 +56,7 @@ const Login: React.FC = () => {
         } catch (err: any) {
             // Check for 409 Conflict (Single Device Login)
             if (err.response?.status === 409) {
-                const message = err.response?.data?.message || "You are already logged in on another device. Do you want to logout from that device and login here?";
-                if (window.confirm(message)) {
-                    handleSubmit(null as any, true);
-                }
+                setShowForceLoginModal(true);
             }
             console.error(err);
         }
@@ -165,6 +164,23 @@ const Login: React.FC = () => {
                 </Card>
             </motion.div>
             </div>
+
+            {/* Force Login Confirmation Modal */}
+            <ConfirmationModal
+                isOpen={showForceLoginModal}
+                onClose={() => setShowForceLoginModal(false)}
+                onConfirm={() => {
+                    handleSubmit(null, true);
+                    setShowForceLoginModal(false);
+                }}
+                title="Active Session Found"
+                description="You are currently logged in on another device. Would you like to logout from that device and continue here?"
+                confirmText="Logout other device"
+                cancelText="Cancel"
+                variant="warning"
+                iconType="devices"
+                isLoading={isLoggingIn}
+            />
         </div>
     );
 };
