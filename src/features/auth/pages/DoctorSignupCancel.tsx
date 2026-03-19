@@ -6,12 +6,14 @@ import { APP_ROUTES } from "../../../constants/app-routes";
 import { Card } from "../../../components/ui/Card";
 import { Button } from "../../../components/ui/Button";
 import { Role } from "../../../types/role.enum";
+import SEO from "../../../components/common/SEO";
 
 const DoctorSignupCancel: React.FC = () => {
     const navigate = useNavigate();
 
     return (
         <div className="min-h-screen bg-background flex items-center justify-center p-4">
+            <SEO title="Registration Cancelled — Niramaya" description="Your registration process was cancelled. No charges were made." />
             <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}

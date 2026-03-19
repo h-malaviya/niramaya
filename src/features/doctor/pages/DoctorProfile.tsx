@@ -12,6 +12,7 @@ import { IUpdateDoctorProfileRequest, IUpdatePatientProfileRequest, DoctorPlan }
 import { getPlanFromToken } from '../../auth/utils/auth.utils';
 import { QRCodeModal } from '../../qrcode/components/QRCodeModal';
 import { QrCode } from 'lucide-react';
+import SEO from '../../../components/common/SEO';
 
 const DoctorProfile: React.FC = () => {
     const [isEditing, setIsEditing] = useState(false);
@@ -79,6 +80,7 @@ const DoctorProfile: React.FC = () => {
 
     return (
         <DoctorLayout>
+            <SEO title="Doctor Profile — Niramaya" description="View and update your professional profile, bio, and consultation details." />
             <input
                 type="file"
                 ref={fileInputRef}

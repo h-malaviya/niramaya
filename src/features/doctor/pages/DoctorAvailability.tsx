@@ -9,6 +9,7 @@ import { toast } from 'react-hot-toast';
 import { getErrorMessage } from '../../../utils/api-error';
 import { getRoleFromToken } from '../../auth/utils/auth.utils';
 import { Role } from '../../../types/role.enum';
+import SEO from '../../../components/common/SEO';
 
 const DoctorAvailability: React.FC = () => {
     const queryClient = useQueryClient();
@@ -44,6 +45,7 @@ const DoctorAvailability: React.FC = () => {
 
     return (
         <DoctorLayout>
+            <SEO title="Manage Availability — Niramaya" description="Configure your working hours and consultation slots for patient bookings." />
             <div className="space-y-8 pb-20">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div>

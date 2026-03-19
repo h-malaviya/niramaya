@@ -10,7 +10,6 @@ import {
     Clock,
     LogOut,
     X,
-    Stethoscope,
     User
 } from 'lucide-react';
 
@@ -52,8 +51,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
             `}>
                 <div className="p-6 border-b border-gray-50 flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-primary-600 rounded-xl flex items-center justify-center shadow-lg shadow-primary-200">
-                            <Stethoscope className="w-6 h-6 text-white" />
+                        <div className="w-10 h-10 flex items-center justify-center overflow-hidden rounded-lg">
+                            <img src="/favicon.png" alt="Niramaya" className="w-full h-full object-contain" />
                         </div>
                         <span className="text-xl font-black text-primary-900 tracking-tight">Niramaya</span>
                     </div>

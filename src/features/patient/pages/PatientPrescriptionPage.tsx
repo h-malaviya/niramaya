@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import PatientLayout from '../../../components/layouts/PatientLayout';
 import { PrescriptionViewer } from '../../../components/common/PrescriptionViewer';
 import { APP_ROUTES } from '../../../constants/app-routes';
+import SEO from '../../../components/common/SEO';
 
 const PatientPrescriptionPage: React.FC = () => {
     const { appointmentId } = useParams<{ appointmentId: string }>();
@@ -20,6 +21,7 @@ const PatientPrescriptionPage: React.FC = () => {
 
     return (
         <PatientLayout>
+            <SEO title="View Prescription — Niramaya" description="Access and download your digital medical prescriptions from previous consultations." />
             <div className="space-y-6 max-w-4xl mx-auto">
                 <div>
                     <h1 className="text-2xl font-bold text-gray-900">View Prescription</h1>

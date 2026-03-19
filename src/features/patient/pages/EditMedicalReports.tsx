@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { APP_ROUTES } from '../../../constants/app-routes';
 import { toast } from 'react-hot-toast';
+import SEO from '../../../components/common/SEO';
 
 const EditMedicalReports: React.FC = () => {
     const { appointmentId } = useParams<{ appointmentId: string }>();
@@ -81,6 +82,7 @@ const EditMedicalReports: React.FC = () => {
 
     return (
         <div className="min-h-screen bg-gray-50 pb-20">
+            <SEO title="Edit Medical Reports — Niramaya" description="Upload or manage medical reports associated with your appointment." />
             <div className="max-w-3xl mx-auto px-4 pt-8">
                 {/* Header */}
                 <button 

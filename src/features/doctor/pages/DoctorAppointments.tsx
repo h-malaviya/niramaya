@@ -18,6 +18,7 @@ import Pagination from '../../../components/common/Pagination';
 import { cn } from '../../../lib/utils';
 import DoctorLayout from '../../../components/layouts/DoctorLayout';
 import { Role } from '../../../types/role.enum';
+import SEO from '../../../components/common/SEO';
 
 const TABS = [
     { id: DoctorAppointmentTabs.ONGOING, label: 'Ongoing', icon: Clock },
@@ -123,6 +124,7 @@ const DoctorAppointments: React.FC = () => {
 
     return (
         <DoctorLayout>
+            <SEO title="My Appointments — Niramaya" description="Review and manage your daily scheduled appointments and patient consultations." />
             <div className="space-y-8">
                 {/* Header Section */}
                 <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">

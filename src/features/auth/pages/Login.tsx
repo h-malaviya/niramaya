@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { LogIn, Mail, Lock, Loader2, UserCircle2, ArrowLeft } from "lucide-react";
+import { LogIn, Mail, Lock, Loader2, ArrowLeft } from "lucide-react";
 import { useAuth } from "../hooks/useAuth";
 import { APP_ROUTES } from "../../../constants/app-routes";
 import { validateEmail, PASSWORD_REGEX } from "../../../lib/utils";
@@ -9,6 +9,7 @@ import { Card } from "../../../components/ui/Card";
 import { Input } from "../../../components/ui/Input";
 import { Button } from "../../../components/ui/Button";
 import { ConfirmationModal } from "../../../components/common/ConfirmationModal";
+import SEO from "../../../components/common/SEO";
 
 const Login: React.FC = () => {
     const [formData, setFormData] = useState({
@@ -64,6 +65,7 @@ const Login: React.FC = () => {
 
     return (
         <div className="min-h-screen bg-background flex flex-col p-4 py-8 sm:py-12 relative overflow-hidden">
+            <SEO title="Login — Niramaya" description="Sign in to your Niramaya account to manage your medical appointments and health records." />
             {/* Absolute Back Button to match PricingPlans style */}
             <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 mb-4">
                 <Link
@@ -85,9 +87,9 @@ const Login: React.FC = () => {
                     <motion.div
                         initial={{ scale: 0.5 }}
                         animate={{ scale: 1 }}
-                        className="bg-primary-600 p-4 rounded-3xl w-20 h-20 flex items-center justify-center mx-auto mb-6 shadow-xl shadow-primary-200"
+                        className="w-24 h-24 flex items-center justify-center mx-auto mb-6 overflow-hidden rounded-2xl"
                     >
-                        <UserCircle2 className="h-10 w-10 text-white" />
+                        <img src="/favicon.png" alt="Niramaya Logo" className="w-full h-full object-contain" />
                     </motion.div>
                     <h1 className="text-4xl font-extrabold text-dark-900 tracking-tight">Welcome Back</h1>
                     <p className="text-dark-600 mt-3 text-lg">Sign in to your Niramaya account</p>

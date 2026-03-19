@@ -8,6 +8,7 @@ import { validateEmail } from "../../../lib/utils";
 import { Card } from "../../../components/ui/Card";
 import { Input } from "../../../components/ui/Input";
 import { Button } from "../../../components/ui/Button";
+import SEO from "../../../components/common/SEO";
 
 const ForgotPassword: React.FC = () => {
     const [email, setEmail] = useState("");
@@ -40,6 +41,7 @@ const ForgotPassword: React.FC = () => {
 
     return (
         <div className="min-h-screen bg-background flex items-center justify-center p-4 py-12">
+            <SEO title="Forgot Password — Niramaya" description="Recover your Niramaya account by requesting a password reset link." />
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
