@@ -28,7 +28,8 @@ export default function GuestBookingForm({ onSubmit, loading }: GuestBookingForm
   const [errors, setErrors] = useState<Record<string, string>>({});
   const formRef = useRef<HTMLFormElement>(null);
   const [formData, setFormData] = useState({
-    name: '',
+    first_name: '',
+    last_name: '',
     email: '',
     phone: '',
     gender: Gender.MALE,
@@ -166,13 +167,26 @@ export default function GuestBookingForm({ onSubmit, loading }: GuestBookingForm
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
         <Input
-          id="field-name"
-          label="Full Name"
-          name="name"
-          value={formData.name}
+          id="field-first_name"
+          label="First Name"
+          name="first_name"
+          value={formData.first_name}
           onChange={handleChange}
-          placeholder="e.g. John Doe"
-          error={errors.name}
+          placeholder="e.g. John"
+          error={errors.first_name}
+          icon={<User className="w-4 h-4" />}
+          iconPosition="left"
+          required
+        />
+
+        <Input
+          id="field-last_name"
+          label="Last Name"
+          name="last_name"
+          value={formData.last_name}
+          onChange={handleChange}
+          placeholder="e.g. Doe"
+          error={errors.last_name}
           icon={<User className="w-4 h-4" />}
           iconPosition="left"
           required

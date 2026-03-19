@@ -65,6 +65,8 @@ const BookAppointment: React.FC = () => {
     const [showAIModal, setShowAIModal] = useState(false);
     const [showChatOverlay, setShowChatOverlay] = useState(false);
     const [patientInfo, setPatientInfo] = useState<any>(null);
+    const [showOverlapModal, setShowOverlapModal] = useState(false);
+    const [overlapMessage, setOverlapMessage] = useState('');
 
     const [showProfileModal, setShowProfileModal] = useState(false);
 
@@ -179,6 +181,14 @@ const BookAppointment: React.FC = () => {
             const pp = p.patient_profile;
             if (!pp?.height || !pp?.weight || !pp?.blood_group) {
                 setShowProfileModal(true);
+                return;
+            }
+
+            // NEW: Check for patient overlap
+            const overlapRes = await appointmentService.checkOverlap(selectedSlot.start_time, selectedSlot.end_time);
+            if (overlapRes.success && overlapRes.data?.overlap) {
+                setOverlapMessage(overlapRes.data.message || 'You already have an appointment at this time.');
+                setShowOverlapModal(true);
                 return;
             }
 
@@ -448,6 +458,17 @@ const BookAppointment: React.FC = () => {
                 onClose={() => setShowProfileModal(false)}
                 onGoToProfile={() => navigate(APP_ROUTES.PATIENT.PROFILE)}
             />
+
+            {/* Overlap Warning Modal */}
+            <OverlapWarningModal
+                isOpen={showOverlapModal}
+                message={overlapMessage}
+                onClose={() => setShowOverlapModal(false)}
+                onConfirm={() => {
+                    setShowOverlapModal(false);
+                    setShowAIModal(true);
+                }}
+            />
         </div>
     );
 };
@@ -684,6 +705,60 @@ const ProfilePromptModal: React.FC<ProfilePromptModalProps> = ({ isOpen, onClose
                                 onClick={onGoToProfile}
                             >
                                 Profile
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+/* Overlap Warning Modal Component */
+interface OverlapWarningModalProps {
+    isOpen: boolean;
+    message: string;
+    onClose: () => void;
+    onConfirm: () => void;
+}
+const OverlapWarningModal: React.FC<OverlapWarningModalProps> = ({ isOpen, message, onClose, onConfirm }) => {
+    if (!isOpen) return null;
+
+    return (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            <div 
+                className="absolute inset-0 bg-dark-900/60 backdrop-blur-sm transition-opacity" 
+                onClick={onClose}
+            />
+            
+            <div className="relative bg-white w-full max-w-md rounded-3xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-300">
+                <div className="p-6 sm:p-8">
+                    <div className="flex flex-col items-center text-center">
+                        <div className="w-16 h-16 bg-amber-50 rounded-2xl flex items-center justify-center mb-6 text-amber-600">
+                            <AlertCircle className="w-8 h-8" />
+                        </div>
+                        
+                        <h3 className="text-xl font-black text-dark-900 mb-4">
+                            Appointment Overlap
+                        </h3>
+                        
+                        <p className="text-slate-600 text-sm font-medium leading-relaxed mb-8">
+                            {message}
+                        </p>
+                        
+                        <div className="flex flex-col sm:flex-row gap-3 w-full">
+                            <Button
+                                variant="secondary"
+                                className="flex-1 rounded-xl font-bold order-2 sm:order-1"
+                                onClick={onClose}
+                            >
+                                Cancel
+                            </Button>
+                            <Button
+                                className="flex-1 rounded-xl bg-primary-600 hover:bg-primary-700 text-white font-bold order-1 sm:order-2"
+                                onClick={onConfirm}
+                            >
+                                Proceed Anyway
                             </Button>
                         </div>
                     </div>

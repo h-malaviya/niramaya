@@ -13,9 +13,12 @@ export const BOOKING_LIMITS = {
 };
 
 export const bookingSchema = z.object({
-  name: z.string()
-    .min(3, 'Full name is required')
-    .regex(/^[a-zA-Z]+\s+[a-zA-Z]+.*$/, 'Please enter at least first and last name'),
+  first_name: z.string()
+    .min(2, 'First name must be at least 2 characters')
+    .regex(/^[a-zA-Z]+$/, 'Only alphabets are allowed'),
+  last_name: z.string()
+    .min(2, 'Last name must be at least 2 characters')
+    .regex(/^[a-zA-Z]+$/, 'Only alphabets are allowed'),
   email: z.string()
     .regex(/^[^\s@]+@[^\s@]+\.[^\s@]+$/, 'Please enter a valid email address'),
   phone: z.string()
