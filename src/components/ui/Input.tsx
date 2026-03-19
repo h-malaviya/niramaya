@@ -8,10 +8,11 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
     prefix?: string;
     icon?: React.ReactNode;
     iconPosition?: "left" | "right";
+    rightElement?: React.ReactNode;
 }
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(
-    ({ label, error, prefix, icon, iconPosition = "right", className, type, ...props }, ref) => {
+    ({ label, error, prefix, icon, iconPosition = "right", rightElement, className, type, ...props }, ref) => {
         const [showPassword, setShowPassword] = useState(false);
         const [hasValue, setHasValue] = useState(Boolean(props.value || props.defaultValue));
         
@@ -57,7 +58,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
                     )}
 
                     {icon && iconPosition === "left" && (
-                        <div className="absolute left-3 text-dark-400 group-focus-within:text-primary-500 transition-colors z-10">
+                        <div className="absolute left-3 top-1/2 -translate-y-1/2 text-dark-400 group-focus-within:text-primary-500 transition-colors z-10">
                             {icon}
                         </div>
                     )}
@@ -70,10 +71,9 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
                             prefix && !icon && "!pl-[4.5rem]",
                             icon && iconPosition === "left" && !prefix && "!pl-[3rem]",
                             icon && iconPosition === "left" && prefix && "!pl-[6.4rem]",
-                            icon && iconPosition === "right" && !isPassword && "!pr-[3rem]",
-                            icon && iconPosition === "right" && (isPassword && hasValue) && "!pr-[5.5rem]",
-                            icon && iconPosition === "right" && (isPassword && !hasValue) && "!pr-[3rem]",
-                            !icon && (isPassword && hasValue) && "!pr-[3rem]",
+                            icon && iconPosition === "right" && !isPassword && !rightElement && "!pr-[3rem]",
+                            icon && iconPosition === "right" && (isPassword || rightElement) && "!pr-[5.5rem]",
+                            rightElement && !icon && "!pr-[5.5rem]",
                             className
                         )}
                         ref={ref}
@@ -81,12 +81,18 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
                         onChange={handleChange}
                     />
 
-                    {icon && iconPosition === "right" && (
+                    {(icon && iconPosition === "right") && (
                         <div className={cn(
-                            "absolute text-dark-400 group-focus-within:text-primary-500 transition-colors",
-                            (isPassword && hasValue) ? "right-10" : "right-3"
+                            "absolute top-1/2 -translate-y-1/2 text-dark-400 group-focus-within:text-primary-500 transition-colors",
+                            (isPassword && hasValue) || rightElement ? "right-10" : "right-3"
                         )}>
                             {icon}
+                        </div>
+                    )}
+
+                    {rightElement && (
+                        <div className="absolute right-1.5 top-1/2 -translate-y-1/2 z-20">
+                            {rightElement}
                         </div>
                     )}
 
@@ -94,7 +100,10 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
                         <button
                             type="button"
                             onClick={() => setShowPassword(!showPassword)}
-                            className="absolute right-3 text-dark-400 hover:text-dark-600 focus:outline-none transition-colors"
+                            className={cn(
+                                "absolute top-1/2 -translate-y-1/2 text-dark-400 hover:text-dark-600 focus:outline-none transition-colors",
+                                rightElement ? "right-10" : "right-3"
+                            )}
                         >
                             {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                         </button>
