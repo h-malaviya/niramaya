@@ -148,6 +148,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({
                     }
                 } else if (event.type === 'error') {
                     toast.error(event.data.text || "An error occurred");
+                    // Reset thread on major errors to prevent stuck states
                     generateNewThreadId();
                 }
 

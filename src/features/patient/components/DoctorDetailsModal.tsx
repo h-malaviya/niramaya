@@ -35,12 +35,12 @@ export default function DoctorDetailsModal({ doctor, onClose }: DoctorDetailsMod
             />
 
             {/* Modal Content */}
-            <div className="relative w-full max-w-2xl max-h-[90vh] bg-white rounded-3xl overflow-hidden shadow-2xl animate-in fade-in zoom-in duration-300 transform-gpu border border-gray-100 flex flex-col">
+            <div className="relative w-full max-w-lg max-h-[90vh] bg-white rounded-3xl overflow-hidden shadow-2xl animate-in fade-in zoom-in duration-300 transform-gpu border border-gray-100 flex flex-col">
                 {/* Header/Cover */}
-                <div className="bg-gradient-to-r from-primary-600 to-primary-700 p-8 text-white relative shrink-0">
+                <div className="bg-gradient-to-r from-primary-600 to-primary-700 p-6 text-white relative shrink-0">
                     <button
                         onClick={onClose}
-                        className="btn btn-sm btn-circle absolute right-6 top-6 bg-white/20 border-none text-white hover:bg-white/30 transition-all hover:rotate-90"
+                        className="btn btn-sm btn-circle absolute right-4 top-4 bg-transparent border-none text-white hover:bg-white/10 transition-all hover:rotate-90"
                     >
                         ✕
                     </button>
@@ -50,11 +50,11 @@ export default function DoctorDetailsModal({ doctor, onClose }: DoctorDetailsMod
                             firstName={first_name}
                             size="xl"
                             variant="square"
-                            className="bg-white/20 backdrop-blur-md text-white border border-white/30"
+                            className="bg-white/20 backdrop-blur-md text-white border border-white/30 shrink-0 aspect-square rounded-2xl w-20 h-20 sm:w-24 sm:h-24"
                         />
                         <div>
-                            <h2 className="text-3xl font-bold">Dr. {first_name} {last_name}</h2>
-                            <p className="text-primary-100 text-lg mt-1">{specialties?.[0] || 'General Practitioner'}</p>
+                            <h2 className="text-2xl font-bold">Dr. {first_name} {last_name}</h2>
+                            <p className="text-primary-100 text-sm mt-0.5">{specialties?.[0] || 'General Practitioner'}</p>
                             <div className="flex items-center mt-2 text-primary-50">
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1 opacity-70" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
@@ -67,20 +67,20 @@ export default function DoctorDetailsModal({ doctor, onClose }: DoctorDetailsMod
                 </div>
 
                 {/* Main Content Area */}
-                <div className="p-8 max-h-[60vh] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-200">
+                <div className="p-6 max-h-[60vh] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-200">
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                         <div className="bg-gray-50 p-4 rounded-xl text-center border border-gray-100">
                             <p className="text-xs text-gray-400 uppercase font-black tracking-widest mb-1">Experience</p>
-                            <p className="text-xl font-bold text-gray-800">{experience || 0} Years</p>
+                            <p className="text-lg font-bold text-gray-800">{experience || 0} Years</p>
                         </div>
                         <div className="bg-gray-50 p-4 rounded-xl text-center border border-gray-100">
                             <p className="text-xs text-gray-400 uppercase font-black tracking-widest mb-1">Fee</p>
-                            <p className="text-xl font-bold text-gray-800">₹{consultation_fee || 500}</p>
+                            <p className="text-lg font-bold text-gray-800">₹{consultation_fee || 500}</p>
                         </div>
                         <div className="bg-gray-50 p-4 rounded-xl text-center border border-gray-100">
                             <p className="text-xs text-gray-400 uppercase font-black tracking-widest mb-1">Ratings</p>
                             <div className="flex flex-col items-center justify-center">
-                                <div className="flex items-center text-xl font-bold text-gray-800">
+                                <div className="flex items-center text-lg font-bold text-gray-800">
                                     <span className="text-yellow-400 mr-1">★</span>
                                     {average_rating || '0.0'}
                                 </div>
@@ -118,18 +118,18 @@ export default function DoctorDetailsModal({ doctor, onClose }: DoctorDetailsMod
                     </div>
                 </div>
 
-                <div className="p-8 border-t border-gray-100 bg-gray-50/50 flex flex-col sm:flex-row gap-4 shrink-0">
+                <div className="p-6 border-t border-gray-100 bg-gray-50/50 flex flex-row gap-3 shrink-0">
                     <button
                         onClick={onClose}
-                        className="btn btn-ghost flex-1 h-14 rounded-2xl font-bold text-gray-500 hover:bg-gray-100 flex items-center justify-center leading-none"
+                        className="btn btn-ghost flex-1 h-12 rounded-xl font-bold text-gray-500 hover:bg-gray-100 flex items-center justify-center leading-none text-sm"
                     >
                         Close
                     </button>
                     <Link
                         to={APP_ROUTES.PATIENT.BOOK_APPOINTMENT.replace(':doctorId', doctor.user_id)}
-                        className="btn bg-primary-600 hover:bg-primary-700 flex-[2] h-14 rounded-2xl text-white font-bold shadow-lg shadow-primary-200 border-none flex items-center justify-center leading-none"
+                        className="btn bg-primary-600 hover:bg-primary-700 flex-[1.4] h-12 rounded-xl text-white font-bold shadow-lg shadow-primary-200 border-none flex items-center justify-center leading-none text-sm whitespace-nowrap"
                     >
-                        Book Appointment
+                        Book Now
                     </Link>
                 </div>
             </div>
