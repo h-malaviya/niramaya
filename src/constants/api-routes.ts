@@ -46,6 +46,7 @@ export const API = {
         CHAT: '/patients/chat',
         VOICE_CALL: '/patients/voice/start',
         GET_PAYMENT_URL: '/appointment/:appointmentId/url',
+        CHECK_OVERLAP: '/appointment/check-overlap',
     },
     RATING: {
         BASE: '/ratings',

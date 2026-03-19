@@ -92,5 +92,13 @@ export const appointmentService = {
         const url = API.PATIENTS.GET_PAYMENT_URL.replace(':appointmentId', appointmentId);
         const response = await apiClient.get<IApiResponse<{ url: string }>>(url);
         return response.data;
+    },
+
+    checkOverlap: async (start_at: string, end_at: string): Promise<IApiResponse<{ overlap: boolean, message?: string }>> => {
+        const response = await apiClient.post<IApiResponse<{ overlap: boolean, message?: string }>>(
+            API.PATIENTS.CHECK_OVERLAP,
+            { start_at, end_at }
+        );
+        return response.data;
     }
 };
