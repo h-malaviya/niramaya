@@ -80,7 +80,7 @@ const PatientProfile: React.FC = () => {
                 accept="image/*"
                 onChange={handleImageUpload}
             />
-            <div className="space-y-8 pb-12">
+            <div className="space-y-4 pb-12">
                 {/* Header Actions */}
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div className="flex items-center gap-4">
@@ -114,6 +114,7 @@ const PatientProfile: React.FC = () => {
                             role={Role.PATIENT}
                             initialData={profile}
                             onSubmit={handleUpdate}
+                            isLoading={isUpdating}
                         />
                     </div>
                 ) : (

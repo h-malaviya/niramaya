@@ -88,7 +88,7 @@ const DoctorProfile: React.FC = () => {
                 accept="image/*"
                 onChange={handleImageUpload}
             />
-            <div className="max-w-5xl mx-auto space-y-8 pb-12">
+            <div className="max-w-5xl mx-auto space-y-4 pb-12">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
                         {isEditing && (
@@ -137,6 +137,7 @@ const DoctorProfile: React.FC = () => {
                         role={Role.DOCTOR}
                         initialData={profile}
                         onSubmit={handleUpdate}
+                        isLoading={isUpdating}
                     />
                 ) : (
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 text-left">

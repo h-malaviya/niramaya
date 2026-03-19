@@ -126,10 +126,16 @@ export const UpdateProfileForm: React.FC<UpdateProfileFormProps> = ({
                 initialVal = initialData[field as keyof typeof initialData] as string | number | string[];
             }
 
-            if (Array.isArray(formData[field])) {
-                return JSON.stringify(formData[field]) !== JSON.stringify(initialVal || []);
+            // Normalize initial value for comparison
+            let normalizedInitial = initialVal;
+            if (field === "phone_number" || field === "emergency_contact_phone") {
+                normalizedInitial = stripPrefix(initialVal as string);
             }
-            return formData[field] !== (initialVal || (typeof formData[field] === "number" ? 0 : ""));
+
+            if (Array.isArray(formData[field])) {
+                return JSON.stringify(formData[field]) !== JSON.stringify(normalizedInitial || []);
+            }
+            return formData[field] !== (normalizedInitial ?? (typeof formData[field] === "number" ? 0 : ""));
         });
         setIsChanged(hasChanges);
     }, [formData, initialData]);

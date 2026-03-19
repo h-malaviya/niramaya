@@ -48,7 +48,7 @@ const SearchBox: React.FC<SearchBoxProps> = ({
                 value={value}
                 onChange={handleChange}
                 onKeyDown={handleKeyDown}
-                className="block w-full pl-10 pr-10 py-2.5 border border-gray-200 rounded-xl leading-5 bg-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 sm:text-sm transition-all shadow-sm"
+                className="block w-full pl-10 pr-10 h-full border border-gray-200 rounded-xl leading-5 bg-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 sm:text-sm transition-all shadow-sm"
                 placeholder={placeholder}
             />
             {value && (
