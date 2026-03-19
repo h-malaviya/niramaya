@@ -23,6 +23,7 @@ import {
     validateDOB,
     validateExperience,
     validateConsultationFee,
+    calculateAge,
 } from "../../../lib/utils";
 import { CheckCircle2, XCircle, Mail, Phone, Lock, User, Calendar, Briefcase, IndianRupee, Loader2 } from "lucide-react";
 
@@ -138,7 +139,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ role, plan }) => {
                 error = validateDOB(value, role);
                 break;
             case "experience":
-                error = validateExperience(Number(value));
+                error = validateExperience(Number(value), role === Role.DOCTOR ? calculateAge(formData.dob) : undefined);
                 break;
             case "consultation_fee":
                 error = validateConsultationFee(Number(value));
@@ -197,7 +198,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ role, plan }) => {
             if (formData.qualifications.length === 0) newErrors.qualifications = "Select at least one qualification";
             if (formData.specialties.length === 0) newErrors.specialties = "Select at least one specialty";
 
-            const expErr = validateExperience(Number(formData.experience));
+            const expErr = validateExperience(Number(formData.experience), calculateAge(formData.dob));
             if (expErr) newErrors.experience = expErr;
 
             const feeErr = validateConsultationFee(Number(formData.consultation_fee));

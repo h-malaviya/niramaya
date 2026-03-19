@@ -22,7 +22,8 @@ import {
     validateHeight,
     validateWeight,
     validateExperience,
-    validateConsultationFee
+    validateConsultationFee,
+    calculateAge
 } from "../../lib/utils";
 import {
     User,
@@ -197,7 +198,7 @@ export const UpdateProfileForm: React.FC<UpdateProfileFormProps> = ({
                 error = validateWeight(Number(value));
                 break;
             case "experience":
-                error = validateExperience(Number(value));
+                error = validateExperience(Number(value), role === Role.DOCTOR ? calculateAge(initialData.dob) : undefined);
                 break;
             case "consultation_fee":
                 error = validateConsultationFee(Number(value));
@@ -246,7 +247,7 @@ export const UpdateProfileForm: React.FC<UpdateProfileFormProps> = ({
         if (role === Role.DOCTOR) {
             const bioErr = validateBio(formData.bio);
             if (bioErr) finalErrors.bio = bioErr;
-            const expErr = validateExperience(Number(formData.experience));
+            const expErr = validateExperience(Number(formData.experience), calculateAge(initialData.dob));
             if (expErr) finalErrors.experience = expErr;
             const feeErr = validateConsultationFee(Number(formData.consultation_fee));
             if (feeErr) finalErrors.consultation_fee = feeErr;
