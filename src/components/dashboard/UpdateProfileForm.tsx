@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Input } from "../ui/Input";
 import { Select } from "../ui/Select";
+import { MultiSelect } from "../ui/MultiSelect";
 import { Button } from "../ui/Button";
-import { Badge } from "../ui/Badge";
 import {
     IndianCity,
     Specialty,
@@ -135,13 +135,23 @@ export const UpdateProfileForm: React.FC<UpdateProfileFormProps> = ({
     }, [formData, initialData]);
 
     // Options
-    const cityOptions = Object.values(IndianCity).map((v) => ({ label: v.replace(/_/g, " "), value: v }));
-    const specialtyOptions = Object.values(Specialty).map((v) => ({ label: v.replace(/_/g, " "), value: v }));
-    const qualificationOptions = Object.values(Qualification).map((v) => ({ label: v.replace(/_/g, " "), value: v }));
-    const bloodTypeOptions = Object.values(BloodType).map((v) => ({
-        label: v.replace(/_POS/g, "+").replace(/_NEG/g, "-"),
-        value: v
-    }));
+    const cityOptions = Object.values(IndianCity)
+        .map((v) => ({ label: v.replace(/_/g, " "), value: v }))
+        .sort((a, b) => a.label.localeCompare(b.label));
+
+    const specialtyOptions = Object.values(Specialty)
+        .map((v) => ({ label: v.replace(/_/g, " "), value: v }))
+        .sort((a, b) => a.label.localeCompare(b.label));
+
+    const qualificationOptions = Object.values(Qualification)
+        .map((v) => ({ label: v.replace(/_/g, " "), value: v }))
+        .sort((a, b) => a.label.localeCompare(b.label));
+
+    const bloodTypeOptions = Object.values(BloodType)
+        .map((v) => ({
+            label: v.replace(/_POS/g, "+").replace(/_NEG/g, "-"),
+            value: v
+        }));
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
@@ -201,23 +211,6 @@ export const UpdateProfileForm: React.FC<UpdateProfileFormProps> = ({
         }
     };
 
-    const handleMultiSelect = (name: "specialties" | "qualifications", value: string) => {
-        if (!value) return;
-        const current = formData[name] as string[];
-        if (!current.includes(value)) {
-            setFormData((prev) => ({
-                ...prev,
-                [name]: [...current, value] as Specialty[] | Qualification[]
-            }));
-        }
-    };
-
-    const handleRemoveItem = (name: "specialties" | "qualifications", value: string) => {
-        setFormData((prev) => ({
-            ...prev,
-            [name]: (formData[name] as string[]).filter((item) => item !== value) as Specialty[] | Qualification[],
-        }));
-    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -335,7 +328,7 @@ export const UpdateProfileForm: React.FC<UpdateProfileFormProps> = ({
                         <div className="md:col-span-2 flex flex-col gap-1.5">
                             <label className="text-sm font-semibold text-dark-700 flex items-center gap-2">
                                 <FileText className="w-4 h-4 text-gray-400" />
-                                Professional Bio <span className="text-red-500">*</span>
+                                Professional Bio
                             </label>
                             <textarea
                                 name="bio"
@@ -349,44 +342,32 @@ export const UpdateProfileForm: React.FC<UpdateProfileFormProps> = ({
                             />
                             {errors.bio && <span className="text-xs text-red-500 font-medium">{errors.bio}</span>}
                             <div className="text-right">
-                                <span className={`text-[10px] font-bold ${formData.bio.length < 20 || formData.bio.length > 500 ? 'text-red-400' : 'text-gray-400'}`}>
+                                <span className={`text-[10px] font-bold ${(formData.bio.length > 0 && formData.bio.length < 20) || formData.bio.length > 500 ? 'text-red-400' : 'text-gray-400'}`}>
                                     {formData.bio.length}/500
                                 </span>
                             </div>
                         </div>
 
                         <div className="space-y-3">
-                            <Select
+                            <MultiSelect
                                 label="Specialties"
                                 options={specialtyOptions}
-                                onChange={(e) => handleMultiSelect("specialties", e.target.value)}
-                                placeholder="Add Specialty"
+                                value={formData.specialties}
+                                onChange={(val) => setFormData(p => ({ ...p, specialties: val as Specialty[] }))}
+                                placeholder="Select Specialties"
                                 error={errors.specialties}
                             />
-                            <div className="flex flex-wrap gap-2">
-                                {formData.specialties.map((s) => (
-                                    <Badge key={s} onRemove={() => handleRemoveItem("specialties", s)} className="bg-primary-50 text-primary-700 hover:bg-primary-100 border-primary-200">
-                                        {s.replace(/_/g, " ")}
-                                    </Badge>
-                                ))}
-                            </div>
                         </div>
 
                         <div className="space-y-3">
-                            <Select
+                            <MultiSelect
                                 label="Qualifications"
                                 options={qualificationOptions}
-                                onChange={(e) => handleMultiSelect("qualifications", e.target.value)}
-                                placeholder="Add Qualification"
+                                value={formData.qualifications}
+                                onChange={(val) => setFormData(p => ({ ...p, qualifications: val as Qualification[] }))}
+                                placeholder="Select Qualifications"
                                 error={errors.qualifications}
                             />
-                            <div className="flex flex-wrap gap-2">
-                                {formData.qualifications.map((q) => (
-                                    <Badge key={q} onRemove={() => handleRemoveItem("qualifications", q)} className="bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border-emerald-200">
-                                        {q.replace(/_/g, " ")}
-                                    </Badge>
-                                ))}
-                            </div>
                         </div>
 
                         <Input

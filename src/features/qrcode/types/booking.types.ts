@@ -15,9 +15,15 @@ export enum BloodGroup {
   O_NEG = 'O_NEG',
 }
 
+export enum QueueFullReason {
+  CAPACITY_REACHED = 'CAPACITY_REACHED',
+  SHIFT_ENDED = 'SHIFT_ENDED',
+}
+
 export interface PublicDoctorStatus {
   is_open: boolean;
   is_full: boolean;
+  full_reason?: QueueFullReason;
   doctor_name: string;
   doctor_image: string;
   doctor_email: string;

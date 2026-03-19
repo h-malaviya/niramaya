@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Filter, Star, Info, Check } from 'lucide-react';
 import { cn } from '../../lib/utils';
+import { MultiSelect } from '../ui/MultiSelect';
 
 interface FilterGroup {
     name: string;
     label: string;
-    type: 'select' | 'checkbox' | 'range' | 'rating' | 'radio';
+    type: 'select' | 'checkbox' | 'range' | 'rating' | 'radio' | 'multiselect';
     options?: { label: string; value: string }[];
     min?: number;
     max?: number;
@@ -15,8 +16,8 @@ interface FilterGroup {
 
 interface FilterBarProps {
     groups: FilterGroup[];
-    selectedFilters: Record<string, string | number>;
-    onApply: (filters: Record<string, string | number>) => void;
+    selectedFilters: Record<string, any>;
+    onApply: (filters: Record<string, any>) => void;
     onClearAll: () => void;
     className?: string;
 }
@@ -34,7 +35,7 @@ const FilterBar: React.FC<FilterBarProps> = ({
         setLocalFilters(selectedFilters);
     }, [selectedFilters]);
 
-    const handleLocalChange = (name: string, value: string | number) => {
+    const handleLocalChange = (name: string, value: any) => {
         setLocalFilters(prev => ({ ...prev, [name]: value }));
     };
 
@@ -109,6 +110,13 @@ const FilterBar: React.FC<FilterBarProps> = ({
                                     </svg>
                                 </div>
                             </div>
+                        ) : group.type === 'multiselect' ? (
+                            <MultiSelect
+                                placeholder={`Select ${group.label}`}
+                                options={group.options || []}
+                                value={(localFilters[group.name] as (string | number)[]) || []}
+                                onChange={(values) => handleLocalChange(group.name, values)}
+                            />
                         ) : group.name === 'feeRange' ? (
                             <div className="space-y-3">
                                 <div className="grid grid-cols-2 gap-3">

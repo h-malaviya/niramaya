@@ -3,8 +3,8 @@ import { useAuth } from "../hooks/useAuth";
 import { APP_ROUTES } from "../../../constants/app-routes";
 import { Input } from "../../../components/ui/Input";
 import { Select } from "../../../components/ui/Select";
+import { MultiSelect } from "../../../components/ui/MultiSelect";
 import { Button } from "../../../components/ui/Button";
-import { Badge } from "../../../components/ui/Badge";
 import {
     Gender,
     IndianCity,
@@ -71,10 +71,21 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ role, plan }) => {
     const [verificationToken, setVerificationToken] = useState("");
 
     // Options for dropdowns
-    const genderOptions = Object.values(Gender).map((v) => ({ label: v, value: v }));
-    const cityOptions = Object.values(IndianCity).map((v) => ({ label: v.replace(/_/g, " "), value: v }));
-    const qualificationOptions = Object.values(Qualification).map((v) => ({ label: v.replace(/_/g, " "), value: v }));
-    const specialtyOptions = Object.values(Specialty).map((v) => ({ label: v.replace(/_/g, " "), value: v }));
+    const genderOptions = Object.values(Gender)
+        .map((v) => ({ label: v, value: v }))
+        .sort((a, b) => a.label.localeCompare(b.label));
+
+    const cityOptions = Object.values(IndianCity)
+        .map((v) => ({ label: v.replace(/_/g, " "), value: v }))
+        .sort((a, b) => a.label.localeCompare(b.label));
+
+    const qualificationOptions = Object.values(Qualification)
+        .map((v) => ({ label: v.replace(/_/g, " "), value: v }))
+        .sort((a, b) => a.label.localeCompare(b.label));
+
+    const specialtyOptions = Object.values(Specialty)
+        .map((v) => ({ label: v.replace(/_/g, " "), value: v }))
+        .sort((a, b) => a.label.localeCompare(b.label));
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
@@ -153,23 +164,6 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ role, plan }) => {
         }
     };
 
-    const handleMultiSelect = (name: "qualifications" | "specialties", value: string) => {
-        if (!value) return;
-        const currentValues = formData[name] as string[];
-        if (!currentValues.includes(value)) {
-            setFormData((prev) => ({
-                ...prev,
-                [name]: [...currentValues, value],
-            }));
-        }
-    };
-
-    const handleRemoveItem = (name: "qualifications" | "specialties", value: string) => {
-        setFormData((prev) => ({
-            ...prev,
-            [name]: (formData[name] as string[]).filter((item) => item !== value),
-        }));
-    };
 
     const validateForm = () => {
         const newErrors: Record<string, string> = {};
@@ -482,38 +476,28 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ role, plan }) => {
                             <h3 className="text-lg font-bold text-gray-800 mb-4">Professional Information</h3>
                         </div>
 
-                        <div className="space-y-2">
-                            <Select
+                        <div className="space-y-4">
+                            <MultiSelect
                                 label="Qualifications"
                                 options={qualificationOptions}
-                                onChange={(e) => handleMultiSelect("qualifications", e.target.value)}
-                                placeholder="Add Qualification"
+                                value={formData.qualifications}
+                                onChange={(val) => setFormData(p => ({ ...p, qualifications: val as Qualification[] }))}
+                                placeholder="Select Qualifications"
                                 error={errors.qualifications}
+                                required
                             />
-                            <div className="flex flex-wrap gap-2 mt-2">
-                                {formData.qualifications.map((q) => (
-                                    <Badge key={q} onRemove={() => handleRemoveItem("qualifications", q)}>
-                                        {q.replace(/_/g, " ")}
-                                    </Badge>
-                                ))}
-                            </div>
                         </div>
 
-                        <div className="space-y-2">
-                            <Select
+                        <div className="space-y-4">
+                            <MultiSelect
                                 label="Specialties"
                                 options={specialtyOptions}
-                                onChange={(e) => handleMultiSelect("specialties", e.target.value)}
-                                placeholder="Add Specialty"
+                                value={formData.specialties}
+                                onChange={(val) => setFormData(p => ({ ...p, specialties: val as Specialty[] }))}
+                                placeholder="Select Specialties"
                                 error={errors.specialties}
+                                required
                             />
-                            <div className="flex flex-wrap gap-2 mt-2">
-                                {formData.specialties.map((s) => (
-                                    <Badge key={s} onRemove={() => handleRemoveItem("specialties", s)}>
-                                        {s.replace(/_/g, " ")}
-                                    </Badge>
-                                ))}
-                            </div>
                         </div>
 
                         <Input
