@@ -156,7 +156,8 @@ const PatientAppointments: React.FC = () => {
         }
     };
 
-    // For History Filter
+    // For date constraints
+    const today = format(new Date(), 'yyyy-MM-dd');
     const yesterday = format(subDays(new Date(), 1), 'yyyy-MM-dd');
 
     return (
@@ -208,12 +209,15 @@ const PatientAppointments: React.FC = () => {
                                     <input
                                         type="date"
                                         value={fromDate}
+                                        min={activeTab === PatientAppointmentTabs.SCHEDULED ? today : undefined}
                                         max={activeTab === PatientAppointmentTabs.HISTORY ? yesterday : undefined}
                                         onChange={(e) => {
                                             const newFrom = e.target.value;
                                             setFromDate(newFrom);
+                                            // Validation: if new from > existing to, reset to
                                             if (toDate && newFrom > toDate) {
                                                 setToDate('');
+                                                toast.error("To date must be after from date");
                                             }
                                         }}
                                         className="h-12 w-full xs:w-40 pl-10 pr-4 rounded-2xl bg-gray-50 border-none text-[11px] font-bold text-gray-700 focus:ring-2 focus:ring-primary-100 transition-all cursor-pointer"
@@ -230,8 +234,16 @@ const PatientAppointments: React.FC = () => {
                                     <input
                                         type="date"
                                         value={toDate}
-                                        min={fromDate || (activeTab === PatientAppointmentTabs.HISTORY ? undefined : undefined)}
-                                        onChange={(e) => setToDate(e.target.value)}
+                                        min={fromDate || (activeTab === PatientAppointmentTabs.SCHEDULED ? today : undefined)}
+                                        max={activeTab === PatientAppointmentTabs.HISTORY ? yesterday : undefined}
+                                        onChange={(e) => {
+                                            const newTo = e.target.value;
+                                            if (fromDate && newTo < fromDate) {
+                                                toast.error("To date cannot be earlier than from date");
+                                                return;
+                                            }
+                                            setToDate(newTo);
+                                        }}
                                         className="h-12 w-full xs:w-40 pl-10 pr-4 rounded-2xl bg-gray-50 border-none text-[11px] font-bold text-gray-700 focus:ring-2 focus:ring-primary-100 transition-all cursor-pointer"
                                     />
                                     <Calendar className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />

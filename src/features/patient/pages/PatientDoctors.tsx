@@ -240,44 +240,27 @@ export default function PatientDoctors() {
         <div className="pb-20">
             <SEO title="Find Doctors — Niramaya" description="Search and book appointments with top-rated doctors and specialists in your city." />
             {/* Sub-header / Controls */}
-            <div className="mb-10">
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div className="mb-8">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-6">
                     <div className="space-y-1">
                         <h1 className="text-3xl font-black text-gray-900 tracking-tight">Find Specialists</h1>
                         <p className="text-gray-500 text-sm font-medium">Book appointments with top-rated doctors in your area</p>
                     </div>
-
-                    <div className="flex flex-col sm:flex-row items-center gap-4 w-full md:w-auto">
-                        <div className="relative w-full sm:w-80 group">
-                            <SearchBox
-                                onSearch={setSearchQuery}
-                                initialValue={searchQuery}
-                                placeholder="Search by name, qualification, bio..."
-                                className="h-14 rounded-2xl border-gray-100 bg-gray-50/50 group-focus-within:bg-white transition-all shadow-none focus:shadow-xl focus:shadow-primary-100/50"
-                            />
-                        </div>
-                        <button
-                            onClick={() => setIsFilterDrawerOpen(true)}
-                            className="lg:hidden h-14 w-full sm:w-14 flex items-center justify-center bg-primary-600 text-white rounded-2xl shadow-lg shadow-primary-200 hover:bg-primary-700 transition-all font-bold text-sm gap-2"
-                        >
-                            <SlidersHorizontal className="w-5 h-5" />
-                            <span className="sm:hidden">Filters</span>
-                        </button>
-                    </div>
                 </div>
 
-                <div className="mt-8 flex items-center justify-between border-b border-gray-100 pb-6">
+                <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-gray-100 pb-6">
                     <div className="flex items-center gap-2 text-gray-600">
-                        <div className="p-2 bg-primary-50 rounded-lg">
-                            <Stethoscope className="w-5 h-5 text-primary-600" />
+                        <div className="p-1.5 bg-primary-50 rounded-lg">
+                            <Stethoscope className="w-4 h-4 text-primary-600" />
                         </div>
-                        <span className="text-xs font-black text-gray-500 uppercase tracking-widest pl-1">
+                        <span className="text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] pl-1">
                             Showing {doctors.length} of {pagination.total} Doctors
                         </span>
                     </div>
 
-                    <div className="flex items-center gap-4">
-                        <div className="hidden sm:flex items-center bg-gray-100 p-1 rounded-xl">
+                    <div className="flex flex-col sm:flex-row items-center gap-3 w-full lg:w-auto">
+                         {/* View Toggle */}
+                         <div className="hidden sm:flex items-center bg-white p-1 rounded-xl border border-gray-100 h-12">
                             <button
                                 onClick={() => setView('grid')}
                                 className={cn("p-2 rounded-lg transition-all", view === 'grid' ? "bg-white text-primary-600 shadow-sm" : "text-gray-400 hover:text-gray-600")}
@@ -292,12 +275,32 @@ export default function PatientDoctors() {
                             </button>
                         </div>
 
+                        {/* Sort Dropdown */}
                         <SortDropdown
                             options={sortOptions}
                             value={`${sortBy}-${sortOrder}`}
                             onChange={handleSortChange}
-                            className="h-11 min-w-[180px]"
+                            className="h-12 min-w-[160px] bg-gray-50/50 border-gray-100 rounded-2xl sm:w-auto w-full"
                         />
+
+                        {/* Search Box */}
+                        <div className="relative w-full sm:w-80 group">
+                            <SearchBox
+                                onSearch={setSearchQuery}
+                                initialValue={searchQuery}
+                                placeholder="Search specialists..."
+                                className="h-12 rounded-2xl border-gray-100 bg-gray-50/50 group-focus-within:bg-white transition-all shadow-none focus:shadow-xl focus:shadow-primary-100/50"
+                            />
+                        </div>
+
+                        {/* Mobile Filter */}
+                        <button
+                            onClick={() => setIsFilterDrawerOpen(true)}
+                            className="lg:hidden h-12 w-full sm:w-14 flex items-center justify-center bg-primary-600 text-white rounded-2xl shadow-lg shadow-primary-200 hover:bg-primary-700 transition-all font-bold text-sm gap-2"
+                        >
+                            <SlidersHorizontal className="w-5 h-5" />
+                            <span className="sm:hidden">Filters</span>
+                        </button>
                     </div>
                 </div>
             </div>

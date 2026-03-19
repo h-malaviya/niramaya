@@ -100,9 +100,7 @@ const EditMedicalReports: React.FC = () => {
                                 <FileText className="w-6 h-6 text-orange-600" />
                             </div>
                             <div>
-                                <h1 className="text-2xl font-black text-gray-900 tracking-tight">Edit Medical Reports</h1>
-                                <p className="text-sm font-bold text-gray-400">Appointment ID: {appointmentId.slice(0, 8)}...</p>
-                            </div>
+                                <h1 className="text-2xl font-black text-gray-900 tracking-tight">Edit Medical Reports</h1>                            </div>
                         </div>
 
                         <div className="space-y-8">

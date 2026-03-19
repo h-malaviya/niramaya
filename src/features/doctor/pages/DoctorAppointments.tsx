@@ -19,6 +19,7 @@ import { cn } from '../../../lib/utils';
 import DoctorLayout from '../../../components/layouts/DoctorLayout';
 import { Role } from '../../../types/role.enum';
 import SEO from '../../../components/common/SEO';
+import { toast } from 'react-hot-toast';
 
 const TABS = [
     { id: DoctorAppointmentTabs.ONGOING, label: 'Ongoing', icon: Clock },
@@ -119,7 +120,8 @@ const DoctorAppointments: React.FC = () => {
         setIsModalOpen(true);
     };
 
-    // For History Filter: From max value is yesterday
+    // For date constraints
+    const today = format(new Date(), 'yyyy-MM-dd');
     const yesterday = format(subDays(new Date(), 1), 'yyyy-MM-dd');
 
     return (
@@ -178,6 +180,7 @@ const DoctorAppointments: React.FC = () => {
                                         <input
                                             type="date"
                                             value={fromDate}
+                                            min={activeTab === DoctorAppointmentTabs.SCHEDULED ? today : undefined}
                                             max={activeTab === DoctorAppointmentTabs.HISTORY ? yesterday : undefined}
                                             onChange={(e) => {
                                                 const newFrom = e.target.value;
@@ -200,8 +203,16 @@ const DoctorAppointments: React.FC = () => {
                                         <input
                                             type="date"
                                             value={toDate}
-                                            min={fromDate || (activeTab === DoctorAppointmentTabs.HISTORY ? undefined : undefined)}
-                                            onChange={(e) => setToDate(e.target.value)}
+                                            min={fromDate || (activeTab === DoctorAppointmentTabs.SCHEDULED ? today : undefined)}
+                                            max={activeTab === DoctorAppointmentTabs.HISTORY ? yesterday : undefined}
+                                            onChange={(e) => {
+                                                const newTo = e.target.value;
+                                                if (fromDate && newTo < fromDate) {
+                                                    toast.error("To date cannot be earlier than from date");
+                                                    return;
+                                                }
+                                                setToDate(newTo);
+                                            }}
                                             className="h-12 w-full xs:w-40 pl-10 pr-4 rounded-2xl bg-gray-50 border-none text-[11px] font-bold text-gray-700 focus:ring-2 focus:ring-primary-100 transition-all cursor-pointer"
                                         />
                                         <Calendar className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
@@ -299,27 +310,29 @@ const DoctorAppointments: React.FC = () => {
 
                 {/* Status Bar for Ongoing */}
                 {activeTab === DoctorAppointmentTabs.ONGOING && appointments.length > 0 && (
-                    <div className="fixed bottom-10 right-10 z-50 animate-in slide-in-from-right-10 duration-500">
-                        <div className="bg-gray-900 text-white rounded-[32px] px-8 py-5 shadow-2xl flex items-center gap-6 border border-white/10 backdrop-blur-md">
-                            <div className="flex items-center gap-4 pr-6 border-r border-white/10">
-                                <div className="w-12 h-12 rounded-2xl bg-primary-600 flex items-center justify-center shadow-lg shadow-primary-500/20">
-                                    <Clock className="w-6 h-6 text-white" />
+                    <div className="fixed sm:bottom-10 sm:right-10 bottom-4 left-4 right-4 z-50 animate-in slide-in-from-right-10 duration-500">
+                        <div className="bg-gray-900 text-white rounded-[24px] sm:rounded-[32px] px-4 sm:px-8 py-3 sm:py-5 shadow-2xl flex items-center justify-between sm:justify-start gap-3 sm:gap-6 border border-white/10 backdrop-blur-md">
+                            <div className="flex items-center gap-3 sm:gap-4 sm:pr-6 sm:border-r border-white/10 overflow-hidden">
+                                <div className="w-9 h-9 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-primary-600 flex-shrink-0 flex items-center justify-center shadow-lg shadow-primary-500/20">
+                                    <Clock className="w-4 h-4 sm:w-6 sm:h-6 text-white" />
                                 </div>
-                                <div>
-                                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-0.5">Active Session</p>
-                                    <p className="text-sm font-black text-white">#{appointments[0].queue_token} • {appointments[0].patient_name}</p>
+                                <div className="min-w-0">
+                                    <p className="text-[8px] sm:text-[10px] font-black text-gray-400 uppercase tracking-widest mb-0.5 truncate">Active Session</p>
+                                    <p className="text-xs sm:text-sm font-black text-white truncate">
+                                        #{appointments[0].queue_token} • {appointments[0].patient_name}
+                                    </p>
                                 </div>
                             </div>
-                            <div className="flex items-center gap-5">
+                            <div className="flex items-center gap-3 sm:gap-5 flex-shrink-0">
                                 <div className="flex flex-col items-end">
-                                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-0.5">Time Remaining</p>
-                                    <div className="flex items-center gap-2">
-                                        <div className="w-2 h-2 rounded-full bg-primary-500 animate-pulse" />
-                                        <span className="text-xl font-black font-mono tracking-tighter">{timeLeft}</span>
+                                    <p className="text-[8px] sm:text-[10px] font-black text-gray-400 uppercase tracking-widest mb-0.5 whitespace-nowrap">Time Remaining</p>
+                                    <div className="flex items-center gap-1.5 sm:gap-2">
+                                        <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-primary-500 animate-pulse" />
+                                        <span className="text-sm sm:text-xl font-black font-mono tracking-tighter">{timeLeft}</span>
                                     </div>
                                 </div>
-                                <button className="w-12 h-12 rounded-2xl bg-white text-gray-900 flex items-center justify-center hover:bg-primary-50 transition-all shadow-xl active:scale-95 group">
-                                    <Timer className="w-5 h-5 group-hover:rotate-12 transition-transform" />
+                                <button className="w-9 h-9 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-white text-gray-900 flex items-center justify-center hover:bg-primary-50 transition-all shadow-xl active:scale-95 group">
+                                    <Timer className="w-4 h-4 sm:w-5 sm:h-5 group-hover:rotate-12 transition-transform" />
                                 </button>
                             </div>
                         </div>

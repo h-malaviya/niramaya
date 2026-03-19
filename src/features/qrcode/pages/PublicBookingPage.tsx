@@ -84,7 +84,7 @@ export default function PublicBookingPage() {
           Clinic Queue Booking
         </h1>
         <p className="text-gray-500 font-bold text-xs md:text-sm italic leading-relaxed">
-          Scan. Book. Wait comfortably. We&apos;ll notify you when it&apos;s your turn.
+          Scan. Book. Wait comfortably.
         </p>
       </div>
 
