@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { publicDoctorService } from '../services/publicDoctor.service';
-import { PublicDoctorStatus } from '../types/booking.types';
+import { PublicDoctorStatus, QueueFullReason } from '../types/booking.types';
 import DoctorStatusCard from '../components/DoctorStatusCard';
 import GuestBookingForm from '../components/GuestBookingForm';
 import { getErrorMessage } from '../../../utils/api-error';
@@ -24,7 +24,10 @@ export default function PublicBookingPage() {
         const data = await publicDoctorService.getDoctorStatus(doctorId);
         setStatus(data);
         if (data.is_full) {
-          toast.error('The queue is currently full. Please try again later.');
+          toast.error(data.full_reason === QueueFullReason.SHIFT_ENDED 
+            ? "Doctor's shift Has ended for today." 
+            : 'The queue is currently full. Please try again later.'
+          );
         }
       } catch (err) {
         setError(getErrorMessage(err));
@@ -106,9 +109,14 @@ export default function PublicBookingPage() {
                 <Ban className="w-12 h-12 text-amber-600" />
               </div>
               <div className="space-y-2">
-                <h2 className="text-2xl font-black text-gray-900 tracking-tight">Queue is Currently Full</h2>
+                <h2 className="text-2xl font-black text-gray-900 tracking-tight">
+                  {status.full_reason === QueueFullReason.SHIFT_ENDED ? "Doctor's Shift for Today has Ended" : "Queue is Currently Full"}
+                </h2>
                 <p className="text-amber-700 font-medium max-w-md mx-auto">
-                  We have reached the maximum capacity for today. Please check back later or contact the clinic directly.
+                  {status.full_reason === QueueFullReason.SHIFT_ENDED 
+                    ? "The doctor has finished consultations for today. Please check back during next shift hours."
+                    : "We have reached the maximum capacity for today. Please check back later or contact the clinic directly."
+                  }
                 </p>
               </div>
             </div>

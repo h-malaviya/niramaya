@@ -201,7 +201,10 @@ export const PrescriptionForm = ({
                                             <Select
                                                 value={item.dosage_unit}
                                                 onChange={(e) => handleUpdateItem(index, 'dosage_unit', e.target.value as DosageUnit)}
-                                                options={Object.values(DosageUnit).map(unit => ({ label: unit, value: unit }))}
+                                                options={Object.values(DosageUnit)
+                                                    .map(unit => ({ label: unit.charAt(0) + unit.slice(1).toLowerCase(), value: unit }))
+                                                    .sort((a, b) => a.label.localeCompare(b.label))
+                                                }
                                                 className="h-10 text-xs px-2 pr-8 shrink-0 flex-1 min-w-[90px]"
                                             />
                                         </div>
@@ -214,7 +217,7 @@ export const PrescriptionForm = ({
                                                 { label: 'After Meal', value: MealTiming.AFTER_MEAL },
                                                 { label: 'Before Meal', value: MealTiming.BEFORE_MEAL },
                                                 { label: 'With Meal', value: MealTiming.WITH_MEAL },
-                                            ]}
+                                            ].sort((a, b) => a.label.localeCompare(b.label))}
                                             className="h-10 text-xs w-full min-w-[110px] px-2 pr-8 shrink-0"
                                         />
                                     </td>

@@ -406,11 +406,20 @@ const AvailabilityForm: React.FC<AvailabilityFormProps> = ({
         e.preventDefault();
         setIsSubmitted(true);
         if (Object.keys(errors).filter(k => k !== '_logic').length === 0) {
-            onSave({
-                ...form,
-                dates: selectedDates,
-                slot_duration: Number(form.slot_duration)
-            });
+            const payload: any = {
+                is_active: form.is_active,
+                dates: selectedDates
+            };
+
+            if (form.is_active) {
+                payload.start_at = form.start_at;
+                payload.end_at = form.end_at;
+                payload.break_start = form.break_start;
+                payload.break_end = form.break_end;
+                payload.slot_duration = Number(form.slot_duration);
+            }
+
+            onSave(payload);
         }
     };
 

@@ -81,7 +81,8 @@ export const validateConsultationFee = (fee: number) => {
 };
 
 export const validateBio = (bio: string) => {
-    if (bio.length < 20) return "Bio must be at least 20 characters";
+    if (!bio || bio.trim().length === 0) return null;
+    if (bio.trim().length < 20) return "Bio must be at least 20 characters";
     if (bio.length > 500) return "Bio cannot exceed 500 characters";
     return null;
 };

@@ -16,7 +16,8 @@ import { cn } from '../../../lib/utils';
 import SEO from '../../../components/common/SEO';
 
 export default function PatientDoctors() {
-    useProfile(Role.PATIENT);
+    const { profile, isFetchingProfile } = useProfile(Role.PATIENT);
+    const [isInitialCitySet, setIsInitialCitySet] = useState(false);
     const [doctors, setDoctors] = useState<DoctorProfile[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -28,9 +29,9 @@ export default function PatientDoctors() {
         totalPages: 0
     });
 
-    const [filters, setFilters] = useState<Record<string, string | number>>({
-        specialty: '',
-        city: '',
+    const [filters, setFilters] = useState<Record<string, any>>({
+        specialties: [],
+        locations: [],
         minExperience: 0,
         minRating: 0,
         gender: '',
@@ -44,7 +45,7 @@ export default function PatientDoctors() {
     const [sortOrder, setSortOrder] = useState('asc');
     const [selectedDoctor, setSelectedDoctor] = useState<DoctorProfile | null>(null);
     const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
-
+ 
     // Debounce search query
     useEffect(() => {
         const timer = setTimeout(() => {
@@ -56,16 +57,20 @@ export default function PatientDoctors() {
 
     const filterGroups = useMemo(() => [
         {
-            name: 'specialty',
+            name: 'specialties',
             label: 'Specialty',
-            type: 'select' as const,
-            options: Object.values(Specialty).map(s => ({ label: s, value: s }))
+            type: 'multiselect' as const,
+            options: Object.values(Specialty)
+                .map(s => ({ label: s.replace(/_/g, ' '), value: s }))
+                .sort((a, b) => a.label.localeCompare(b.label))
         },
         {
-            name: 'city',
+            name: 'locations',
             label: 'Location',
-            type: 'select' as const,
-            options: Object.values(IndianCity).map(c => ({ label: c, value: c }))
+            type: 'multiselect' as const,
+            options: Object.values(IndianCity)
+                .map(c => ({ label: c.replace(/_/g, ' '), value: c }))
+                .sort((a, b) => a.label.localeCompare(b.label))
         },
         {
             name: 'minExperience',
@@ -88,7 +93,7 @@ export default function PatientDoctors() {
                 { label: 'Male', value: Gender.MALE },
                 { label: 'Female', value: Gender.FEMALE },
                 { label: 'Other', value: Gender.OTHER }
-            ]
+            ].sort((a, b) => a.label.localeCompare(b.label))
         },
         {
             name: 'feeRange',
@@ -101,6 +106,54 @@ export default function PatientDoctors() {
         }
     ], []);
 
+    const formatEnum = (val: string | number | undefined) => {
+        if (!val) return "";
+        return val.toString().replace(/_/g, " ").toLowerCase().split(' ').map(s => s.charAt(0).toUpperCase() + s.substring(1)).join(' ');
+    };
+
+    const noResultsMessage = useMemo(() => {
+        const parts: string[] = [];
+
+        if (filters.specialties && filters.specialties.length > 0) {
+            const specialtyLabels = filters.specialties.map((s: string) => `<span class="font-bold text-gray-900">${formatEnum(s)}</span>`);
+            parts.push(`${specialtyLabels.join(', ')} specialists`);
+        } else {
+            parts.push('doctors');
+        }
+    
+        if (filters.locations && filters.locations.length > 0) {
+            const locationLabels = filters.locations.map((l: string) => `<span class="font-bold text-gray-900">${formatEnum(l)}</span>`);
+            parts.push(`in ${locationLabels.join(', ')}`);
+        }
+    
+        if (filters.gender) {
+            parts.push(`(${filters.gender.toLowerCase()})`);
+        }
+
+        const details: string[] = [];
+        if ((filters.minExperience as number) > 0) {
+            details.push(`${filters.minExperience}+ years experience`);
+        }
+        if ((filters.minRating as number) > 0) {
+            details.push(`${filters.minRating}+ stars`);
+        }
+        if ((filters.maxFee as number) < 1000000) {
+            details.push(`fees up to ₹${filters.maxFee}`);
+        }
+
+        let message = `We couldn't find any ${parts.join(' ')}`;
+        
+        if (details.length > 0) {
+            message += ` with ${details.join(', ')}`;
+        }
+
+        if (debouncedSearch) {
+            message += ` matching <span class="italic text-gray-900">"${debouncedSearch}"</span>`;
+        }
+
+        return message + ".";
+    }, [filters, debouncedSearch]);
+
     const fetchDoctors = useCallback(async () => {
         try {
             setLoading(true);
@@ -109,11 +162,11 @@ export default function PatientDoctors() {
                 limit: pagination.limit,
                 search: debouncedSearch || undefined,
                 sort_by: `${sortBy}_${sortOrder}` as any,
-                specialties: filters.specialty ? [filters.specialty as string] : undefined,
-                locations: filters.city ? [filters.city as string] : undefined,
+                specialties: filters.specialties.length > 0 ? filters.specialties : undefined,
+                locations: filters.locations.length > 0 ? filters.locations : undefined,
                 min_experience: (filters.minExperience as number) > 0 ? (filters.minExperience as number) : undefined,
                 min_rating: (filters.minRating as number) > 0 ? (filters.minRating as number) : undefined,
-                genders: filters.gender ? [filters.gender as string] : undefined,
+                genders: filters.gender ? [filters.gender] : undefined,
                 min_fee: filters.minFee as number,
                 max_fee: (filters.maxFee as number) < 1000000 ? (filters.maxFee as number) : undefined,
             };
@@ -134,14 +187,27 @@ export default function PatientDoctors() {
         }
     }, [pagination.page, pagination.limit, debouncedSearch, sortBy, sortOrder, filters]);
 
+    // Wait for profile loading before applying default filters or fetching doctors
     useEffect(() => {
+        if (isFetchingProfile) return;
+
+        // Apply profile city if available and not yet applied
+        if (profile?.city && !isInitialCitySet) {
+            setFilters(prev => ({ ...prev, locations: [profile.city] }));
+            setIsInitialCitySet(true);
+            return; // State update will trigger next effect run
+        }
+
+        // Profile is loaded (or not available), and filters are ready, so fetch
         fetchDoctors();
-    }, [fetchDoctors]);
+    }, [fetchDoctors, isFetchingProfile, profile?.city, isInitialCitySet]);
+
+    // Search results are handled by fetchDoctors via its filters/debouncedSearch dependencies
 
     const handleClearFilters = () => {
         setFilters({
-            specialty: '',
-            city: '',
+            specialties: [],
+            locations: [],
             minExperience: 0,
             minRating: 0,
             gender: '',
@@ -282,9 +348,13 @@ export default function PatientDoctors() {
                             <div className="p-6 bg-primary-50 w-fit mx-auto rounded-[32px] ring-8 ring-primary-50/50">
                                 <Search className="w-12 h-12 text-primary-600" />
                             </div>
-                            <div className="space-y-2">
+                            <div className="space-y-4">
                                 <h3 className="text-2xl font-black text-gray-900">No Specialists Found</h3>
-                                <p className="text-gray-500 max-w-sm mx-auto font-medium">We couldn't find any doctors matching your current filters. Try adjusting your preferences or clear all filters.</p>
+                                <p 
+                                    className="text-gray-500 max-w-md mx-auto font-medium leading-relaxed"
+                                    dangerouslySetInnerHTML={{ __html: noResultsMessage }}
+                                />
+                                <p className="text-gray-400 text-sm italic">Try adjusting your preferences or clear all filters to see more results.</p>
                             </div>
                             <button onClick={handleClearFilters} className="btn btn-primary h-12 rounded-2xl px-10 text-sm font-bold shadow-lg shadow-primary-200">
                                 Clear All Filters

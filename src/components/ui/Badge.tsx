@@ -2,7 +2,7 @@ import { cn } from "../../lib/utils";
 
 interface BadgeProps {
     children: React.ReactNode;
-    onRemove?: () => void;
+    onRemove?: (e: React.MouseEvent<HTMLButtonElement>) => void;
     className?: string;
 }
 

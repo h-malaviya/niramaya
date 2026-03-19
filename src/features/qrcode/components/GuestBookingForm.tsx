@@ -146,12 +146,14 @@ export default function GuestBookingForm({ onSubmit, loading }: GuestBookingForm
     { label: 'Male', value: Gender.MALE },
     { label: 'Female', value: Gender.FEMALE },
     { label: 'Other', value: Gender.OTHER },
-  ];
+  ].sort((a, b) => a.label.localeCompare(b.label));
 
-  const bloodGroupOptions = (Object.values(BloodGroup) as string[]).map(bg => ({
-    label: bloodGroupLabels[bg as BloodGroup],
-    value: bg
-  }));
+  const bloodGroupOptions = (Object.values(BloodGroup) as string[])
+    .map(bg => ({
+      label: bloodGroupLabels[bg as BloodGroup],
+      value: bg
+    }))
+    .sort((a, b) => a.label.localeCompare(b.label));
 
   return (
     <form ref={formRef} onSubmit={handleSubmit} className="bg-white rounded-[32px] border border-gray-100 p-8 lg:p-12 shadow-sm space-y-10">
