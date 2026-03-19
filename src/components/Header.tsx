@@ -27,7 +27,7 @@ const Header = () => {
                         setActiveSection(entry.target.id);
                     }
                 });
-            }, { threshold: 0.2, rootMargin: '-20% 0px -20% 0px' });
+            }, { threshold: 0.1, rootMargin: '-20% 0px -40% 0px' });
 
             sectionIds.forEach(id => {
                 const el = document.getElementById(id);

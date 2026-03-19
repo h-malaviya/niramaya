@@ -1,5 +1,6 @@
-import { InputHTMLAttributes, forwardRef } from "react";
+import { InputHTMLAttributes, forwardRef, useState, useEffect } from "react";
 import { cn } from "../../lib/utils";
+import { Eye, EyeOff } from "lucide-react";
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
     label?: string;
@@ -10,7 +11,34 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
 }
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(
-    ({ label, error, prefix, icon, iconPosition = "right", className, ...props }, ref) => {
+    ({ label, error, prefix, icon, iconPosition = "right", className, type, ...props }, ref) => {
+        const [showPassword, setShowPassword] = useState(false);
+        const [hasValue, setHasValue] = useState(Boolean(props.value || props.defaultValue));
+        
+        const isPassword = type === "password";
+        const inputType = isPassword ? (showPassword ? "text" : "password") : type;
+
+        // Sync with external value changes if controlled
+        useEffect(() => {
+            if (props.value !== undefined) {
+                setHasValue(String(props.value).length > 0);
+                if (String(props.value).length === 0) {
+                    setShowPassword(false);
+                }
+            }
+        }, [props.value]);
+
+        const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+            const val = e.target.value;
+            setHasValue(val.length > 0);
+            if (val.length === 0) {
+                setShowPassword(false);
+            }
+            if (props.onChange) {
+                props.onChange(e);
+            }
+        };
+
         return (
             <div className="flex w-full flex-col gap-1.5">
                 {label && (
@@ -35,23 +63,41 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
                     )}
 
                     <input
+                        type={inputType}
                         className={cn(
                             "flex h-11 w-full rounded-xl border border-dark-200 bg-white px-4 py-2 text-sm ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-dark-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/20 focus-visible:border-primary-500 disabled:cursor-not-allowed disabled:opacity-50 transition-all",
                             error && "border-red-500 focus-visible:ring-red-500/20 focus-visible:border-red-500",
                             prefix && !icon && "!pl-[4.5rem]",
                             icon && iconPosition === "left" && !prefix && "!pl-[3rem]",
                             icon && iconPosition === "left" && prefix && "!pl-[6.4rem]",
-                            icon && iconPosition === "right" && "!pr-[3rem]",
+                            icon && iconPosition === "right" && !isPassword && "!pr-[3rem]",
+                            icon && iconPosition === "right" && (isPassword && hasValue) && "!pr-[5.5rem]",
+                            icon && iconPosition === "right" && (isPassword && !hasValue) && "!pr-[3rem]",
+                            !icon && (isPassword && hasValue) && "!pr-[3rem]",
                             className
                         )}
                         ref={ref}
                         {...props}
+                        onChange={handleChange}
                     />
 
                     {icon && iconPosition === "right" && (
-                        <div className="absolute right-3 text-dark-400 group-focus-within:text-primary-500 transition-colors">
+                        <div className={cn(
+                            "absolute text-dark-400 group-focus-within:text-primary-500 transition-colors",
+                            (isPassword && hasValue) ? "right-10" : "right-3"
+                        )}>
                             {icon}
                         </div>
+                    )}
+
+                    {isPassword && hasValue && (
+                        <button
+                            type="button"
+                            onClick={() => setShowPassword(!showPassword)}
+                            className="absolute right-3 text-dark-400 hover:text-dark-600 focus:outline-none transition-colors"
+                        >
+                            {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                        </button>
                     )}
                 </div>
                 {error && <span className="text-xs text-red-500 font-medium">{error}</span>}
