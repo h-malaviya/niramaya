@@ -70,8 +70,14 @@ export const validateDOB = (dob: string, role: Role) => {
     return null;
 };
 
-export const validateExperience = (exp: number) => {
+export const validateExperience = (exp: number, age?: number) => {
     if (exp < 0 || exp > 128) return "Experience must be between 0 and 128 years";
+    if (age !== undefined) {
+        const maxExp = Math.max(0, age - 22);
+        if (exp > maxExp) {
+            return `Experience cannot exceed ${maxExp} years for your age`;
+        }
+    }
     return null;
 };
 
