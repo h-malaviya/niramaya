@@ -28,10 +28,6 @@ const DoctorSignupSuccess: React.FC = () => {
                 const response = await doctorVerifySession({ session_id: sessionId });
                 if (response.success) {
                     setStatus("success");
-                    // Auto redirect after 3 seconds or via button
-                    setTimeout(() => {
-                        navigate(APP_ROUTES.HOME);
-                    }, 3000);
                 } else {
                     setStatus("error");
                     setErrorMessage(response.message || "Something went wrong during verification.");
@@ -81,7 +77,7 @@ const DoctorSignupSuccess: React.FC = () => {
                                 Redirecting you to your dashboard...
                             </p>
                             <Button
-                                onClick={() => navigate(APP_ROUTES.HOME)}
+                                onClick={() => navigate(APP_ROUTES.DOCTOR.DASHBOARD)}
                                 className="w-full py-4 text-lg font-bold group"
                             >
                                 Go to Dashboard

@@ -24,7 +24,7 @@ import {
     validateExperience,
     validateConsultationFee,
 } from "../../../lib/utils";
-import { CheckCircle2, XCircle, Mail, Phone, Lock, User, Calendar, Briefcase, IndianRupee } from "lucide-react";
+import { CheckCircle2, XCircle, Mail, Phone, Lock, User, Calendar, Briefcase, IndianRupee, Loader2 } from "lucide-react";
 
 interface RegisterFormProps {
     role: Role;
@@ -328,9 +328,9 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ role, plan }) => {
 
                 <div className="md:col-span-2 space-y-4">
                     <div className="flex flex-col md:flex-row gap-4 items-end">
-                        <div className="flex-grow w-full">
+                        <div className="flex-grow w-full relative group">
                             <Input
-                                label="Email Address"
+                                label="Email"
                                 name="email"
                                 type="email"
                                 value={formData.email}
@@ -354,24 +354,26 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ role, plan }) => {
                                 }
                                 iconPosition="left"
                                 required
+                                rightElement={
+                                    !isEmailVerified && !otpSent && (
+                                        <button
+                                            type="button"
+                                            onClick={handleSendOtp}
+                                            disabled={isSendingOtp}
+                                            className="h-8 px-3 bg-primary-50 text-primary-700 hover:bg-primary-100 disabled:bg-dark-50 disabled:text-dark-400 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5"
+                                        >
+                                            {isSendingOtp && <Loader2 className="h-3 w-3 animate-spin" />}
+                                            Verify
+                                        </button>
+                                    )
+                                }
                             />
                         </div>
-                        {!isEmailVerified && !otpSent && (
-                            <Button
-                                type="button"
-                                onClick={handleSendOtp}
-                                loading={isSendingOtp}
-                                variant="outline"
-                                className="w-full md:w-auto mb-1.5"
-                            >
-                                Verify Email
-                            </Button>
-                        )}
                     </div>
 
                     {otpSent && !isEmailVerified && (
-                        <div className="flex flex-col md:flex-row gap-4 items-end animate-in fade-in slide-in-from-top-2">
-                            <div className="flex-grow w-full">
+                        <div className="animate-in fade-in slide-in-from-top-2 space-y-2">
+                            <div className="flex-grow w-full relative group">
                                 <Input
                                     label="Enter 6-digit OTP"
                                     value={enteredOtp}
@@ -379,16 +381,30 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ role, plan }) => {
                                     placeholder="000000"
                                     icon={errors.otp ? <XCircle className="text-red-500 h-5 w-5" /> : null}
                                     maxLength={6}
+                                    rightElement={
+                                        <button
+                                            type="button"
+                                            onClick={handleVerifyOtp}
+                                            disabled={isVerifyingOtp || enteredOtp.length !== 6}
+                                            className="h-8 px-3 bg-primary-600 text-white hover:bg-primary-700 disabled:bg-dark-50 disabled:text-dark-400 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm"
+                                        >
+                                            {isVerifyingOtp && <Loader2 className="h-3 w-3 animate-spin" />}
+                                            Confirm
+                                        </button>
+                                    }
                                 />
                             </div>
-                            <Button
-                                type="button"
-                                onClick={handleVerifyOtp}
-                                loading={isVerifyingOtp}
-                                className="w-full md:w-auto mb-1.5"
-                            >
-                                Confirm OTP
-                            </Button>
+                            <div className="flex justify-between items-center px-1">
+                                <p className="text-[11px] text-dark-400 font-medium">Haven't received the code?</p>
+                                <button
+                                    type="button"
+                                    onClick={handleSendOtp}
+                                    disabled={isSendingOtp}
+                                    className="text-[11px] font-bold text-primary-600 hover:text-primary-700 disabled:text-dark-300 transition-colors"
+                                >
+                                    {isSendingOtp ? "Sending..." : "Resend OTP"}
+                                </button>
+                            </div>
                         </div>
                     )}
                 </div>
