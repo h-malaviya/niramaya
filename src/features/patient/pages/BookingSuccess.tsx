@@ -23,6 +23,7 @@ const BookingSuccess: React.FC = () => {
     const sessionId = searchParams.get('session_id');
     const [loading, setLoading] = useState(true);
     const [data, setData] = useState<IBookingStatusResponse | null>(null);
+    const [isFinalizingReceipt, setIsFinalizingReceipt] = useState(false);
 
     useEffect(() => {
         if (!sessionId) {
@@ -38,16 +39,47 @@ const BookingSuccess: React.FC = () => {
             const res = await appointmentService.getBookingStatus(sessionId!);
             if (res.success && res.data) {
                 setData(res.data);
+                // If receipt is missing, start polling
+                if (!res.data.payment.receipt_url) {
+                    startPolling();
+                }
             } else {
                 toast.error('Could not fetch appointment details');
             }
         } catch (error) {
             console.error('Error fetching booking status:', error);
-            // We don't toast error here because it might take a second for the webhook to process
-            // In a real app, we might poll, but for now we'll just show a retry option if it fails
         } finally {
             setLoading(false);
         }
+    };
+
+    const startPolling = () => {
+        setIsFinalizingReceipt(true);
+        let count = 0;
+        const maxTries = 15;
+        
+        const poll = async () => {
+            if (count >= maxTries) {
+                setIsFinalizingReceipt(false);
+                return;
+            }
+            
+            try {
+                const res = await appointmentService.getBookingStatus(sessionId!);
+                if (res.success && res.data?.payment.receipt_url) {
+                    setData(res.data);
+                    setIsFinalizingReceipt(false);
+                    return;
+                }
+            } catch (err) {
+                console.error("Polling error:", err);
+            }
+            
+            count++;
+            setTimeout(poll, 3000);
+        };
+        
+        poll();
     };
 
     const formatDate = (dateStr: string) => {
@@ -194,16 +226,30 @@ const BookingSuccess: React.FC = () => {
 
                     {/* Actions */}
                     <div className="flex flex-col gap-3">
-                        {data.payment.receipt_url && (
-                            <Button 
-                                variant="outline" 
-                                className="w-full rounded-2xl h-12 font-bold text-primary-600 border-primary-100 hover:bg-primary-50"
-                                onClick={() => window.open(data.payment.receipt_url!, '_blank')}
-                            >
-                                <Download className="w-4 h-4 mr-2" />
-                                View Receipt
-                            </Button>
-                        )}
+                        <Button 
+                            variant="outline" 
+                            className="w-full rounded-2xl h-12 font-bold text-primary-600 border-primary-100 hover:bg-primary-50 disabled:opacity-50"
+                            onClick={() => {
+                                if (data.payment.receipt_url) {
+                                    window.open(data.payment.receipt_url, '_blank');
+                                } else {
+                                    toast.error("Receipt is still being finalized. Please wait.");
+                                }
+                            }}
+                            disabled={isFinalizingReceipt && !data.payment.receipt_url}
+                        >
+                            {isFinalizingReceipt && !data.payment.receipt_url ? (
+                                <>
+                                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                    Finalizing Receipt...
+                                </>
+                            ) : (
+                                <>
+                                    <Download className="w-4 h-4 mr-2" />
+                                    View Receipt
+                                </>
+                            )}
+                        </Button>
                         <Button 
                             className="w-full rounded-2xl h-12 font-bold bg-primary-600 hover:bg-primary-700 shadow-md shadow-primary-200"
                             onClick={() => navigate(APP_ROUTES.PATIENT.APPOINTMENTS)}

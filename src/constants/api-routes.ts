@@ -50,4 +50,8 @@ export const API = {
     RATING: {
         BASE: '/ratings',
     },
+    PUBLIC: {
+        GET_DOCTOR_STATUS: '/public/doctor/:doctorId/status',
+        BOOK_GUEST: '/public/doctor/:doctorId/book-guest',
+    },
 };
