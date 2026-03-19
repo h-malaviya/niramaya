@@ -29,10 +29,28 @@ import { APP_ROUTES } from "../constants/app-routes";
 
 import PatientLayout from "../components/layouts/PatientLayout";
 
+// Public QR Booking Pages
+import PublicBookingPage from "../features/qrcode/pages/PublicBookingPage";
+import QrBookingSuccess from "../features/qrcode/pages/QrBookingSuccess";
+import QrBookingCancel from "../features/qrcode/pages/QrBookingCancel";
+
 const router = createBrowserRouter([
     {
         path: APP_ROUTES.HOME,
         element: <Landing />,
+    },
+    // Public QR Booking Routes
+    {
+        path: APP_ROUTES.PUBLIC.BOOK_APPOINTMENT,
+        element: <PublicBookingPage />,
+    },
+    {
+        path: APP_ROUTES.PUBLIC.BOOKING_SUCCESS,
+        element: <QrBookingSuccess />,
+    },
+    {
+        path: APP_ROUTES.PUBLIC.BOOKING_CANCEL,
+        element: <QrBookingCancel />,
     },
     // Guest Routes
     {
