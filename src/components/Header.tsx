@@ -90,11 +90,9 @@ const Header = () => {
                         onClick={() => setIsMobileMenuOpen(false)}
                         className="flex items-center gap-2 sm:gap-3 group"
                     >
-                        <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center transition-all duration-300 ${isScrolled ? 'bg-primary-600' : 'bg-white/20 backdrop-blur-sm border border-white/30'
+                        <div className={`w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center transition-all duration-300 overflow-hidden rounded-lg ${isScrolled ? '' : ''
                             }`}>
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M12 2L13.09 8.26L18 4L14.74 9.91L21 11L14.74 12.09L18 18L13.09 13.74L12 20L10.91 13.74L6 18L9.26 12.09L3 11L9.26 9.91L6 4L10.91 8.26L12 2Z" fill="white" />
-                            </svg>
+                            <img src="/favicon.png" alt="Niramaya Logo" className="w-full h-full object-contain" />
                         </div>
                         <span className={`font-display text-2xl font-bold tracking-tight transition-colors duration-300 ${isScrolled ? 'text-primary-700' : 'text-white'
                             }`}>

@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import DoctorLayout from '../../../components/layouts/DoctorLayout';
 import { PrescriptionForm } from '../components/PrescriptionForm';
 import { APP_ROUTES } from '../../../constants/app-routes';
+import SEO from '../../../components/common/SEO';
 
 const PrescriptionPage: React.FC = () => {
     const { appointmentId } = useParams<{ appointmentId: string }>();
@@ -20,6 +21,7 @@ const PrescriptionPage: React.FC = () => {
 
     return (
         <DoctorLayout>
+            <SEO title="Issue Prescription — Niramaya" description="Create and issue professional medical prescriptions for your patients." />
             <div className="space-y-6">
                 <div>
                     <h1 className="text-2xl font-bold text-gray-900">Issue Prescription</h1>

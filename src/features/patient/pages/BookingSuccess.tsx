@@ -15,6 +15,7 @@ import { appointmentService } from '../services/appointment.service';
 import { IBookingStatusResponse } from '../types/booking.types';
 import { toast } from 'react-hot-toast';
 import { APP_ROUTES } from '../../../constants/app-routes';
+import SEO from '../../../components/common/SEO';
 
 const BookingSuccess: React.FC = () => {
     const [searchParams] = useSearchParams();
@@ -99,6 +100,7 @@ const BookingSuccess: React.FC = () => {
 
     return (
         <div className="min-h-screen flex items-center justify-center p-4 bg-slate-50/50 py-12">
+            <SEO title="Booking Confirmed — Niramaya" description="Your appointment has been successfully scheduled. Check your email for details." />
             <div className="max-w-xl w-full bg-white rounded-[2.5rem] border border-dark-100 shadow-xl shadow-primary-50/50 overflow-hidden">
                 {/* Header Section */}
                 <div className="bg-primary-600 p-8 text-center relative overflow-hidden">

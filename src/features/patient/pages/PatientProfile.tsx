@@ -9,6 +9,7 @@ import { UpdateProfileForm } from '../../../components/dashboard/UpdateProfileFo
 import { useProfile } from '../../auth/hooks/useProfile';
 import { Role } from '../../../types/role.enum';
 import { IUpdateDoctorProfileRequest, IUpdatePatientProfileRequest } from '../../auth/types/auth.types';
+import SEO from '../../../components/common/SEO';
 
 const PatientProfile: React.FC = () => {
     const [isEditing, setIsEditing] = useState(false);
@@ -71,6 +72,7 @@ const PatientProfile: React.FC = () => {
 
     return (
         <PatientLayout>
+            <SEO title="My Health Profile — Niramaya" description="Manage your personal medical information, blood group, allergies, and emergency contacts." />
             <input
                 type="file"
                 ref={fileInputRef}

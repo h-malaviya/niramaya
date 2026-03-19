@@ -26,6 +26,7 @@ import { getRoleFromToken } from '../../auth/utils/auth.utils';
 import { Role } from '../../../types/role.enum';
 import { cn } from '../../../lib/utils';
 import { APP_ROUTES } from '../../../constants/app-routes';
+import SEO from '../../../components/common/SEO';
 
 // AI Integration
 import BookingAISelectionModal from '../components/BookingAISelectionModal';
@@ -131,10 +132,20 @@ const BookAppointment: React.FC = () => {
         if (!e.target.files) return;
         const newFiles = Array.from(e.target.files);
         const validTypes = ['application/pdf', 'image/jpeg', 'image/png', 'image/jpg'];
+        
+        // Validation: File types
         if (newFiles.some(f => !validTypes.includes(f.type))) {
             toast.error('Only PDF, JPG, and PNG formats allowed');
             return;
         }
+
+        // Validation: File size (5MB)
+        const MAX_FILE_SIZE = 5 * 1024 * 1024;
+        if (newFiles.some(f => f.size > MAX_FILE_SIZE)) {
+            toast.error('Maximum file size allowed is 5MB per file');
+            return;
+        }
+
         const unique = newFiles.filter(f =>
             !reports.some(r => r.name === f.name && r.size === f.size)
         );
@@ -218,6 +229,7 @@ const BookAppointment: React.FC = () => {
     /* ─── render ─── */
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-primary-50/30">
+            <SEO title="Book Appointment — Niramaya" description="Schedule a consultation with our specialized doctors at your preferred time slot." />
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 space-y-8">
 
                 {/* ── Page Header ── */}

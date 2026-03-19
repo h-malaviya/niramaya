@@ -21,6 +21,7 @@ import Pagination from '../../../components/common/Pagination';
 import { cn } from '../../../lib/utils';
 import { Role } from '../../../types/role.enum';
 import { toast } from 'react-hot-toast';
+import SEO from '../../../components/common/SEO';
 
 const TABS = [
     { id: PatientAppointmentTabs.SCHEDULED, label: 'Scheduled', icon: CalendarDays },
@@ -160,6 +161,7 @@ const PatientAppointments: React.FC = () => {
 
     return (
         <div className="space-y-10">
+            <SEO title="My Appointments — Niramaya" description="Track your health journey, view upcoming visits, and manage consultation history." />
             {/* Header section moved to inside for better spacing with layout */}
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
                 <div>

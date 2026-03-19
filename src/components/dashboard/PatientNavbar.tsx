@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
-    Stethoscope,
     User,
     LogOut,
     ChevronDown,
@@ -40,8 +39,8 @@ const PatientNavbar: React.FC = () => {
                         {/* Left: Logo & Desktop Nav */}
                         <div className="flex items-center gap-8">
                             <Link to={APP_ROUTES.PATIENT.DASHBOARD} className="flex items-center gap-3 group shrink-0">
-                                <div className="w-10 h-10 bg-primary-600 rounded-xl flex items-center justify-center shadow-lg shadow-primary-200 group-hover:scale-105 transition-transform">
-                                    <Stethoscope className="w-6 h-6 text-white" />
+                                <div className="w-10 h-10 flex items-center justify-center group-hover:scale-105 transition-transform overflow-hidden rounded-lg">
+                                    <img src="/favicon.png" alt="Niramaya" className="w-full h-full object-contain" />
                                 </div>
                                 <span className="text-xl font-black text-primary-900 tracking-tight hidden xs:block">Niramaya</span>
                             </Link>

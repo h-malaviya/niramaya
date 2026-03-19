@@ -9,6 +9,7 @@ import {
 import { Button } from '../../../components/ui/Button';
 import { APP_ROUTES } from '../../../constants/app-routes';
 import { appointmentService } from '../services/appointment.service';
+import SEO from '../../../components/common/SEO';
 
 const BookingCancel: React.FC = () => {
     const navigate = useNavigate();
@@ -28,6 +29,7 @@ const BookingCancel: React.FC = () => {
 
     return (
         <div className="min-h-screen flex items-center justify-center p-4 bg-slate-50 py-12">
+            <SEO title="Booking Cancelled — Niramaya" description="The booking process was cancelled. You can try scheduling again at any time." />
             <div className="max-w-xl w-full bg-white rounded-[2.5rem] border border-dark-100 shadow-xl overflow-hidden p-8 sm:p-12 text-center">
                 {/* Icon Circle */}
                 <div className="w-20 h-20 bg-red-50 rounded-2xl flex items-center justify-center mb-6 mx-auto relative">

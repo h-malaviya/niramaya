@@ -13,6 +13,7 @@ import {
 import { Users, CalendarDays, IndianRupee, Loader2, CalendarClock, Target, UserPlus, ListTodo, Star, Sparkles, Pill, CircleX, Info } from 'lucide-react';
 import { format, subDays, isAfter, startOfDay } from 'date-fns';
 import { useState } from 'react';
+import SEO from '../../../components/common/SEO';
 
 const COLORS = ['#10b981', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6'];
 
@@ -110,6 +111,7 @@ const DoctorDashboard: React.FC = () => {
 
     return (
         <DoctorLayout>
+            <SEO title="Doctor Dashboard — Niramaya" description="Manage your appointments, view patient analytics, and oversee your medical practice statistics." />
             <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
                 {/* Header */}
                 <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">

@@ -8,6 +8,7 @@ import { PASSWORD_REGEX } from "../../../lib/utils";
 import { Card } from "../../../components/ui/Card";
 import { Input } from "../../../components/ui/Input";
 import { Button } from "../../../components/ui/Button";
+import SEO from "../../../components/common/SEO";
 
 const ResetPasswordForm: React.FC = () => {
     const [searchParams] = useSearchParams();
@@ -56,6 +57,7 @@ const ResetPasswordForm: React.FC = () => {
 
     return (
         <div className="min-h-screen bg-background flex items-center justify-center p-4 py-12">
+            <SEO title="Reset Password — Niramaya" description="Create a new secure password for your Niramaya account." />
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}

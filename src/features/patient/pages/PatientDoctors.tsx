@@ -13,6 +13,7 @@ import Pagination from '../../../components/common/Pagination';
 import SortDropdown from '../../../components/common/SortDropdown';
 import { useProfile } from '../../../features/auth/hooks/useProfile';
 import { cn } from '../../../lib/utils';
+import SEO from '../../../components/common/SEO';
 
 export default function PatientDoctors() {
     useProfile(Role.PATIENT);
@@ -171,6 +172,7 @@ export default function PatientDoctors() {
 
     return (
         <div className="pb-20">
+            <SEO title="Find Doctors — Niramaya" description="Search and book appointments with top-rated doctors and specialists in your city." />
             {/* Sub-header / Controls */}
             <div className="mb-10">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">

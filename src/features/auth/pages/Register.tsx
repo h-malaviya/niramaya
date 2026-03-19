@@ -8,6 +8,7 @@ import { Role } from "../../../types/role.enum";
 import { DoctorPlan } from "../types/auth.types";
 import { UserCircle2, Stethoscope, ArrowLeft } from "lucide-react";
 import { APP_ROUTES } from "../../../constants/app-routes";
+import SEO from "../../../components/common/SEO";
 
 const Register: React.FC = () => {
     const navigate = useNavigate();
@@ -66,6 +67,7 @@ const Register: React.FC = () => {
 
     return (
         <div className="min-h-screen bg-background w-full overflow-x-hidden flex flex-col pt-8 sm:pt-12 relative overflow-hidden">
+            <SEO title="Register — Niramaya" description="Create a Niramaya account as a patient or doctor to start your digital healthcare journey." />
             {/* Absolute Back Button to match PricingPlans style */}
             <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 mb-4">
                 <button
