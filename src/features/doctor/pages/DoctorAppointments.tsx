@@ -310,7 +310,7 @@ const DoctorAppointments: React.FC = () => {
 
                 {/* Status Bar for Ongoing */}
                 {activeTab === DoctorAppointmentTabs.ONGOING && appointments.length > 0 && (
-                    <div className="fixed sm:bottom-10 sm:right-10 bottom-4 left-4 right-4 z-50 animate-in slide-in-from-right-10 duration-500">
+                    <div className="fixed sm:bottom-10 sm:right-10 bottom-4 left-4 right-4 sm:left-auto z-50 animate-in slide-in-from-right-10 duration-500">
                         <div className="bg-gray-900 text-white rounded-[24px] sm:rounded-[32px] px-4 sm:px-8 py-3 sm:py-5 shadow-2xl flex items-center justify-between sm:justify-start gap-3 sm:gap-6 border border-white/10 backdrop-blur-md">
                             <div className="flex items-center gap-3 sm:gap-4 sm:pr-6 sm:border-r border-white/10 overflow-hidden">
                                 <div className="w-9 h-9 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-primary-600 flex-shrink-0 flex items-center justify-center shadow-lg shadow-primary-500/20">
