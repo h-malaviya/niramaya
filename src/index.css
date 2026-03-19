@@ -47,8 +47,8 @@
 
 :root {
   /* Master hue and saturation controls the whole theme */
-  --theme-h: 158;
-  --theme-s: 71%;
+  --theme-h: 111;
+  --theme-s: 23%;
 }
 
 /* ===== Base Styles ===== */
