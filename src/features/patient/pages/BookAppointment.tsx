@@ -21,11 +21,11 @@ import { Badge } from '../../../components/ui/Badge';
 
 import { appointmentService } from '../services/appointment.service';
 import { IDayAvailability, ISlot, SlotStatus } from '../types/booking.types';
-import { profileService } from '../../auth/services/profile.service';
 import { getRoleFromToken } from '../../auth/utils/auth.utils';
 import { Role } from '../../../types/role.enum';
 import { cn } from '../../../lib/utils';
 import { APP_ROUTES } from '../../../constants/app-routes';
+import { useProfile } from '../../../features/auth/hooks/useProfile';
 import SEO from '../../../components/common/SEO';
 
 // AI Integration
@@ -64,11 +64,9 @@ const BookAppointment: React.FC = () => {
     // AI Integration States
     const [showAIModal, setShowAIModal] = useState(false);
     const [showChatOverlay, setShowChatOverlay] = useState(false);
-    const [patientInfo, setPatientInfo] = useState<any>(null);
+    const { profile: patientInfo, isFetchingProfile } = useProfile(Role.PATIENT);
     const [showOverlapModal, setShowOverlapModal] = useState(false);
     const [overlapMessage, setOverlapMessage] = useState('');
-
-    const [showProfileModal, setShowProfileModal] = useState(false);
 
     useEffect(() => {
         window.scrollTo(0, 0);
@@ -170,21 +168,18 @@ const BookAppointment: React.FC = () => {
         
         try {
             setBooking(true);
-            const profileRes = await profileService.getPatientProfile();
-            if (!profileRes.success || !profileRes.data) {
-                toast.error('Failed to fetch patient profile. Please try again.');
-                return;
-            }
-            const p = profileRes.data;
-            setPatientInfo(p);
             
-            const pp = p.patient_profile;
-            if (!pp?.height || !pp?.weight || !pp?.blood_group) {
-                setShowProfileModal(true);
+            if (isFetchingProfile) {
+                toast.error('Fetching patient profile. Please wait...');
                 return;
             }
 
-            // NEW: Check for patient overlap
+            if (!patientInfo) {
+                toast.error('Failed to fetch patient profile. Please try again.');
+                return;
+            }
+
+            // Check for patient overlap
             const overlapRes = await appointmentService.checkOverlap(selectedSlot.start_time, selectedSlot.end_time);
             if (overlapRes.success && overlapRes.data?.overlap) {
                 setOverlapMessage(overlapRes.data.message || 'You already have an appointment at this time.');
@@ -206,16 +201,16 @@ const BookAppointment: React.FC = () => {
             doctor_id: doctorId!,
             start_at: selectedSlot!.start_time,
             end_at: selectedSlot!.end_time,
-            name: `${p.first_name} ${p.last_name}`.trim(),
-            email: p.email ?? '',
-            phone: p.phone_number ?? '',
-            gender: p.gender ?? '',
+            name: `${p?.first_name || ''} ${p?.last_name || ''}`.trim(),
+            email: p?.email ?? '',
+            phone: p?.phone_number ?? '',
+            gender: p?.gender ?? '',
         };
     };
 
     const handleStartVoiceCall = async () => {
         const p = patientInfo;
-        if (!p.phone_number) {
+        if (!p?.phone_number) {
             toast.error("Phone number missing in profile. Please update your profile page first.");
             navigate(APP_ROUTES.PATIENT.PROFILE);
             return;
@@ -452,12 +447,6 @@ const BookAppointment: React.FC = () => {
                     patientImageUrl={patientInfo?.profile_image}
                 />
             )}
-            {/* Profile Completion Prompt Modal */}
-            <ProfilePromptModal
-                isOpen={showProfileModal}
-                onClose={() => setShowProfileModal(false)}
-                onGoToProfile={() => navigate(APP_ROUTES.PATIENT.PROFILE)}
-            />
 
             {/* Overlap Warning Modal */}
             <OverlapWarningModal
@@ -660,59 +649,6 @@ const ConfirmBar: React.FC<ConfirmBarProps> = ({
         </div>
     </div>
 );
-
-/* Profile Prompt Modal Component */
-interface ProfilePromptModalProps {
-    isOpen: boolean;
-    onClose: () => void;
-    onGoToProfile: () => void;
-}
-const ProfilePromptModal: React.FC<ProfilePromptModalProps> = ({ isOpen, onClose, onGoToProfile }) => {
-    if (!isOpen) return null;
-
-    return (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-            <div 
-                className="absolute inset-0 bg-dark-900/60 backdrop-blur-sm transition-opacity" 
-                onClick={onClose}
-            />
-            
-            <div className="relative bg-white w-full max-w-md rounded-3xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-300">
-                <div className="p-6 sm:p-8">
-                    <div className="flex flex-col items-center text-center">
-                        <div className="w-16 h-16 bg-primary-50 rounded-2xl flex items-center justify-center mb-6 text-primary-600">
-                            <Sparkles className="w-8 h-8" />
-                        </div>
-                        
-                        <h3 className="text-xl font-black text-dark-900 mb-3">
-                            Profile Incomplete
-                        </h3>
-                        
-                        <p className="text-dark-500 text-sm leading-relaxed mb-8">
-                            Please update your profile with your height, weight, and blood group to book an appointment.
-                        </p>
-                        
-                        <div className="flex flex-col sm:flex-row gap-3 w-full">
-                            <Button
-                                variant="secondary"
-                                className="flex-1 rounded-xl font-bold order-2 sm:order-1"
-                                onClick={onClose}
-                            >
-                                Not Now
-                            </Button>
-                            <Button
-                                className="flex-1 rounded-xl bg-primary-600 hover:bg-primary-700 text-white font-bold order-1 sm:order-2"
-                                onClick={onGoToProfile}
-                            >
-                                Profile
-                            </Button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
-};
 
 /* Overlap Warning Modal Component */
 interface OverlapWarningModalProps {
