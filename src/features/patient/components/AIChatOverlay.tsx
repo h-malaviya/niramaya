@@ -9,6 +9,7 @@ import {
     BrainCircuit
 } from 'lucide-react';
 import { Button } from '../../../components/ui/Button';
+import ReactMarkdown from 'react-markdown';
 import { aiService } from '../services/ai.service';
 import { BookingContext } from '../types/ai.types';
 import { cn } from '../../../lib/utils';
@@ -75,6 +76,15 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({
     useEffect(() => {
         scrollToBottom();
     }, [messages]);
+
+    // Auto-expand textarea
+    useEffect(() => {
+        if (inputRef.current) {
+            inputRef.current.style.height = 'auto';
+            const newHeight = Math.min(inputRef.current.scrollHeight, 120); // 120px is roughly 3-4 lines
+            inputRef.current.style.height = `${newHeight}px`;
+        }
+    }, [input]);
 
     useEffect(() => {
         if (isOpen && messages.length === 0 && !welcomeSentRef.current) {
@@ -253,8 +263,15 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({
 
                                         {/* Message Content */}
                                         {msg.content ? (
-                                            <div className="whitespace-pre-wrap animate-in fade-in slide-in-from-bottom-1 duration-500">
-                                                {msg.content}
+                                            <div className="animate-in fade-in slide-in-from-bottom-1 duration-500">
+                                                <div className={cn(
+                                                    "markdown-content",
+                                                    msg.role === 'user' ? "text-white" : "text-dark-800"
+                                                )}>
+                                                    <ReactMarkdown>
+                                                        {msg.content}
+                                                    </ReactMarkdown>
+                                                </div>
                                             </div>
                                         ) : (
                                             // Only show loader if no status is being displayed
@@ -289,7 +306,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({
             {/* Input Area */}
             <footer className="p-6 border-t border-dark-50 bg-white">
                 <div className="max-w-3xl mx-auto">
-                    <div className="relative group">
+                    <div className="flex items-center gap-3 bg-slate-50 border-2 border-slate-100 rounded-[1.5rem] px-4 py-2 focus-within:border-primary-400 focus-within:bg-white transition-all shadow-sm relative group">
                         <textarea
                             ref={inputRef}
                             rows={1}
@@ -302,18 +319,21 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({
                                     handleSendMessage();
                                 }
                             }}
-                            className="w-full bg-slate-50 border-2 border-slate-100 rounded-[2rem] py-4 pl-6 pr-16 text-sm font-medium placeholder-dark-300 outline-none focus:border-primary-400 focus:bg-white transition-all resize-none shadow-sm"
+                            className="flex-1 bg-transparent border-none py-2 text-sm font-medium placeholder-dark-300 outline-none resize-none min-h-[40px]"
                         />
                         <button
                             onClick={() => handleSendMessage()}
                             disabled={!input.trim() || isProcessing}
-                            className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-primary-600 text-white flex items-center justify-center disabled:opacity-50 disabled:bg-dark-100 transition-all shadow-lg shadow-primary-200"
+                            className={cn(
+                                "flex-shrink-0 w-10 h-10 rounded-full bg-primary-600 text-white flex items-center justify-center disabled:opacity-50 disabled:bg-dark-100 transition-all shadow-lg shadow-primary-200",
+                                "self-center" // Ensure internal vertical centering
+                            )}
                         >
                             {isProcessing ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}
                         </button>
                     </div>
-                    <p className="mt-3 text-center text-[10px] font-bold text-dark-300 uppercase tracking-[0.2em]">
-                        Your medical data is encrypted and secure
+                    <p className="mt-4 text-center text-[10px] font-bold text-dark-300 uppercase tracking-[0.2em]">
+                        Niramaya AI may make mistakes. Please verify important information.
                     </p>
                 </div>
             </footer>
