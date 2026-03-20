@@ -57,11 +57,14 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({
     useEffect(() => {
         if (isOpen) {
             document.body.style.overflow = 'hidden';
+            document.documentElement.style.overflow = 'hidden';
         } else {
             document.body.style.overflow = '';
+            document.documentElement.style.overflow = '';
         }
         return () => {
             document.body.style.overflow = '';
+            document.documentElement.style.overflow = '';
         };
     }, [isOpen]);
 
@@ -192,7 +195,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 z-[200] flex flex-col bg-white animate-in slide-in-from-bottom-full duration-500 ease-out">
+        <div className="fixed inset-0 z-[200] flex flex-col bg-white overflow-hidden animate-in slide-in-from-bottom-full duration-500 ease-out">
             {/* Header */}
             <header className="flex items-center justify-between px-6 py-4 border-b border-dark-50 shrink-0">
                 <div className="flex items-center gap-4">
