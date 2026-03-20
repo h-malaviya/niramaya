@@ -10,6 +10,7 @@ export default function QrBookingSuccess() {
   const [searchParams] = useSearchParams();
   const sessionId = searchParams.get('session_id');
   const [receiptUrl, setReceiptUrl] = useState<string | null>(null);
+  const [token, setToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   useEffect(() => {
     let pollTimeout: any;
@@ -27,6 +28,10 @@ export default function QrBookingSuccess() {
         const data = response.data.data;
         
         console.log(`🔍 Polling Receipt (${count}/15):`, data?.payment?.receipt_url ? 'Found' : 'Missing');
+
+        if (data?.appointment?.queue_token) {
+          setToken(data.appointment.queue_token);
+        }
 
         if (data?.payment?.receipt_url) {
           setReceiptUrl(data.payment.receipt_url);
@@ -74,15 +79,31 @@ export default function QrBookingSuccess() {
           </div>
         </div>
 
-        <div className="space-y-4">
+        <div className="space-y-6">
           <h1 className="text-4xl font-black text-gray-900 tracking-tight leading-tight">
-            Booking Initialized!
+            Booking Successful!
           </h1>
-          <p className="text-gray-500 font-semibold text-lg max-w-md mx-auto leading-relaxed">
-            {receiptUrl 
-              ? "Payment successful! Your spot in the queue is confirmed." 
-              : "Payment successful! Your spot in the queue is being finalized."}
-          </p>
+          
+          {token && (
+            <div className="bg-primary-50 rounded-[32px] p-8 border-2 border-dashed border-primary-200 relative group overflow-hidden">
+               <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                  <FileText className="w-16 h-16 text-primary-600" />
+               </div>
+               <p className="text-primary-600 font-bold text-sm uppercase tracking-[0.2em] mb-2">Your Token Number</p>
+               <h2 className="text-6xl font-black text-primary-700 tracking-tighter">{token}</h2>
+            </div>
+          )}
+
+          <div className="space-y-3">
+            <p className="text-gray-600 font-bold text-lg leading-relaxed">
+              {token 
+                ? "Your spot in the queue is confirmed." 
+                : "Your spot in the queue is being finalized."}
+            </p>
+            <p className="text-gray-400 font-medium text-sm max-w-sm mx-auto">
+              We've also sent your token number and booking details to your email so you can check them anytime.
+            </p>
+          </div>
         </div>
 
         <div className="space-y-6 pt-4">
