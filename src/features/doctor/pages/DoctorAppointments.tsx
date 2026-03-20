@@ -145,7 +145,7 @@ const DoctorAppointments: React.FC = () => {
                 {/* Main Tabs Container */}
                 <div className="bg-white rounded-[40px] border border-gray-100 shadow-xl shadow-gray-200/50 overflow-hidden">
                     {/* Tabs Navigation - Scrollable on mobile */}
-                    <div className="overflow-x-auto no-scrollbar">
+                    <div className="overflow-x-auto md:no-scrollbar">
                         <div className="flex items-center border-b border-gray-50 px-8 min-w-max">
                             {TABS.map((tab) => {
                                 const Icon = tab.icon;

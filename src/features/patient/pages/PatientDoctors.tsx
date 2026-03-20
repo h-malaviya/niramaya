@@ -347,7 +347,7 @@ export default function PatientDoctors() {
                             <button onClick={fetchDoctors} className="bg-primary-600 text-white hover:bg-primary-700 rounded-2xl px-8 py-3 mt-4 font-bold transition-all">Try Again</button>
                         </div>
                     ) : doctors.length === 0 ? (
-                        <div className="bg-white border border-dashed border-gray-200 rounded-3xl md:rounded-[40px] p-8 md:p-24 text-center space-y-6">
+                        <div className="bg-white border border-dashed border-gray-200 rounded-3xl md:rounded-[40px] p-6 min-[400px]:p-8 md:p-24 text-center space-y-6">
                             <div className="p-6 bg-primary-50 w-fit mx-auto rounded-[32px] ring-8 ring-primary-50/50">
                                 <Search className="w-12 h-12 text-primary-600" />
                             </div>
@@ -359,7 +359,10 @@ export default function PatientDoctors() {
                                 />
                                 <p className="text-gray-400 text-sm italic">Try adjusting your preferences or clear all filters to see more results.</p>
                             </div>
-                            <button onClick={handleClearFilters} className="bg-primary-600 text-white hover:bg-primary-700 h-12 rounded-2xl px-10 text-sm font-bold shadow-lg shadow-primary-200 transition-all">
+                            <button 
+                                onClick={handleClearFilters} 
+                                className="bg-primary-600 text-white hover:bg-primary-700 min-h-[48px] py-3 rounded-2xl px-6 min-[400px]:px-10 text-sm font-bold shadow-lg shadow-primary-200 transition-all active:scale-95"
+                            >
                                 Clear All Filters
                             </button>
                         </div>
