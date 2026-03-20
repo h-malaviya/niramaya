@@ -624,7 +624,7 @@ const ConfirmBar: React.FC<ConfirmBarProps> = ({
             <div className="absolute -bottom-8 -left-8 w-48 h-48 bg-emerald-600/10 blur-[60px] rounded-full" />
         </div>
 
-        <div className="relative z-10 flex flex-col sm:flex-row items-center justify-between gap-6 p-6 sm:p-8">
+        <div className="relative z-10 flex flex-col sm:flex-row items-center justify-between gap-6 p-5 sm:p-8">
             <div className="flex items-center gap-5">
                 <div className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center shrink-0">
                     <Sparkles className="w-6 h-6 text-primary-400" />
@@ -639,16 +639,16 @@ const ConfirmBar: React.FC<ConfirmBarProps> = ({
                 </div>
             </div>
 
-            <div className="flex items-center gap-3 w-full sm:w-auto shrink-0">
+            <div className="flex flex-col-reverse min-[450px]:flex-row items-center gap-3 w-full sm:w-auto shrink-0">
                 <Button
                     variant="secondary"
-                    className="flex-1 sm:flex-none px-6 h-14 rounded-2xl bg-white/5 hover:bg-white/10 border-white/10 text-white font-bold transition-all"
+                    className="w-full min-[450px]:w-auto px-6 h-14 rounded-2xl bg-white/5 hover:bg-white/10 border-white/10 text-white font-bold transition-all text-sm"
                     onClick={onCancel}
                 >
                     Cancel
                 </Button>
                 <Button
-                    className="flex-1 sm:flex-none px-10 h-14 rounded-2xl bg-primary-600 hover:bg-primary-500 text-white font-black border-none shadow-xl shadow-primary-900/40 transition-all hover:-translate-y-1 active:translate-y-0"
+                    className="w-full min-[450px]:w-auto px-6 min-[450px]:px-10 h-14 rounded-2xl bg-primary-600 hover:bg-primary-500 text-white font-black border-none shadow-xl shadow-primary-900/40 transition-all hover:-translate-y-1 active:translate-y-0 text-sm"
                     onClick={onBook}
                     loading={booking}
                     disabled={!canBook || booking}
