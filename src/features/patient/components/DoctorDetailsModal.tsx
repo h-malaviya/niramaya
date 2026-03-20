@@ -54,7 +54,6 @@ export default function DoctorDetailsModal({ doctor, onClose }: DoctorDetailsMod
                         />
                         <div>
                             <h2 className="text-2xl font-bold">Dr. {first_name} {last_name}</h2>
-                            <p className="text-primary-100 text-sm mt-0.5">{specialties?.[0] || 'General Practitioner'}</p>
                             <div className="flex items-center mt-2 text-primary-50">
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1 opacity-70" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
@@ -101,16 +100,27 @@ export default function DoctorDetailsModal({ doctor, onClose }: DoctorDetailsMod
                         <div>
                             <h3 className="text-sm font-black text-primary-600 mb-3 uppercase tracking-widest">About Doctor</h3>
                             <p className="text-gray-600 leading-relaxed text-sm break-all">
-                                {bio || `Dr. ${first_name} ${last_name} is a highly experienced ${specialties?.[0] || 'General Practitioner'} dedicated to providing compassionate and comprehensive healthcare. With over ${experience || 5} years in the field, they have helped numerous patients achieve better health outcomes through personalized care plans.`}
+                                {bio || `Dr. ${first_name} ${last_name} is a highly experienced ${specialties?.[0]?.replace(/_/g, ' ') || 'General Practitioner'} dedicated to providing compassionate and comprehensive healthcare. With over ${experience || 5} years in the field, they have helped numerous patients achieve better health outcomes through personalized care plans.`}
                             </p>
+                        </div>
+
+                        <div>
+                            <h3 className="text-sm font-black text-primary-600 mb-3 uppercase tracking-widest">Specialties</h3>
+                            <div className="flex flex-wrap gap-2">
+                                {(Array.isArray(specialties) ? specialties : [specialties?.[0] || 'General Practitioner']).map((s, idx) => (
+                                    <span key={idx} className="px-3 py-1 bg-primary-50 border border-primary-100 rounded-lg text-xs font-bold text-primary-700 capitalize">
+                                        {s.replace(/_/g, ' ').toLowerCase()}
+                                    </span>
+                                ))}
+                            </div>
                         </div>
 
                         <div>
                             <h3 className="text-sm font-black text-primary-600 mb-3 uppercase tracking-widest">Qualifications</h3>
                             <div className="flex flex-wrap gap-2">
-                                {(Array.isArray(qualifications) ? qualifications : [qualifications || 'MBBS']).map((q, idx) => (
+                                {(qualifications?.length > 0 ? qualifications : ['MBBS']).map((q, idx) => (
                                     <span key={idx} className="px-3 py-1 bg-gray-50 border border-gray-200 rounded-lg text-xs font-bold text-gray-600">
-                                        {q}
+                                        {q.replace(/_/g, ' ')}
                                     </span>
                                 ))}
                             </div>
