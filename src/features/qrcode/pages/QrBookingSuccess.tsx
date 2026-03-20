@@ -10,6 +10,7 @@ export default function QrBookingSuccess() {
   const [searchParams] = useSearchParams();
   const sessionId = searchParams.get('session_id');
   const [receiptUrl, setReceiptUrl] = useState<string | null>(null);
+  const [tokenNumber, setTokenNumber] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   useEffect(() => {
     let pollTimeout: any;
@@ -27,6 +28,10 @@ export default function QrBookingSuccess() {
         const data = response.data.data;
         
         console.log(`🔍 Polling Receipt (${count}/15):`, data?.payment?.receipt_url ? 'Found' : 'Missing');
+
+        if (data?.appointment?.queue_token) {
+          setTokenNumber(data.appointment.queue_token);
+        }
 
         if (data?.payment?.receipt_url) {
           setReceiptUrl(data.payment.receipt_url);
@@ -83,6 +88,16 @@ export default function QrBookingSuccess() {
               ? "Payment successful! Your spot in the queue is confirmed." 
               : "Payment successful! Your spot in the queue is being finalized."}
           </p>
+
+          {tokenNumber && (
+            <div className="mt-6 p-6 bg-primary-50/50 rounded-3xl border border-primary-100 animate-in fade-in zoom-in duration-500">
+              <p className="text-sm text-primary-600 font-bold uppercase tracking-wider mb-2">Your Token Number</p>
+              <p className="text-6xl font-black text-primary-700 tabular-nums">#{tokenNumber}</p>
+              <p className="mt-4 text-sm text-gray-500 font-medium italic">
+                We've also sent this token to your email for easy access.
+              </p>
+            </div>
+          )}
         </div>
 
         <div className="space-y-6 pt-4">
