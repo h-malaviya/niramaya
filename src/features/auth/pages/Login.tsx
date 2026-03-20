@@ -64,10 +64,10 @@ const Login: React.FC = () => {
     };
 
     return (
-        <div className="min-h-screen bg-background flex flex-col p-4 py-8 sm:py-12 relative overflow-hidden">
+        <div className="min-h-screen bg-background flex flex-col p-4 py-4 sm:py-6 relative overflow-hidden">
             <SEO title="Login — Niramaya" description="Sign in to your Niramaya account to manage your medical appointments and health records." />
-            {/* Absolute Back Button to match PricingPlans style */}
-            <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 mb-4">
+            {/* Reduced Back Button margin */}
+            <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 mb-2">
                 <Link
                     to={APP_ROUTES.HOME}
                     className="flex items-center text-dark-600 hover:text-primary-600 transition-colors font-semibold group w-fit"
@@ -83,20 +83,22 @@ const Login: React.FC = () => {
                     animate={{ opacity: 1, y: 0 }}
                     className="w-full max-w-md"
                 >
-                    <div className="text-center mb-8">
-                    <motion.div
-                        initial={{ scale: 0.5 }}
-                        animate={{ scale: 1 }}
-                        className="w-24 h-24 flex items-center justify-center mx-auto mb-6 overflow-hidden rounded-2xl"
-                    >
-                        <img src="/favicon.png" alt="Niramaya Logo" className="w-full h-full object-contain" />
-                    </motion.div>
-                    <h1 className="text-4xl font-extrabold text-dark-900 tracking-tight">Welcome Back</h1>
-                    <p className="text-dark-600 mt-3 text-lg">Sign in to your Niramaya account</p>
-                </div>
+                    <div className="flex items-center justify-center gap-5 sm:gap-6 mb-6">
+                        <motion.div
+                            initial={{ scale: 0.5 }}
+                            animate={{ scale: 1 }}
+                            className="w-20 h-20 shrink-0 flex items-center justify-center overflow-hidden rounded-2xl"
+                        >
+                            <img src="/favicon.png" alt="Niramaya Logo" className="w-full h-full object-contain" />
+                        </motion.div>
+                        <div className="text-left">
+                            <h1 className="text-3xl sm:text-4xl font-extrabold text-dark-900 tracking-tight leading-tight">Welcome Back</h1>
+                            <p className="text-dark-600 mt-1 text-base sm:text-lg">Sign in to your Niramaya account</p>
+                        </div>
+                    </div>
 
                 <Card className="p-8 sm:p-10">
-                    <form onSubmit={handleSubmit} className="space-y-6">
+                    <form onSubmit={handleSubmit} className="space-y-4">
                         <div className="space-y-2">
                             <label className="text-sm font-bold text-dark-700 ml-1">Email Address</label>
                             <Input
@@ -152,7 +154,7 @@ const Login: React.FC = () => {
                         </Button>
                     </form>
 
-                    <div className="mt-10 pt-8 border-t border-dark-100 text-center">
+                    <div className="mt-2 pt-4 border-t border-dark-100 text-center">
                         <p className="text-dark-600 font-medium">
                             Don't have an account?{" "}
                             <Link

@@ -549,7 +549,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ role, plan }) => {
                 )}
             </div>
 
-            <div className="pt-8">
+            <div className="pt-4">
                 <Button
                     type="submit"
                     className="w-full py-4 text-lg"
@@ -559,7 +559,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ role, plan }) => {
                 >
                     {role === Role.DOCTOR ? "Pay Now & Register" : "Register"}
                 </Button>
-                <p className="text-center text-sm text-gray-500 mt-4">
+                <p className="text-center text-sm text-gray-500 mt-3">
                     Already have an account? <a href={APP_ROUTES.AUTH.LOGIN} className="text-blue-600 font-semibold hover:underline">Log in</a>
                 </p>
             </div>
