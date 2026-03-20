@@ -65,7 +65,7 @@ export default function DoctorCard({ doctor, onViewProfile }: DoctorCardProps) {
                         </div>
                         <div className="flex items-center gap-1.5 text-gray-500 text-xs font-medium">
                             <GraduationCap className="w-3.5 h-3.5 text-gray-400" />
-                            {Array.isArray(qualifications) ? qualifications.join(', ') : (qualifications || 'MBBS')}
+                            {(qualifications?.length > 0 ? qualifications : ['MBBS']).join(', ').replace(/_/g, ' ')}
                         </div>
                     </div>
 
