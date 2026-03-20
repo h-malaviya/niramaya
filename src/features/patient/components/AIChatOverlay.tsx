@@ -125,10 +125,13 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({
 
         try {
             const isFirstTurn = messages.length === 0;
+            // Always send booking_context on every turn so the backend always has doctor_id/patient_id.
+            // MemorySaver is in-memory only — if the server restarts, this context would be lost.
+            // The reducer on booking_context does { ...state, ...update }, so re-sending is safe.
             const stream = aiService.streamChat(
                 text,
                 threadId,
-                isFirstTurn ? { ...bookingContext, doctor_id: doctorId } : undefined,
+                { ...bookingContext, doctor_id: doctorId },
                 isFirstTurn ? files : undefined
             );
 
