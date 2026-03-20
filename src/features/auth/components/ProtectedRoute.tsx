@@ -55,7 +55,8 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, allowedRoles 
             validate(true);
             
             // Connect to SSE webhook handshake to instantly detect force-logouts from other devices
-            const eventSource = new EventSource(`${import.meta.env.VITE_BACKEND_URL}${API.AUTH.VALIDATE_SESSION_STREAM}`, {
+            const backendUrl = import.meta.env.PROD ? '/api' : import.meta.env.VITE_BACKEND_URL;
+            const eventSource = new EventSource(`${backendUrl}${API.AUTH.VALIDATE_SESSION_STREAM}`, {
                 withCredentials: true
             });
 
