@@ -59,16 +59,16 @@ const AppointmentModal: React.FC<AppointmentModalProps> = ({ appointment, role, 
 
             <div className="relative w-full max-w-2xl bg-white rounded-[40px] shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-300 max-h-[90vh] flex flex-col m-4">
                 {/* Header */}
-                <div className="relative h-32 bg-primary-600 p-8">
+                <div className="relative min-h-[128px] bg-primary-600 p-6 sm:p-8 flex flex-col justify-center">
                     <button
                         onClick={onClose}
-                        className="absolute top-6 right-6 w-10 h-10 rounded-2xl bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors border border-white/20"
+                        className="absolute top-4 right-4 sm:top-6 sm:right-6 w-10 h-10 rounded-2xl bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors border border-white/20 z-10"
                     >
                         <X className="w-5 h-5" />
                     </button>
 
-                    <div className="flex items-center gap-6">
-                        <div className="w-20 h-20 rounded-3xl bg-white p-1 shadow-xl">
+                    <div className="flex items-center gap-4 sm:gap-6">
+                        <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-3xl bg-white p-1 shadow-xl shrink-0">
                             <div className="w-full h-full rounded-[20px] bg-gray-50 overflow-hidden">
                                 {(isDoctor ? appointment.patient_avatar : appointment.doctor_avatar) ? (
                                     <img
@@ -81,8 +81,8 @@ const AppointmentModal: React.FC<AppointmentModalProps> = ({ appointment, role, 
                                 )}
                             </div>
                         </div>
-                        <div className="text-white">
-                            <h2 className="text-2xl font-black mb-1">
+                        <div className="text-white pr-10 sm:pr-0">
+                            <h2 className="text-xl sm:text-2xl font-black mb-1 leading-tight">
                                 {isDoctor ? appointment.patient_name : appointment.doctor_name}
                             </h2>
                             <div className="flex flex-wrap items-center gap-3">
@@ -104,9 +104,9 @@ const AppointmentModal: React.FC<AppointmentModalProps> = ({ appointment, role, 
                 </div>
 
                 {/* Content */}
-                <div className="p-8 overflow-y-auto no-scrollbar flex-1">
+                <div className="p-6 sm:p-8 overflow-y-auto md:no-scrollbar flex-1">
                     {/* Time Info */}
-                    <div className="grid grid-cols-2 gap-4 mb-8">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
                         <InfoCard
                             icon={Calendar}
                             label="Date"
@@ -143,7 +143,7 @@ const AppointmentModal: React.FC<AppointmentModalProps> = ({ appointment, role, 
                             <FileText className="w-4 h-4 text-primary-500" />
                             Description / Reason
                         </h3>
-                        <div className="bg-gray-50 rounded-2xl p-5 border border-gray-100">
+                        <div className="bg-gray-50 rounded-2xl p-4 sm:p-5 border border-gray-100">
                             <p className="text-sm text-gray-600 leading-relaxed font-medium">
                                 {appointment.description || 'No description provided.'}
                             </p>
@@ -157,7 +157,7 @@ const AppointmentModal: React.FC<AppointmentModalProps> = ({ appointment, role, 
                                 <Activity className="w-4 h-4" />
                                 AI-Generated Summary
                             </h3>
-                            <div className="bg-orange-50/50 rounded-2xl p-5 border border-orange-100 shadow-sm">
+                            <div className="bg-orange-50/50 rounded-2xl p-4 sm:p-5 border border-orange-100 shadow-sm">
                                 <p className="text-sm text-orange-900/80 leading-relaxed font-medium">
                                     {appointment.ai_generated_summary || 'No AI summary available.'}
                                 </p>
@@ -245,7 +245,7 @@ const AppointmentModal: React.FC<AppointmentModalProps> = ({ appointment, role, 
                 </div>
 
                 {/* Footer Action */}
-                <div className="p-8 pt-0">
+                <div className="p-6 sm:p-8 pt-0">
                     <button
                         onClick={onClose}
                         className="w-full h-14 rounded-3xl bg-gray-900 text-white text-xs font-black uppercase tracking-widest hover:bg-gray-800 transition-colors"
