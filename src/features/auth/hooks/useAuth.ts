@@ -1,4 +1,4 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { authService } from "../services/auth.service";
 import toast from "react-hot-toast";
@@ -10,6 +10,7 @@ import { Role } from "../../../types/role.enum";
 
 export const useAuth = () => {
     const navigate = useNavigate();
+    const queryClient = useQueryClient();
 
     const sendOtpMutation = useMutation({
         mutationFn: authService.sendVerificationOtp,
@@ -37,6 +38,7 @@ export const useAuth = () => {
         onSuccess: (data) => {
             if (data.success && data.data) {
                 localStorage.setItem(STORAGE_KEYS.ACCESS_TOKEN, data.data.accessToken);
+                queryClient.clear();
                 toast.success("Account created successfully!");
                 navigate(APP_ROUTES.PATIENT.DASHBOARD);
             } else {
@@ -70,6 +72,7 @@ export const useAuth = () => {
         onSuccess: (data) => {
             if (data.success && data.data) {
                 localStorage.setItem(STORAGE_KEYS.ACCESS_TOKEN, data.data.accessToken);
+                queryClient.clear();
                 toast.success("Payment verified! Welcome to Niramaya.");
                 navigate(APP_ROUTES.DOCTOR.DASHBOARD);
             } else {
@@ -86,6 +89,7 @@ export const useAuth = () => {
         onSuccess: (data) => {
             if (data.success && data.data) {
                 localStorage.setItem(STORAGE_KEYS.ACCESS_TOKEN, data.data.accessToken);
+                queryClient.clear();
                 toast.success("Logged in successfully!");
 
                 // Redirect based on role
@@ -141,6 +145,7 @@ export const useAuth = () => {
         onSuccess: (data: IApiResponse<null>) => {
             if (data.success) {
                 localStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN);
+                queryClient.clear();
                 toast.success("Logged out successfully!");
                 navigate(APP_ROUTES.AUTH.LOGIN);
             } else {
@@ -150,6 +155,7 @@ export const useAuth = () => {
         onError: (_error: AxiosError<IApiResponse>) => {
             // Even if server fails, we should clear local session
             localStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN);
+            queryClient.clear();
             toast.success("Logged out successfully!");
             navigate(APP_ROUTES.AUTH.LOGIN);
         },
